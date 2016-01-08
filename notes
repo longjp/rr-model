@@ -1,17 +1,30 @@
-- union observation times across bands
-- a sin(wt + phi) + e, amplitude is median amplitude across all bands for sdss data
+==== accomplished so far
+== simulations with panstarrs cadence
+ - using panstarrs cadence unioned into single band and simulating sines,
+   sine model gets ~ 97% of periods correct ****
+ - accuracy was not affected by using / not using errors
+ - accuracy goes down to about 70% if use sawtooth function to simulate
+ - conclusion: 97% is probably quite favorable, but does suggest that 
+   accurate period estimation is possible
 
-files
-- construct simulated light curves
-- estimate periods
-- assess period estimation accuracy
+== newton method
+ - used newton method to find phase in sawtooth model (period fixed), see
+   sim.R. newton method is faster and nearly as accurate as gridsearch. gets
+   stuck in local minima sometimes
 
 
+==== goals
+== simulations with newton and sawtooth
+  - rerun simulations **** simulating from and fitting a sinusoid
+    GOAL: have algorithm be fast (about same speed as GLS) because using
+    newton AND have algorithm be accurate ~ 97%
 
-- work for three months on trying to estimate periods for panstarrs light curves
+== panstarrs data
+  - estimate sawtooth functions from SDSS and compare GLS with sawtooths
+    for Panstarrs data. branimir gave ground truth.
+    GOAL: see some improvement in period estimation accuracy.
 
-- test period recovery on sinusoids using panstarrs cadence
-- 
+
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)
