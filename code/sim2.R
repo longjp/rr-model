@@ -27,13 +27,27 @@ NewtonUpdate <- function(m,t,phi,omega){
 omega_grid <- (1:1000)/1000 + 2
 
 ## construct data
-n <- 20
-e.sd <- 0.25
+n <- 1000
+e.sd <- 0.05
 t <- runif(n)
 phi <- runif(1)
+amp <- rchisq(1,30)/30
+beta <- rnorm(1)
 omega <- sample(omega_grid,1)
-m <- Saw(omega*t+phi) + rnorm(n,mean=0,sd=e.sd)
+m <- amp*Saw(omega*t+phi) + beta + rnorm(n,mean=0,sd=e.sd)
 plot(t,m)
+
+
+
+compute_rss <- function(m,t,phi,omega){
+    X <- cbind(1,Saw(omega*t+phi))
+    B <- t(X)%*%X
+    d <- t(X)%*%m
+    z <- solve(B,d)
+    return(m - X%*%z)
+}
+
+
 
 ## grid search to estimate omega and phase
 N <- 100
@@ -41,8 +55,9 @@ phis_grid <- (0:(N-1))/N
 rss <- rep(0,length(omega_grid))
 tm <- proc.time()
 for(ii in 1:length(omega_grid)){
-    m.pred <- vapply(phis_grid,function(x){Saw(omega_grid[ii]*t+x)},rep(0,length(t)))
-    rss[ii] <- min(colSums((m-m.pred)^2))
+    ##m.resid <- vapply(phis_grid,function(x){lm(m~Saw(omega_grid[ii]*t+x))$residuals},rep(0,length(t)))
+    m.resid <- vapply(phis_grid,function(x){compute_rss(m,t,x,omega_grid[ii])},rep(0,length(t))) ## faster not using lm
+    rss[ii] <- min(colSums(m.resid^2))
 }
 proc.time() - tm
 plot(omega_grid,rss)

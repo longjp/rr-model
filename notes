@@ -26,6 +26,9 @@
 
 
 
+how does parameterization of light curve shape affect algorithm speed? are certain parameterizations conducive to optimization across phase?
+
+
 - papers
    - algorithm + results on panstarrs (astronomy paper)
    - classification of rr lyrae in 
