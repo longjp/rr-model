@@ -15,7 +15,7 @@
 
 ==== goals
 == simulations with newton and sawtooth
-  - rerun simulations **** simulating from and fitting a sinusoid
+  - rerun simulations **** simulating from and fitting a sawtooth
     GOAL: have algorithm be fast (about same speed as GLS) because using
     newton AND have algorithm be accurate ~ 97%
 
