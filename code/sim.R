@@ -24,7 +24,7 @@ NewtonUpdate <- function(m,t,phi){
     return((phi - h^{-1}*del) %% 1)
 }
 
-n <- 100
+n <- 20
 e.sd <- 1
 t <- runif(n)
 phi <- runif(1)
@@ -32,7 +32,7 @@ m <- Saw(t+phi) + rnorm(n,e.sd)
 plot(t,m)
 
 
-N <- 1000
+N <- 100000
 phis_grid <- (0:(N-1))/N
 rss <- rep(0,N)
 tm <- proc.time()
@@ -42,13 +42,18 @@ for(ii in 1:N){
 }
 proc.time() - tm
 plot(phis_grid,rss)
+
+
+upto <- 20000
+plot(phis_grid[1:upto],rss[1:upto])
+
+
+
+
 abline(v=phi,lwd=2,col='grey')
 abline(v=phis_grid[which.min(rss)],lwd=2)
-
-
-
 phi.init <- runif(1)
-NN <- 21
+NN <- 2
 phis_new <- rep(0,NN)
 phis_new[1] <- phi.init
 tm <- proc.time()
@@ -56,6 +61,10 @@ for(ii in 2:NN){
     phis_new[ii] <- NewtonUpdate(m,t,phis_new[ii-1])
 }
 proc.time() - tm
+abline(v=phis_new[1],col='red',lwd=2)
+abline(v=phis_new[2],col='blue',lwd=2)
+
+
 abline(v=phis_new[1],col='red',lwd=2)
 abline(v=phis_new[2:(NN-1)],col=alpha('red',.1))
 abline(v=phis_new[NN],col='blue',lwd=2,lty=2)
