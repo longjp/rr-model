@@ -19,8 +19,10 @@ SawPrime <- function(t,cc=0.75){
 NewtonUpdate <- function(m,t,phi,omega){
     gp <- SawPrime(omega*t+phi)
     g <- Saw(omega*t+phi)
-    del <- -2*sum(m*gp) + 2*sum(g*gp)
-    h <- 2*sum(gp*gp)
+    del <- sum(gp*(g-m))
+    h <- sum(gp*gp)
+    ## del <- -2*sum(m*gp) + 2*sum(g*gp)
+    ## h <- 2*sum(gp*gp)
     return((phi - h^{-1}*del) %% 1)
 }
 

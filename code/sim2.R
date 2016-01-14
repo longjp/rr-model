@@ -16,12 +16,21 @@ SawPrime <- function(t,cc=0.75){
     return((-2/cc)*(t < cc) + ((2/(1-cc))*(t >= cc)))
 }
 
-NewtonUpdate <- function(m,t,phi,omega){
+NewtonUpdate <- function(m,t,phi,amp,beta0,omega){
     gp <- SawPrime(omega*t+phi)
     g <- Saw(omega*t+phi)
-    del <- -2*sum(m*gp) + 2*sum(g*gp)
-    h <- 2*sum(gp*gp)
-    return((phi - h^{-1}*del) %% 1)
+    X <- cbind(1,g)
+    Hul <- 2*t(X)%*%X
+    Hlr <- 2*amp^2*sum(g*gp)
+    Hoff <- c(2*amp*sum(g),-2*sum((m-beta0)*gp)+4*amp*sum(g*gp))
+    h <- rbind(cbind(Hul,Hoff),c(Hoff,Hlr))
+    Beta <- matrix(c(beta0,amp),nrow=2)
+    dgdBeta <- 2*t(X)%*%X%*%Beta - 2*t(X)%*%m
+    dgdphi <- -2*amp*sum((m-beta0)*gp) + 2*amp^2*sum(g*gp)
+    del <- c(dgdBeta,dgdphi)
+    theta <- c(beta0,amp,phi) - solve(h)*del
+    theta[3] <- theta[3] %% 1
+    return(theta)
 }
 
 omega_grid <- (1:1000)/1000 + 2
