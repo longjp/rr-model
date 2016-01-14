@@ -1,0 +1,174 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim, amsmath,amssymb,amsthm,graphicx}
+\usepackage[margin=1in,nohead]{geometry}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{bbm}
+\usepackage{bm}
+
+\sectionfont{\normalsize}
+\subsectionfont{\small}
+
+\title{}
+\date{}
+\author{}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\newcommand{\Remark}[2]{{\color{red}Remark from #1: #2}\xspace}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\newcommand{\minimax}[2]{\argmin{#1}\underset{#2}{\operatorname{max}}}
+\newcommand{\bb}{\textbf{b}}
+
+\newcommand{\Var}{\text{Var }}
+\newcommand{\Cov}{\text{Cov }}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
+
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+\newenvironment{my_enumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}}{\end{enumerate}
+}
+
+
+
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of [yas] elisp error!TeX Unbound'' for suggested values.
+% See pp. 199-200 of Lamport's [yas] elisp error!LaTeX'' book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}% require fuller float pages
+
+% remember to use [htp] or [htpb] for placement
+
+
+
+
+
+\begin{document}
+\noindent
+\textbf{James Long}\\
+\textbf{\today}\\
+\textbf{Description of Model and Newton Optimization Algorithm}
+
+The data is $(m_i,t_i)$ for $i=1,\ldots,n$ and the parameters are $(\omega,a,\phi,\beta,\sigma^2)$. The model is
+\begin{equation*}
+m_i = a\gamma(\omega t_i + \phi) + \beta + \epsilon_i
+\end{equation*}
+where $\epsilon_i \sim N(0,\sigma^2)$ independent. The function $\gamma$ is 
+
+\begin{equation*}
+  \gamma(t) =    \left\{
+  \begin{array}{lr}
+    1 - \frac{2}{c}t &:  t \text{ mod } 1 > c\\ 
+    \frac{2}{1-c}t - \frac{1+c}{1-c}  &: o.w.
+  \end{array} \right.
+\end{equation*}
+
+We seek the ML estimator
+\begin{equation*}
+\widehat{\omega},\widehat{\beta},\widehat{a},\widehat{\phi} = \argmin{\omega,\beta,a,\phi} \sum_{i=1}^n (m_i - a\gamma(\omega t_i + \phi) - \beta_0)^2 \equiv \argmin{\omega,\beta,a,\phi} g_\omega(\beta,a,\phi)
+\end{equation*}
+We propose a grid search across $\omega$ with Newton updates for $\theta = (\beta,a)$. We derive the Hessian and the gradient for the Newton updates. 
+
+The gradient is
+\begin{equation*}
+\nabla = \begin{pmatrix}
+\frac{\partial g}{\partial \theta} \\
+\frac{\partial g}{\partial \phi}
+\end{pmatrix} \in \mathbb{R}^{3 \times 1}
+\end{equation*}
+The Hessian is
+\begin{equation*}
+H = \begin{pmatrix}
+\frac{\partial g^2}{\partial \theta^2} & \frac{\partial g^2}{\partial \theta \partial \phi} \\
+\frac{\partial g^2}{\partial \theta \partial \phi}^T  & \frac{\partial g^2}{\partial \phi^2} 
+\end{pmatrix} \in \mathbb{R}^{3 \times 3}
+\end{equation*}
+
+
+
+Now define
+\begin{equation*}
+X = \begin{pmatrix}
+1 & \gamma(\omega t_1 + \phi) \\
+\vdots & \vdots\\
+1 & \gamma(\omega t_n + \phi)
+\end{pmatrix} \in \mathbb{R}^{n \times 2}
+\end{equation*}
+
+So
+\begin{equation*}
+g_\omega(\beta,a,\phi) = g_\omega(\theta,\phi) = (m - X\theta)^T(m - X\theta)
+\end{equation*}
+Therefore
+\begin{equation*}
+\frac{\partial g}{\partial \theta} = -2X^Tm + 2X^TX\theta
+\end{equation*}
+and
+\begin{equation*}
+\frac{\partial g^2}{\partial \theta^2} = 2X^TX.
+\end{equation*}
+For $\phi$ we have
+\begin{equation*}
+\frac{\partial g}{\partial \phi} = -2a(m - 1\beta)^T\gamma' + 2a^2\gamma^T\gamma'
+\end{equation*}
+and
+\begin{equation*}
+\frac{\partial g^2}{\partial \phi^2} = 2a^2\gamma^{'T}\gamma'
+\end{equation*}
+For the two mixed derivates we get
+\begin{equation*}
+\frac{\partial g^2}{\partial a \partial \phi} = -2(m-1\beta)^T\gamma' + 4a\gamma^{'T}\gamma
+\end{equation*}
+and
+\begin{equation*}
+\frac{\partial g^2}{\partial \beta \partial \phi} = 2a\gamma^T1
+\end{equation*}
+Finally note that
+\begin{equation*}
+  \gamma'(t\omega + \phi) =    \left\{
+  \begin{array}{lr}
+     - \frac{2}{c} &:  t\omega + \phi \text{ mod } 1 > c\\ 
+    \frac{2}{1-c}  &: o.w.
+  \end{array} \right.
+\end{equation*}
+and
+\begin{equation*}
+  \gamma''(t\omega + \phi) =    0
+\end{equation*}
+
+
+
+
+
+%\bibliographystyle{plainnat}
+%\bibliography{refs}
+
+
+\end{document}
+
