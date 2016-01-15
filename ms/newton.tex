@@ -93,7 +93,7 @@ We seek the ML estimator
 \begin{equation*}
 \widehat{\omega},\widehat{\beta},\widehat{a},\widehat{\phi} = \argmin{\omega,\beta,a,\phi} \sum_{i=1}^n (m_i - a\gamma(\omega t_i + \phi) - \beta_0)^2 \equiv \argmin{\omega,\beta,a,\phi} g_\omega(\beta,a,\phi)
 \end{equation*}
-We propose a grid search across $\omega$ with Newton updates for $\theta = (\beta,a)$. We derive the Hessian and the gradient for the Newton updates. 
+We propose a grid search across $\omega$ with Newton updates for $\theta = (\beta,a)$ and $\phi$. We derive the Hessian and the gradient for the Newton updates. 
 
 The gradient is
 \begin{equation*}
@@ -147,7 +147,7 @@ For the two mixed derivates we get
 \end{equation*}
 and
 \begin{equation*}
-\frac{\partial g^2}{\partial \beta \partial \phi} = 2a\gamma^T1
+\frac{\partial g^2}{\partial \beta \partial \phi} = 2a1^T\gamma'
 \end{equation*}
 Finally note that
 \begin{equation*}

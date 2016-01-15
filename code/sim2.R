@@ -16,24 +16,33 @@ SawPrime <- function(t,cc=0.75){
     return((-2/cc)*(t < cc) + ((2/(1-cc))*(t >= cc)))
 }
 
-NewtonUpdate <- function(m,t,phi,amp,beta0,omega){
+ComputeRss <- function(m,t,phi,omega){
+    X <- cbind(1,Saw(omega*t+phi))
+    B <- t(X)%*%X
+    d <- t(X)%*%m
+    z <- solve(B,d)
+    return(m - X%*%z)
+}
+
+NewtonUpdate <- function(m,t,params,omega){
+    beta0 <- params[1]
+    amp <- params[2]
+    phi <- params[3]
     gp <- SawPrime(omega*t+phi)
     g <- Saw(omega*t+phi)
     X <- cbind(1,g)
     Hul <- 2*t(X)%*%X
-    Hlr <- 2*amp^2*sum(g*gp)
-    Hoff <- c(2*amp*sum(g),-2*sum((m-beta0)*gp)+4*amp*sum(g*gp))
+    Hlr <- 2*amp^2*sum(gp*gp)
+    Hoff <- c(2*amp*sum(gp),-2*sum((m-beta0)*gp)+4*amp*sum(g*gp))
     h <- rbind(cbind(Hul,Hoff),c(Hoff,Hlr))
-    Beta <- matrix(c(beta0,amp),nrow=2)
-    dgdBeta <- 2*t(X)%*%X%*%Beta - 2*t(X)%*%m
+    theta <- matrix(c(beta0,amp),nrow=2)
+    dgdtheta <- 2*t(X)%*%X%*%theta - 2*t(X)%*%matrix(m,nrow=length(m))
     dgdphi <- -2*amp*sum((m-beta0)*gp) + 2*amp^2*sum(g*gp)
-    del <- c(dgdBeta,dgdphi)
-    theta <- c(beta0,amp,phi) - solve(h)*del
-    theta[3] <- theta[3] %% 1
-    return(theta)
+    del <- matrix(c(dgdtheta,dgdphi),nrow=3)
+    params <- params - solve(h)%*%del
+    params[3] <- params[3] %% 1
+    return(params)
 }
-
-omega_grid <- (1:1000)/1000 + 2
 
 ## construct data
 n <- 1000
@@ -42,48 +51,34 @@ t <- runif(n)
 phi <- runif(1)
 amp <- rchisq(1,30)/30
 beta <- rnorm(1)
-omega <- sample(omega_grid,1)
+omega <- 2.4
 m <- amp*Saw(omega*t+phi) + beta + rnorm(n,mean=0,sd=e.sd)
 plot(t,m)
 
 
 
-compute_rss <- function(m,t,phi,omega){
-    X <- cbind(1,Saw(omega*t+phi))
-    B <- t(X)%*%X
-    d <- t(X)%*%m
-    z <- solve(B,d)
-    return(m - X%*%z)
-}
 
-
-
-## grid search to estimate omega and phase
-N <- 100
+## grid search to estimate omega and phase, closed for solution for beta0 and amp
+N <- 1000
 phis_grid <- (0:(N-1))/N
-rss <- rep(0,length(omega_grid))
 tm <- proc.time()
-for(ii in 1:length(omega_grid)){
-    ##m.resid <- vapply(phis_grid,function(x){lm(m~Saw(omega_grid[ii]*t+x))$residuals},rep(0,length(t)))
-    m.resid <- vapply(phis_grid,function(x){compute_rss(m,t,x,omega_grid[ii])},rep(0,length(t))) ## faster not using lm
-    rss[ii] <- min(colSums(m.resid^2))
-}
+##m.resid <- vapply(phis_grid,function(x){lm(m~Saw(omega_grid[ii]*t+x))$residuals},rep(0,length(t)))
+m.resid <- vapply(phis_grid,function(x){ComputeRss(m,t,x,omega)},rep(0,length(t))) ## faster not using lm
+rss <- colSums(m.resid^2)
 proc.time() - tm
-plot(omega_grid,rss)
-abline(v=omega,col="black")
+plot(phis_grid,rss)
+abline(v=phi,col="black")
 
 #### Newton optimization
-rss <- rep(0,length(omega_grid))
-NN <- 1 ## number of Newton steps for each updated frequency
-phi_temp <- runif(1) ## random initial phase
+NN <- 5
+phis <- matrix(0,nrow=NN,ncol=3)
+phis[1,] <- c(0,1,runif(1))
 tm <- proc.time()
-for(ii in 1:length(omega_grid)){
-    for(jj in 1:NN){
-        phi_temp <- NewtonUpdate(m,t,phi_temp,omega_grid[ii])
-    }
-    rss[ii] <- sum((Saw(omega_grid[ii]*t+phi_temp) - m)^2)
+for(jj in 1:(NN-1)){
+    phis[jj+1,] <- NewtonUpdate(m,t,phis[jj,],omega)
 }
 proc.time() - tm
-points(omega_grid,rss,col='red')
+abline(v=phis[1,3],col="red")
+abline(v=phis[NN,3],col="blue")
 
 

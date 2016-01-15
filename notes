@@ -25,8 +25,9 @@
     GOAL: see some improvement in period estimation accuracy.
 
 
-
-how does parameterization of light curve shape affect algorithm speed? are certain parameterizations conducive to optimization across phase?
+- redo sim2.R with newton updates separately for phi and (beta0,amp)
+   - probably fairly easy to code
+- how does parameterization of light curve shape affect algorithm speed? are certain parameterizations conducive to optimization across phase?
 
 
 - papers
