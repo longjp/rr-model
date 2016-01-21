@@ -1,5 +1,5 @@
 ### compare newton method to grid search
-### for estimating phase
+### for estimating phase, amplitude, and mean
 
 rm(list=ls())
 library(scales)
@@ -21,6 +21,7 @@ ComputeRss <- function(m,t,phi,omega){
     B <- t(X)%*%X
     d <- t(X)%*%m
     z <- solve(B,d)
+    z[2] <- max(z[2],0)
     return(m - X%*%z)
 }
 
@@ -41,6 +42,7 @@ NewtonUpdate <- function(m,t,params,omega){
     del <- matrix(c(dgdtheta,dgdphi),nrow=3)
     params <- params - solve(h)%*%del
     params[3] <- params[3] %% 1
+    params[2] <- max(0,params[2]) ## amplitude must be positive
     return(params)
 }
 
@@ -68,6 +70,7 @@ rss <- colSums(m.resid^2)
 proc.time() - tm
 plot(phis_grid,rss)
 abline(v=phi,col="black")
+abline(v=(phi+.5) %% 1,col="black")
 
 #### Newton optimization
 NN <- 5

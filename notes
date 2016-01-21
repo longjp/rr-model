@@ -11,7 +11,7 @@
  - used newton method to find phase in sawtooth model (period fixed), see
    sim.R. newton method is faster and nearly as accurate as gridsearch. gets
    stuck in local minima sometimes
-
+- rss as function of phase is somewhat complicated. it is a piecewise quadratic (convex function). this is clear when there are few observations
 
 ==== goals
 == simulations with newton and sawtooth
