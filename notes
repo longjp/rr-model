@@ -25,9 +25,10 @@
     GOAL: see some improvement in period estimation accuracy.
 
 
-- redo sim2.R with newton updates separately for phi and (beta0,amp)
-   - probably fairly easy to code
-- how does parameterization of light curve shape affect algorithm speed? are certain parameterizations conducive to optimization across phase?
+= to do
+- write up optimization in hyperplane formula
+- comment sim3.R well
+- create sim4.R where optimize of phase and period
 
 
 - papers
