@@ -1,0 +1,109 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim, amsmath,amssymb,amsthm,graphicx}
+\usepackage[margin=1in,nohead]{geometry}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{bbm}
+\usepackage{bm}
+
+\sectionfont{\normalsize}
+\subsectionfont{\small}
+
+\title{}
+\date{}
+\author{}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\newcommand{\Remark}[2]{{\color{red}Remark from #1: #2}\xspace}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\newcommand{\minimax}[2]{\argmin{#1}\underset{#2}{\operatorname{max}}}
+\newcommand{\bb}{\textbf{b}}
+
+\newcommand{\Var}{\text{Var }}
+\newcommand{\Cov}{\text{Cov }}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
+
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+\newenvironment{my_enumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}}{\end{enumerate}
+}
+
+
+
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of [yas] elisp error!TeX Unbound'' for suggested values.
+% See pp. 199-200 of Lamport's [yas] elisp error!LaTeX'' book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}% require fuller float pages
+
+% remember to use [htp] or [htpb] for placement
+
+
+
+
+
+\begin{document}
+\noindent
+\textbf{James Long}\\
+\textbf{\today}\\
+\textbf{Quadratic Program with Single Inequality}
+
+Suppose we have the problem
+\begin{equation*}
+x^* = \argmin{x:x^Td \geq 0} x^TAx + x^Tc
+\end{equation*}
+where $A \succ 0$. This is a quadratic program with linear constraints. Since $y = A^{1/2}x$ is bijective we have
+\begin{align*}
+x^* &= A^{-1/2}\argmin{y:(A^{-1/2}y)^Td \geq 0} (A^{-1/2}y)^TAA^{-1/2}y + (A^{-1/2}y)^Tc\\
+&= A^{-1/2}\underbrace{\argmin{y:y^TA^{-1/2}d \geq 0} y^Ty + y^TA^{-1/2}c.}_{\equiv g(y)}
+\end{align*}
+The unconstrained minimizer of $g$ is $-(1/2)A^{-1/2}c$. Thus the unconstrained minimizer of the original problem is $q \equiv -(1/2)A^{-1}c$. If the uncontrained minimizer is in the feasible set we are done. If not, because the objective of $g$ has identity matrix for the quadratic term, we need to find the point in the feasible set which is closest to the unconstrained minimizer. We achieve this by projecting the unconstrained minimizer onto the vector orthogonal to the feasible set (halfspace) and then removing this component. So
+\begin{align*}
+y^* &= -(1/2)A^{-1/2}c - (A^{-1/2}d) \frac{(A^{-1/2}d)^T((-1/2)A^{-1/2}c)}{(A^{-1/2}d)^T(A^{-1/2}d)}\\
+&= -(1/2)A^{-1/2}c - (A^{-1/2}d) \frac{d^T(-1/2)A^{-1}c}{d^TA^{-1}d}\\
+\end{align*}
+Multiplying by $A^{-1/2}$ we obtain
+\begin{align*}
+x^{*} &= -(1/2)A^{-1}c - (A^{-1}d)\frac{d^T(-1/2)A^{-1}c}{d^TA^{-1}d}\\
+&= q - (A^{-1}d)\frac{d^Tq}{d^TA^{-1}d}\\
+\end{align*}
+By defining $z = A^{-1}d$ we have
+\begin{equation*}
+x^* = q - z\frac{d^Tq}{d^Tz}
+\end{equation*}
+
+
+
+%\bibliographystyle{plainnat}
+%\bibliography{refs}
+
+
+\end{document}
+
