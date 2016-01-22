@@ -1,5 +1,5 @@
 ### compare newton method to grid search
-### for estimating phase, amplitude, and mean
+### for newton, condition on amplitude, beta0, update phase
 
 rm(list=ls())
 library(scales)
@@ -16,54 +16,52 @@ SawPrime <- function(t,cc=0.75){
     return((-2/cc)*(t < cc) + ((2/(1-cc))*(t >= cc)))
 }
 
-## ComputeRss <- function(m,t,phi,omega){
-##     X <- cbind(1,Saw(omega*t+phi))
-##     B <- t(X)%*%X
-##     d <- t(X)%*%m
-##     z <- solve(B,d)
-##     ##z[2] <- max(z[2],0)
-##     return(m - X%*%z)
-## }
-
-ComputeRss <- function(m,t,phi,omega){
+ComputeBeta <- function(m,t,phi,omega){
     X <- cbind(1,Saw(omega*t+phi))
     B <- t(X)%*%X
     d <- t(X)%*%m
     z <- solve(B,d)
+    ## find best solution with amp > 0
     if(z[2] < 0){
         e <- c(0,1)
         q <- solve(B,e)
         z <- z - q*(sum(e*z)/sum(e*q))
     }
+   return(z)
+}
+
+ComputeRss <- function(m,t,phi,omega){
+    X <- cbind(1,Saw(omega*t+phi))
+    z <- ComputeBeta(m,t,phi,omega)
     return(m - X%*%z)
 }
 
-
-
 NewtonUpdate <- function(m,t,params,omega){
+    ## 1. condition on phi, omega, closed for update for amp,beta0
     beta0 <- params[1]
     amp <- params[2]
     phi <- params[3]
-    gp <- SawPrime(omega*t+phi)
-    g <- Saw(omega*t+phi)
-    X <- cbind(1,g)
-    Hul <- 2*t(X)%*%X
-    Hlr <- 2*amp^2*sum(gp*gp)
-    Hoff <- c(2*amp*sum(gp),-2*sum((m-beta0)*gp)+4*amp*sum(g*gp))
-    h <- rbind(cbind(Hul,Hoff),c(Hoff,Hlr))
-    theta <- matrix(c(beta0,amp),nrow=2)
-    dgdtheta <- 2*t(X)%*%X%*%theta - 2*t(X)%*%matrix(m,nrow=length(m))
-    dgdphi <- -2*amp*sum((m-beta0)*gp) + 2*amp^2*sum(g*gp)
-    del <- matrix(c(dgdtheta,dgdphi),nrow=3)
-    params <- params - solve(h)%*%del
-    params[3] <- params[3] %% 1
-    params[2] <- max(0,params[2]) ## amplitude must be positive
-    return(params)
+    beta <- ComputeBeta(m,t,phi,omega)
+    beta0 <- beta[1]
+    amp <- beta[2]
+    ## 2. condition on amp,beta0,omega, newton update phi (see sim.R for code)
+    ## if amp = 0 we are at a (bad) stationary point, so choose random phase
+    if(amp != 0){
+        gp <- SawPrime(omega*t+phi)
+        g <- Saw(omega*t+phi)
+        del <- sum(gp*(g-(m-beta0)/amp))
+        h <- sum(gp*gp)
+        phi <- (phi - h^{-1}*del) %% 1
+    } else {
+        phi <- runif(1)
+    }
+    out <- c(beta0,amp,phi)
+    return(out)
 }
 
 ## construct data
-n <- 1000
-e.sd <- 0.05
+n <- 10
+e.sd <- 0.2
 t <- runif(n)
 phi <- runif(1)
 amp <- rchisq(1,30)/30
@@ -85,10 +83,9 @@ rss <- colSums(m.resid^2)
 proc.time() - tm
 plot(phis_grid,rss)
 abline(v=phi,col="black")
-abline(v=(phi+.5) %% 1,col="black")
 
 #### Newton optimization
-NN <- 5
+NN <- 10
 phis <- matrix(0,nrow=NN,ncol=3)
 phis[1,] <- c(0,1,runif(1))
 tm <- proc.time()
