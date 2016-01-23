@@ -9,7 +9,6 @@ library(scales)
 ##   t : evaluaation points
 ##  cc : fraction down
 Saw <- function(t,cc=0.75){
-
     t <- t %% 1
     return(((-2/cc)*t + 1)*(t < cc) + ((2/(1-cc))*t - (1+cc)/(1-cc))*(t >= cc))
 }
@@ -35,7 +34,7 @@ ComputeBeta <- function(m,t,phi,omega){
    return(z)
 }
 
-ComputeRss <- function(m,t,phi,omega){
+ComputeResiduals <- function(m,t,phi,omega){
     X <- cbind(1,Saw(omega*t+phi))
     z <- ComputeBeta(m,t,phi,omega)
     return(m - X%*%z)
@@ -64,41 +63,53 @@ NewtonUpdate <- function(m,t,params,omega){
     return(out)
 }
 
+omega_grid <- (1:1000)/1000 + 2
+
 ## construct data
-n <- 10
+n <- 50
 e.sd <- 0.2
 t <- runif(n)
 phi <- runif(1)
 amp <- rchisq(1,30)/30
-beta <- rnorm(1)
-omega <- 2.4
-m <- amp*Saw(omega*t+phi) + beta + rnorm(n,mean=0,sd=e.sd)
+beta0 <- rnorm(1)
+omega <- sample(omega_grid,1)
+m <- amp*Saw(omega*t+phi) + beta0 + rnorm(n,mean=0,sd=e.sd)
 plot(t,m)
 
 
 
 
 ## grid search to estimate omega and phase, closed for solution for beta0 and amp
-N <- 1000
+N <- 500
 phis_grid <- (0:(N-1))/N
 tm <- proc.time()
-##m.resid <- vapply(phis_grid,function(x){lm(m~Saw(omega_grid[ii]*t+x))$residuals},rep(0,length(t)))
-m.resid <- vapply(phis_grid,function(x){ComputeRss(m,t,x,omega)},rep(0,length(t))) ## faster not using lm
-rss <- colSums(m.resid^2)
-proc.time() - tm
-plot(phis_grid,rss)
-abline(v=phi,col="black")
-
-#### Newton optimization
-NN <- 10
-phis <- matrix(0,nrow=NN,ncol=3)
-phis[1,] <- c(0,1,runif(1))
-tm <- proc.time()
-for(jj in 1:(NN-1)){
-    phis[jj+1,] <- NewtonUpdate(m,t,phis[jj,],omega)
+rss <- rep(0,length(omega_grid))
+for(ii in 1:length(rss)){
+    print(ii)
+    m.resid <- vapply(phis_grid,function(x){ComputeResiduals(m,t,x,omega_grid[ii])},rep(0,length(t))) ## faster not using lm
+    rss[ii] <- min(colSums(m.resid^2))
 }
 proc.time() - tm
-abline(v=phis[1,3],col="red")
-abline(v=phis[NN,3],col="blue")
+plot(omega_grid,rss)
+abline(v=omega,col="black")
 
 
+
+#### Newton optimization
+rss <- rep(0,length(omega_grid))
+NN <- 2
+param <- c(0,1,runif(1))
+tm <- proc.time()
+for(ii in 1:length(omega_grid)){
+    for(jj in 1:NN){
+        param <- NewtonUpdate(m,t,param,omega_grid[ii])
+    }
+    X <- cbind(1,Saw(omega*t+param[3]))
+    rss[ii] <- sum((m - X%*%param[1:2])^2)
+}
+proc.time() - tm
+points(omega_grid,rss,col='red')
+
+## why are red points sometimes less than black
+## amplitude not being restricted to > 0
+## 
