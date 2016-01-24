@@ -26,8 +26,8 @@
 
 
 = to do
-- comment sim3.R well
-- create sim4.R where optimize of phase and period
+- turn sim4.R into set of functions that will return period estimate
+- run code on panstarss like cadence
 
 
 - papers
