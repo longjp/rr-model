@@ -30,6 +30,7 @@ ComputeBeta <- function(m,t,phi,omega){
         e <- c(0,1)
         q <- solve(B,e)
         z <- z - q*(sum(e*z)/sum(e*q))
+        z[2] <- 0
     }
    return(z)
 }
@@ -50,7 +51,7 @@ NewtonUpdate <- function(m,t,params,omega){
     amp <- beta[2]
     ## 2. condition on amp,beta0,omega, newton update phi (see sim.R for code)
     ## if amp = 0 we are at a (bad) stationary point, so choose random phase
-    if(amp != 0){
+    if(amp > 0){
         gp <- SawPrime(omega*t+phi)
         g <- Saw(omega*t+phi)
         del <- sum(gp*(g-(m-beta0)/amp))
@@ -66,8 +67,8 @@ NewtonUpdate <- function(m,t,params,omega){
 omega_grid <- (1:1000)/1000 + 2
 
 ## construct data
-n <- 50
-e.sd <- 0.2
+n <- 25
+e.sd <- 0.4
 t <- runif(n)
 phi <- runif(1)
 amp <- rchisq(1,30)/30
@@ -76,10 +77,7 @@ omega <- sample(omega_grid,1)
 m <- amp*Saw(omega*t+phi) + beta0 + rnorm(n,mean=0,sd=e.sd)
 plot(t,m)
 
-
-
-
-## grid search to estimate omega and phase, closed for solution for beta0 and amp
+#### grid search to estimate omega and phase, closed for solution for beta0 and amp
 N <- 500
 phis_grid <- (0:(N-1))/N
 tm <- proc.time()
@@ -93,23 +91,17 @@ proc.time() - tm
 plot(omega_grid,rss)
 abline(v=omega,col="black")
 
-
-
 #### Newton optimization
 rss <- rep(0,length(omega_grid))
-NN <- 2
+NN <- 1
 param <- c(0,1,runif(1))
 tm <- proc.time()
 for(ii in 1:length(omega_grid)){
     for(jj in 1:NN){
         param <- NewtonUpdate(m,t,param,omega_grid[ii])
     }
-    X <- cbind(1,Saw(omega*t+param[3]))
+    X <- cbind(1,Saw(omega_grid[ii]*t+param[3]))
     rss[ii] <- sum((m - X%*%param[1:2])^2)
 }
 proc.time() - tm
-points(omega_grid,rss,col='red')
-
-## why are red points sometimes less than black
-## amplitude not being restricted to > 0
-## 
+points(omega_grid,rss,col='blue')
