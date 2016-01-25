@@ -26,8 +26,9 @@
 
 
 = to do
-- turn sim4.R into set of functions that will return period estimate
-- run code on panstarss like cadence
+- newton on panstarrs is not converging, sine model does better even
+  when data is generated from sawtooth. need to investigate algorithm
+  possitibilites for better performance include: NN > 1, random phase sampling
 
 
 - papers
