@@ -29,7 +29,11 @@
 - newton on panstarrs is not converging, sine model does better even
   when data is generated from sawtooth. need to investigate algorithm
   possitibilites for better performance include: NN > 1, random phase sampling
-
+  - refine grid near optimum
+  - get all simulated light curves which did not get period right for 
+    saw model
+  - sometimes newton returns error larger than rss with amp=0, why?
+    can this be fixed?
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)
