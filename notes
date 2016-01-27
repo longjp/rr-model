@@ -35,6 +35,12 @@
        and test them in sim4.R
      - have NN phases at each freq, if phases get close OR amp = 0 OR 
        newton goes uphill, select a random new phase.
+     - refine grid near optimum
+     - get all simulated light curves which did not get period right for 
+       saw model
+     - sometimes newton returns error larger than rss with amp=0, why?
+       can this be fixed?
+
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)
