@@ -50,9 +50,11 @@ abline(v=omegas[which.min(rss)],col="blue")
 
 ## use newton method
 tm <- proc.time()
+set.seed(1234)
 rss_newton <- SawRss(m,t,omegas)
 proc.time() - tm
-points(omegas,rss_newton,col='red')
+dev.new()
+plot(omegas,rss_newton,col='red')
 abline(v=omegas[which.min(rss_newton)],col="red",lwd=2)
 
 

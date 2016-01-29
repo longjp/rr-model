@@ -19,12 +19,12 @@ ComputeBeta <- function(m,t,phi,omega){
     d <- t(X)%*%m
     z <- solve(B,d)
     ## find best solution with amp > 0
-    if(z[2] < 0){
-        e <- c(0,1)
-        q <- solve(B,e)
-        z <- z - q*(sum(e*z)/sum(e*q))
-        z[2] <- 0
-    }
+    ## if(z[2] < 0){
+    ##     e <- c(0,1)
+    ##     q <- solve(B,e)
+    ##     z <- z - q*(sum(e*z)/sum(e*q))
+    ##     z[2] <- 0
+    ## }
    return(z)
 }
 
@@ -58,7 +58,8 @@ NewtonUpdate <- function(m,t,params,omega){
 }
 
 SawRss <- function(m,t,omegas,NN=1){
-    param <- c(0,1,runif(1))
+    param <- c(mean(m),1,0.5)
+    ##param <- c(mean(m),1,runif(1))
     rss <- rep(0,length(omegas))
     for(ii in 1:length(omegas)){
         for(jj in 1:NN){

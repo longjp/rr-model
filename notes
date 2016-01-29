@@ -29,8 +29,6 @@
 - newton on panstarrs is not converging, sine model does better even
   when data is generated from sawtooth. need to investigate algorithm
   possitibilites for better performance include: NN > 1, random phase sampling
-     - when amp = 0, is it necessary to do projection since we choose
-       a random phase anyway?
      - get a few lcs that have period estimated incorrectly with saw
        and test them in sim4.R
      - have NN phases at each freq, if phases get close OR amp = 0 OR 
@@ -38,8 +36,13 @@
      - refine grid near optimum
      - get all simulated light curves which did not get period right for 
        saw model
+
      - sometimes newton returns error larger than rss with amp=0, why?
        can this be fixed?
+     - when amp = 0, is it necessary to do projection since we choose
+       a random phase anyway?
+     - if amp=0 then beta0 is just mean of mags, right?
+     - initial value for amp should be something intelligent, like sd(m)
 
 
 - papers
