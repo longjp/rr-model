@@ -21,6 +21,14 @@ ComputeBeta <- function(m,t,phi,omega){
    return(z)
 }
 
+
+ComputeResiduals <- function(m,t,phi,omega){
+    X <- cbind(1,Saw(omega*t+phi))
+    z <- ComputeBeta(m,t,phi,omega)
+    return(m - X%*%z)
+}
+
+
 NewtonUpdate <- function(m,t,params,omega){
     ## 1. condition on phi, omega, closed for update for amp,beta0
     beta0 <- params[1]
