@@ -18,6 +18,7 @@
   - rerun simulations **** simulating from and fitting a sawtooth
     GOAL: have algorithm be fast (about same speed as GLS) because using
     newton AND have algorithm be accurate ~ 97%
+       - ACHIEVED: 95% of lcs within 1% of truth (using NN=5)
 
 == panstarrs data
   - estimate sawtooth functions from SDSS and compare GLS with sawtooths
@@ -26,6 +27,12 @@
 
 
 = to do
+- prove that projecting onto amp > 0 will make beta0 be mean(m)
+- more accurate period estimate:
+   - NN > 1 (easy to try)
+   - force algorithm to get lower rss at newton update
+   - try several phases simultaneously
+
 - newton on panstarrs is not converging, sine model does better even
   when data is generated from sawtooth. need to investigate algorithm
   possitibilites for better performance include: NN > 1, random phase sampling
@@ -37,13 +44,13 @@
      - get all simulated light curves which did not get period right for 
        saw model
 
-     - sometimes newton returns error larger than rss with amp=0, why?
-       can this be fixed?
      - when amp = 0, is it necessary to do projection since we choose
        a random phase anyway?
      - if amp=0 then beta0 is just mean of mags, right?
-     - initial value for amp should be something intelligent, like sd(m)
 
+
+
+     - how well does algorithm do just selecting random phases? (at 1% accuracy, get 40% correct, ~ 65% with newton)
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)
