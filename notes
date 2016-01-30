@@ -28,8 +28,9 @@
 
 = to do
 - prove that projecting onto amp > 0 will make beta0 be mean(m)
+- make ps_X.R do multiband data
+
 - more accurate period estimate:
-   - NN > 1 (easy to try)
    - force algorithm to get lower rss at newton update
    - try several phases simultaneously
 
