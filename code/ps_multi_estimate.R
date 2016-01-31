@@ -43,4 +43,4 @@ p_est_sine <- unlist(mclapply(1:length(tms),sine_pest,mc.cores=mc.cores))
 
 
 
-save(tms,periods,p_est_sine,p_est_new,file="ps_estimate.RData")
+save(tms,periods,p_est_sine,p_est_new,file="ps_multi_estimate.RData")
