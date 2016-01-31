@@ -14,3 +14,13 @@ compute_rss <- function(w,K,lc){
     beta <- compute_params(w,K,lc[,2],X)
     return(sum((lc[,2] - X%*%beta)^2))
 }
+
+
+to_list_lc <- function(lc){
+    lc.list <- list()
+    bands <- unique(lc$ampj)
+    for(bb in 1:length(bands)){
+        lc.list[[bb]] <- lc[lc$ampj==bands[bb],1:3]
+    }
+    return(lc.list)
+}
