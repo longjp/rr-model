@@ -3,7 +3,7 @@ set.seed(1234)
 
 library(parallel)
 
-source("func_multi_sine.R")
+##source("func_multi_sine.R")
 source("func_multi_saw.R")
 source("func.R")
 
@@ -39,8 +39,6 @@ p_est_new <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
 ##     return((2*pi)/omegas[which.min(rss)])
 ## }
 ## p_est_sine <- unlist(mclapply(1:length(tms),sine_pest,mc.cores=mc.cores))
-
-
 
 
 save(tms,periods,p_est_new,file="ps_multi_estimate.RData")
