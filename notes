@@ -13,6 +13,9 @@
    stuck in local minima sometimes
 - rss as function of phase is somewhat complicated. it is a piecewise quadratic (convex function). this is clear when there are few observations
 
+
+
+
 ==== goals
 == simulations with newton and sawtooth
   - rerun simulations **** simulating from and fitting a sawtooth
@@ -24,12 +27,25 @@
   - estimate sawtooth functions from SDSS and compare GLS with sawtooths
     for Panstarrs data. branimir gave ground truth.
     GOAL: see some improvement in period estimation accuracy.
+       - ACHIEVED: 45% of lcs within 1% of truth
 
+== to do
 
-= to do
-- prove that projecting onto amp > 0 will make beta0 be mean(m)
+=== do the following three simple steps (1 day)
+- double check for coding errors in algorithm
+- get rid of rr lyrae c (reduce period range to rrlyrae ab)
+- return top 5 periods
 
+=== bigger adjustments
+- more accurate lc shape (2 days)
+- could algorithm be converging to local min / max (2 days)
+  - NN = 5 with 2 (or more) chains
+- ridge penalty on amplitude, prior on period (1 day)
 
+=== after doing all these we require
+- 90% of lcs have a top 5 estimate within .1% of truth
+
+If we cannot achieve this, we quit.
 
 
 - newton on panstarrs is not converging, sine model does better even
