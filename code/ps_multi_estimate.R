@@ -16,8 +16,7 @@ period_max <- 1
 mc.cores <- 7
 
 
-tms <- tms[1:10]
-
+print("running Newton NN=1")
 NN <- 1
 newton_pest <- function(ii){
     print(ii)
@@ -30,6 +29,7 @@ newton_pest <- function(ii){
 p_est_new1 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
 
 
+print("running Newton NN=5")
 NN <- 5
 newton_pest <- function(ii){
     print(ii)
@@ -42,6 +42,7 @@ newton_pest <- function(ii){
 p_est_new5 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
 
 
+print("running Newton NN=10")
 NN <- 10
 newton_pest <- function(ii){
     print(ii)
@@ -54,6 +55,7 @@ newton_pest <- function(ii){
 p_est_new10 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
 
 
+print("running sine")
 sine_pest <- function(ii){
     print(ii)
     omegas <- get_freqs(period_min,period_max,.1/diff(range(tms[[ii]][,1])))
