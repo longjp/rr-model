@@ -24,3 +24,6 @@ print(paste("1%:",mean(abs((periods - p_est_new10)/periods) < 0.01)))
 print(paste("0.1%:",mean(abs((periods - p_est_new10)/periods) < 0.001)))
 print(paste("0.01%:",mean(abs((periods - p_est_new10)/periods) < 0.0001)))
 print("")
+
+
+pairs(cbind(periods,p_est_sine,p_est_new1,p_est_new5,p_est_new10))

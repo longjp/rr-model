@@ -4,6 +4,8 @@ rm(list=ls())
 set.seed(1234)
 
 amp <- 0.3 ## typical amplitude for rr lyrae
+cc <- 0.25 ## fraction lightcurve mag goes down
+
 
 ######## get rr lyrae periods
 stars <- read.table("apj326724t2_mrt.txt",skip=42)
@@ -30,7 +32,7 @@ for(ii in 1:length(f)){
 }
 
 
-gammaf <- function(t,cc=0.75){
+gammaf <- function(t,cc=0.25){
     t <- t %% 1
     return(((-2/cc)*t + 1)*(t < cc) + ((2/(1-cc))*t - (1+cc)/(1-cc))*(t >= cc))
 }
@@ -45,10 +47,10 @@ sinef <- function(t){
 periods <- sample(periods,size=length(tms),replace=TRUE)
 for(ii in 1:length(tms)){
     phi <- runif(1,min=0,max=1)
-    tms[[ii]][,2] <- (amp*tms[[ii]]$ampj*gammaf((tms[[ii]]$t/periods[ii]) + tms[[ii]]$phij + phi)
+    tms[[ii]][,2] <- (amp*tms[[ii]]$ampj*gammaf((tms[[ii]]$t/periods[ii]) + tms[[ii]]$phij + phi,cc)
                       + rnorm(nrow(tms[[ii]]),mean=0,sd=tms[[ii]]$sig))
     tms[[ii]][,3] <- 1
 }
 
 ######## 3. WRITE OUT RESULTS
-save(tms,periods,file="ps_multi_sim.RData")
+save(tms,periods,cc,file="ps_multi.RData")

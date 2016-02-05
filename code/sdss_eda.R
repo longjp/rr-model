@@ -43,7 +43,6 @@ tmss <- lapply(lcs,LCtoTMS)
 bands <- names(tmss[[1]])
 nobs <- matrix(0,nrow=length(tmss),ncol=5)
 for(ii in 1:length(bands)){
-    print(bands[ii])
     nobs[,ii] <- vapply(tmss,function(x){nrow(x[[bands[ii]]])},c(0))
 }
 to_use <- rowSums(nobs > 45) == 5
@@ -56,7 +55,6 @@ rrlyrae <- rrlyrae[to_use,]
 
 
 ### extract location max, location min, amp, beta0 for each lc,band
-
 params <- array(0,dim=c(length(tmss),5,4),dimnames=list(NULL,bands,c("max","min","amp","beta")))
 for(ii in 1:length(tmss)){
     for(jj in 1:length(bands)){
@@ -73,42 +71,35 @@ for(ii in 1:length(tmss)){
 amps <- rep(0,length(bands))
 names(amps) <- bands
 for(jj in 1:length(bands)){
-    amps[jj] <- lm(params[,1,"amp"] ~ params[,bands[jj],"amp"]-1)$coefficients
+    amps[jj] <- lm(params[,bands[jj],"amp"] ~ params[,bands[1],"amp"]-1)$coefficients
 }
 
 ### get median difference in mean mags across bands
 betas <- rep(0,length(bands))
 names(betas) <- bands
 for(jj in 1:length(bands)){
-    betas[jj] <- median(params[,1,"beta"] - params[,jj,"beta"])
+    betas[jj] <- median(params[,jj,"beta"] - params[,1,"beta"])
 }
 
-
+## find cc
 phis <- (params[,,"min"] - params[,,"max"]) %% 1
-median(phis) ## this is the value of cc
+phis <- as.vector(phis)
+phis <- cbind(cos(2*pi*phis),sin(2*pi*phis))
+phis <- colSums(phis)
+phis_av <- phis / sqrt(sum(phis^2))
+cc <- atan2(phis_av[2],phis_av[1]) / (2*pi)
 
 
-######## this is totally wrong, can't take median here
-## derive the ML estimator for mu in the fisher von-mises distribution
-## implement here
-
+######## find phij
 phis <- rep(0,length(bands))
 names(phis) <- bands
 for(jj in 1:length(bands)){
-    phis[jj] <- median((params[,jj,"min"] - params[,1,"min"]) %% 1)
+    phis_temp <- (params[,jj,"min"] - params[,1,"min"]) %% 1
+    phis_temp <- cbind(cos(2*pi*phis_temp),sin(2*pi*phis_temp))
+    phis_temp <- colSums(phis_temp)
+    phis_av <- phis_temp / sqrt(sum(phis_temp^2))
+    phis[jj] <- atan2(phis_av[2],phis_av[1]) / (2*pi)
 }
 
 
-temp <- list()
-for(jj in 1:length(bands)){
-    temp[[jj]] <- (params[,jj,"min"] - params[,1,"min"]) %% 1
-}
-boxplot(temp)
-
-names(temp) <- bands
-pairs(temp)
-
-
-#### issues:
-## 1. what band to define as having ampj=1 and phij = 0
-## 2. deal with magnitudes being inversely prop to brightness (should we flip RR model)
+save(betas,amps,phis,cc,file="sdss_eda.RData")

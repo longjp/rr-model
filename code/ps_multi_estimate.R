@@ -8,8 +8,7 @@ library(multiband)
 source("func_multi_saw.R")
 source("func.R")
 
-load("ps_multi_sim.RData")
-
+load("ps_multi.RData")
 
 period_min <- 0.2
 period_max <- 1
@@ -23,11 +22,10 @@ newton_pest <- function(ii){
     lc <- tms[[ii]]
     omegas <- get_freqs(period_min,period_max,.1/diff(range(lc[,1])))
     omegas <- omegas / (2*pi)
-    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN)
+    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN,cc=cc)
     return(1/omegas[which.min(rss)])
 }
 p_est_new1 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
-
 
 print("running Newton NN=5")
 NN <- 5
@@ -36,7 +34,7 @@ newton_pest <- function(ii){
     lc <- tms[[ii]]
     omegas <- get_freqs(period_min,period_max,.1/diff(range(lc[,1])))
     omegas <- omegas / (2*pi)
-    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN)
+    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN,cc=cc)
     return(1/omegas[which.min(rss)])
 }
 p_est_new5 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
@@ -49,7 +47,7 @@ newton_pest <- function(ii){
     lc <- tms[[ii]]
     omegas <- get_freqs(period_min,period_max,.1/diff(range(lc[,1])))
     omegas <- omegas / (2*pi)
-    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN)
+    rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN,cc=cc)
     return(1/omegas[which.min(rss)])
 }
 p_est_new10 <- unlist(mclapply(1:length(tms),newton_pest,mc.cores=mc.cores))
