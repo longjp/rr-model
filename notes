@@ -28,11 +28,9 @@
 
 = to do
 - prove that projecting onto amp > 0 will make beta0 be mean(m)
-- make ps_X.R do multiband data
 
-- more accurate period estimate:
-   - force algorithm to get lower rss at newton update
-   - try several phases simultaneously
+
+
 
 - newton on panstarrs is not converging, sine model does better even
   when data is generated from sawtooth. need to investigate algorithm
