@@ -62,7 +62,6 @@ for(ii in 1:length(tmss)){
     for(jj in 1:length(bands)){
         lc <- tmss[[ii]][[bands[jj]]]
         lc[,1] <- (lc[,1] %% rrlyrae[ii,3]) / rrlyrae[ii,3]
-        plot(lc[,1],lc[,2])
         out <- supsmu(lc[,1],lc[,2],periodic=TRUE)
         params[ii,jj,] <- c(out$x[which.max(out$y)],out$x[which.min(out$y)],max(out$y)-min(out$y),mean(out$y))
     }
@@ -70,29 +69,44 @@ for(ii in 1:length(tmss)){
 
 
 
-pairs(params[,,"amp"])
+### get ratio of amplitudes, g band is defined as 0
+amps <- rep(0,length(bands))
+names(amps) <- bands
+for(jj in 1:length(bands)){
+    amps[jj] <- lm(params[,1,"amp"] ~ params[,bands[jj],"amp"]-1)$coefficients
+}
 
-pairs(params[,,"beta"])
-
-
-
-for(jj in 2:5){
-    print(jj)
-    print(lm(params[,1,"beta"] ~ params[,jj,"beta"]))
+### get median difference in mean mags across bands
+betas <- rep(0,length(bands))
+names(betas) <- bands
+for(jj in 1:length(bands)){
+    betas[jj] <- median(params[,1,"beta"] - params[,jj,"beta"])
 }
 
 
+phis <- (params[,,"min"] - params[,,"max"]) %% 1
+median(phis) ## this is the value of cc
 
 
-for(jj in 2:5){
-    print(jj)
-    print(lm(params[,1,"amp"] ~ params[,jj,"amp"]))
+######## this is totally wrong, can't take median here
+## derive the ML estimator for mu in the fisher von-mises distribution
+## implement here
+
+phis <- rep(0,length(bands))
+names(phis) <- bands
+for(jj in 1:length(bands)){
+    phis[jj] <- median((params[,jj,"min"] - params[,1,"min"]) %% 1)
 }
 
 
+temp <- list()
+for(jj in 1:length(bands)){
+    temp[[jj]] <- (params[,jj,"min"] - params[,1,"min"]) %% 1
+}
+boxplot(temp)
 
-pairs(params[,,2]-params[,,1])
-
+names(temp) <- bands
+pairs(temp)
 
 
 #### issues:
