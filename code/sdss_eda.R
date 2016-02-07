@@ -50,10 +50,6 @@ tmss <- tmss[to_use]
 rrlyrae <- rrlyrae[to_use,]
 
 
-
-
-
-
 ### extract location max, location min, amp, beta0 for each lc,band
 params <- array(0,dim=c(length(tmss),5,4),dimnames=list(NULL,bands,c("max","min","amp","beta")))
 for(ii in 1:length(tmss)){
@@ -78,8 +74,9 @@ for(jj in 1:length(bands)){
 betas <- rep(0,length(bands))
 names(betas) <- bands
 for(jj in 1:length(bands)){
-    betas[jj] <- median(params[,jj,"beta"] - params[,1,"beta"])
+    betas[jj] <- median(params[,bands[jj],"beta"] - params[,1,"beta"])
 }
+
 
 ## find cc
 phis <- (params[,,"min"] - params[,,"max"]) %% 1
@@ -94,7 +91,7 @@ cc <- atan2(phis_av[2],phis_av[1]) / (2*pi)
 phis <- rep(0,length(bands))
 names(phis) <- bands
 for(jj in 1:length(bands)){
-    phis_temp <- (params[,jj,"min"] - params[,1,"min"]) %% 1
+    phis_temp <- (params[,bands[jj],"min"] - params[,1,"min"]) %% 1
     phis_temp <- cbind(cos(2*pi*phis_temp),sin(2*pi*phis_temp))
     phis_temp <- colSums(phis_temp)
     phis_av <- phis_temp / sqrt(sum(phis_temp^2))
