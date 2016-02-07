@@ -5,6 +5,7 @@ rm(list=ls())
 load("sdss_eda.RData")
 periods <- read.table("period_comparisons.txt",header=TRUE)
 periods[,1] <- as.character(periods[,1])
+periods <- periods[periods$RRtype=="ab",]
 
 fs <- list.files("PS1_sample_LCs")
 tms <- list()
