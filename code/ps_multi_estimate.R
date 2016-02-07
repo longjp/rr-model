@@ -15,6 +15,23 @@ period_max <- 1
 mc.cores <- 7
 
 
+
+
+## NN <- 5
+## ii <- 22
+## lc <- tms[[ii]]
+## omegas <- get_freqs(period_min,period_max,.1/diff(range(lc[,1])))
+## omegas <- omegas / (2*pi)
+## rss <- SawRss(m=lc$m,t=lc$t,ampj=lc$ampj,phij=lc$phij,omegas=omegas,NN=NN,cc=cc)
+
+## plot(omegas,rss)
+## abline(v=omegas[which.min(rss)],col='red',lwd=2)
+## abline(v=1/periods[ii])
+
+## bad cases
+## 8, 9, 15, 20, 21
+
+
 print("running Newton NN=1")
 NN <- 1
 newton_pest <- function(ii){
