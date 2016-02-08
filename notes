@@ -33,8 +33,11 @@
 
 === do the following three simple steps (1 day)
 - double check for coding errors in algorithm
+   DONE: could not find any
 - get rid of rr lyrae c (reduce period range to rrlyrae ab)
+   DONE: NN=10, 0.1% accuracy now up to 55%
 - return top 5 periods
+   DONE: NN=10, 0.1% accuracy now up to 80%
 
 === bigger adjustments
 - more accurate lc shape (2 days)
