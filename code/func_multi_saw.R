@@ -14,7 +14,7 @@ SawPrime <- function(t,cc){
 
 ## computes beta
 ComputeBeta <- function(m,t,ampj,phij,phi,omega,cc){
-    X <- cbind(1,ampj*Saw(omega*t+phij+phi,cc))
+    X <- cbind(1,ampj*Saw(omega*(t+phij)+phi,cc))
     B <- t(X)%*%X
     d <- t(X)%*%m
     z <- solve(B,d)
@@ -22,7 +22,7 @@ ComputeBeta <- function(m,t,ampj,phij,phi,omega,cc){
 }
 
 ComputeResiduals <- function(m,t,ampj,phij,phi,omega,cc){
-    X <- cbind(1,ampj*Saw(omega*t+phij+phi,cc))
+    X <- cbind(1,ampj*Saw(omega*(t+phij)+phi,cc))
     z <- ComputeBeta(m,t,ampj,phij,phi,omega,cc)
     return(m - X%*%z)
 }
@@ -38,8 +38,8 @@ NewtonUpdate <- function(m,t,ampj,phij,params,omega,cc){
     ## 2. condition on amp,beta0,omega, newton update phi (see sim.R for code)
     ## if amp = 0 we are at a (bad) stationary point, so choose random phase
     if(amp > 0){
-        gp <- ampj*SawPrime(omega*t+phij+phi,cc)
-        g <- ampj*Saw(omega*t+phij+phi,cc)
+        gp <- ampj*SawPrime(omega*(t+phij)+phi,cc)
+        g <- ampj*Saw(omega*(t+phij)+phi,cc)
         del <- sum(gp*(g-(m-beta0)/amp))
         h <- sum(gp*gp)
         phi <- (phi - h^{-1}*del) %% 1
@@ -59,7 +59,7 @@ SawRss <- function(m,t,ampj,phij,omegas,NN=1,cc=0.25){
         for(jj in 1:NN){
             param <- NewtonUpdate(m,t,ampj,phij,param,omegas[ii],cc)
         }
-        X <- cbind(1,ampj*Saw(omegas[ii]*t+phij+param[3],cc))
+        X <- cbind(1,ampj*Saw(omegas[ii]*(t+phij)+param[3],cc))
         rss[ii] <- min(sum((m - X%*%param[1:2])^2),rss_min)
     }
     return(rss)
