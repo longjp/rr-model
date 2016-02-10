@@ -1,5 +1,7 @@
 rm(list=ls())
 
+source('func_sine.R')
+
 library(RColorBrewer)
 library(scales)
 library(fda)
@@ -67,6 +69,31 @@ for(ii in 1:length(tmss)){
         params[ii,jj,] <- c(temp$x[which.max(temp$y)],temp$x[which.min(temp$y)],max(temp$y)-min(temp$y),mean(temp$y))
     }
 }
+
+
+tms <- lapply(tmss,function(x){x[[1]]})
+K <- 4
+
+beta0 <- rep(0,length(tms))
+amp <- matrix(0,nrow=length(tms),ncol=K)
+colnames(amp) <- 1:K
+rho <- matrix(0,nrow=length(tms),ncol=K)
+colnames(rho) <- 1:K
+for(ii in 1:length(tms)){
+    lc <- tms[[ii]]
+    X <- construct_design(2*pi/rrlyrae[ii,3],K,lc[,1])
+    beta <- compute_params(2*pi/rrlyrae[ii,3],K,lc[,2],X)
+    fit <- get_sinusoidal_params(beta)
+    amp[ii,] <- fit$amp
+    rho[ii,] <- fit$rho
+    beta0[ii] <- fit$beta0
+}
+
+plot((tms[[ii]][,1] %% rrlyrae[ii,3])/rrlyrae[ii,3],tms[[ii]][,2])
+
+pairs(amp,main="amp")
+dev.new()
+pairs(rho,main="rho")
 
 
 
