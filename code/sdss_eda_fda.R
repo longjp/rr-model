@@ -2,6 +2,7 @@ rm(list=ls())
 
 library(RColorBrewer)
 library(scales)
+library(fda)
 
 rrlyrae <- read.table("apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
