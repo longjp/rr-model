@@ -28,9 +28,10 @@ for(ii in 1:length(fnames)){
 }
 for(ii in 1:length(tms)) names(tms[[ii]]) <- c("t","b","m","sigma")
 
-
+tms_band <- list()
 for(ii in 1:length(tms)){
     band <- as.character(tms[[ii]]$b)
+    tms_band[[ii]] <- band
     tms[[ii]] <- data.frame(t=tms[[ii]][,1],
                             m=tms[[ii]][,3]-betas[band],
                             sig=1,ampj=amps[band],
@@ -41,4 +42,4 @@ for(ii in 1:length(tms)){
 names(tms) <- rrlyrae[,1]
 periods <- rrlyrae[,3]
 
-save(tms,periods,cc,file="ps_multi.RData")
+save(tms,tms_band,periods,cc,file="ps_multi.RData")

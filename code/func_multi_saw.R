@@ -27,6 +27,20 @@ ComputeResiduals <- function(m,t,ampj,phij,phi,omega,cc){
     return(m - X%*%z)
 }
 
+
+GetParamsPhiGrid <- function(m,t,ampj,phij,omega,cc,N=500){
+    phis_grid <- (0:(N-1))/N
+    m.resid <- vapply(phis_grid,
+                      function(x){ComputeResiduals(m,t,ampj,phij,x,omega,cc)},
+                      rep(0,length(t)))
+    phi <- phis_grid[which.min(colSums(m.resid^2))]
+    betas <- ComputeBeta(m,t,ampj,phij,phi,omega,cc)
+    params <- c(beta=betas[1],amp=betas[2],phi=phi)
+    return(params)
+}
+
+
+
 NewtonUpdate <- function(m,t,ampj,phij,params,omega,cc){
     ## 1. condition on phi, omega, closed for update for amp,beta0
     beta0 <- params[1]
