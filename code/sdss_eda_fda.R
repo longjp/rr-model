@@ -1,6 +1,7 @@
 rm(list=ls())
 
 source('func_sine.R')
+source('func.R')
 
 library(RColorBrewer)
 library(scales)
@@ -55,10 +56,12 @@ to_use <- rowSums(nobs > 45) == 5
 tmss <- tmss[to_use]
 rrlyrae <- rrlyrae[to_use,]
 
-
+N <- 100
+t <- (1:N)/N
 ### extract location max, location min, amp, beta0 for each lc,band
 params <- array(0,dim=c(length(tmss),5,4),dimnames=list(NULL,bands,c("max","min","amp","beta")))
 out <- list()
+lc_grid <- array(0,c(length(tmss),N,5))
 for(ii in 1:length(tmss)){
     out[[ii]] <- list()
     for(jj in 1:length(bands)){
@@ -66,36 +69,51 @@ for(ii in 1:length(tmss)){
         lc[,1] <- (lc[,1] %% rrlyrae[ii,3]) / rrlyrae[ii,3]
         temp <- supsmu(lc[,1],lc[,2],periodic=TRUE)
         out[[ii]][[jj]] <- temp
+        lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
         params[ii,jj,] <- c(temp$x[which.max(temp$y)],temp$x[which.min(temp$y)],max(temp$y)-min(temp$y),mean(temp$y))
     }
 }
 
 
-tms <- lapply(tmss,function(x){x[[1]]})
-K <- 4
-
-beta0 <- rep(0,length(tms))
-amp <- matrix(0,nrow=length(tms),ncol=K)
-colnames(amp) <- 1:K
-rho <- matrix(0,nrow=length(tms),ncol=K)
-colnames(rho) <- 1:K
-for(ii in 1:length(tms)){
-    lc <- tms[[ii]]
-    X <- construct_design(2*pi/rrlyrae[ii,3],K,lc[,1])
-    beta <- compute_params(2*pi/rrlyrae[ii,3],K,lc[,2],X)
-    fit <- get_sinusoidal_params(beta)
-    amp[ii,] <- fit$amp
-    rho[ii,] <- fit$rho
-    beta0[ii] <- fit$beta0
+## phase and amplitude align light curves in lc_grid
+for(ii in 1:length(tmss)){
+    for(jj in 1:5){
+        temp <- lc_grid[ii,,jj]
+        temp <- temp - mean(temp)
+        temp <- temp / (max(temp) - min(temp))
+        ix <- which.min(temp)
+        if(ix > 1.5){
+            lc_grid[ii,,jj] <- c(temp[ix:N],temp[1:(ix-1)])
+        } else {
+            lc_grid[ii,,jj] <- temp
+        }
+    }
 }
 
-plot((tms[[ii]][,1] %% rrlyrae[ii,3])/rrlyrae[ii,3],tms[[ii]][,2])
+    
 
-pairs(amp,main="amp")
+JJ <- 1
+ylim <- range(lc_grid[,,JJ])
+plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag")
+for(ii in 1:length(tmss)){
+    points(t,lc_grid[ii,,JJ],type='l',col="#00000030")
+}
+
+
+x_new <- phase(lc_grid[,,JJ])
+
 dev.new()
-pairs(rho,main="rho")
+ylim <- range(x_new)
+plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
+for(ii in 1:nrow(x_new)){
+    points(t,x_new[ii,],type='l',col="#00000050")
+}
 
 
+
+meds <- apply(x_new,2,median)
+
+((which.max(meds) - which.min(meds)) / N) %% 1
 
 
 ## construct lightcurve model from out
