@@ -1,6 +1,7 @@
 rm(list=ls())
+set.seed(1235)
 
-N <- 500
+N <- 50
 t <- (1:N)/N
 
 sinef <- function(t){
@@ -19,11 +20,6 @@ for(ii in 1:n){
 }
 
 
-ylim <- range(x)
-plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
-for(ii in 1:nrow(x)){
-    points(t,x[ii,],type='l',col="#00000050")
-}
 
 
 ## phase shift elements in mu by ix
@@ -49,16 +45,32 @@ phase <- function(x,niter=10){
         num <- rowSums((t(t(x) - mu))*xd)
         del <- round(-num/den %% N)
         x <- t(vapply(1:n,function(ii){phase_shift(x[ii,],del[ii])},rep(0,N)))
+        xd <- t(vapply(1:n,function(ii){phase_shift(xd[ii,],del[ii])},rep(0,N)))
         mu <- colMeans(x)
     }
     return(x)
 }
 
 
-x_new <- phase(x)
+x_new <- phase(x,niter=10)
+
+par(mfcol=c(1,2))
+ylim <- range(x)
+plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
+for(ii in 1:nrow(x)){
+    points(t,x[ii,],type='l',col="#00000050")
+}
+mu <- colMeans(x)
+points(t,mu,type='l',col='red',lwd=2)
+
+
 
 ylim <- range(x_new)
 plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
 for(ii in 1:nrow(x)){
     points(t,x_new[ii,],type='l',col="#00000050")
 }
+mu <- colMeans(x_new)
+points(t,mu,type='l',col='red',lwd=2)
+
+

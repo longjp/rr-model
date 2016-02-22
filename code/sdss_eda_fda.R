@@ -103,11 +103,14 @@ for(ii in 1:length(tmss)){
 x_new <- phase(lc_grid[,,JJ])
 
 dev.new()
+
+pdf("new_phased.pdf")
 ylim <- range(x_new)
 plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
 for(ii in 1:nrow(x_new)){
     points(t,x_new[ii,],type='l',col="#00000050")
 }
+dev.off()
 
 
 

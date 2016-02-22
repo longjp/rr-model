@@ -22,7 +22,6 @@ sort_local_min <- function(x,y){
 }
 
 
-
 ## phase shift elements in mu by ix
 phase_shift <- function(mu,ix){
     n <- length(mu)
@@ -46,6 +45,7 @@ phase <- function(x,niter=10){
         num <- rowSums((t(t(x) - mu))*xd)
         del <- round(-num/den %% N)
         x <- t(vapply(1:n,function(ii){phase_shift(x[ii,],del[ii])},rep(0,N)))
+        xd <- t(vapply(1:n,function(ii){phase_shift(xd[ii,],del[ii])},rep(0,N)))
         mu <- colMeans(x)
     }
     return(x)
