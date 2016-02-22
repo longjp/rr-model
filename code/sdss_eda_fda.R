@@ -111,7 +111,7 @@ for(ii in 1:nrow(x_new)){
 
 
 
-meds <- apply(x_new,2,median)
+meds <- apply(x_new,2,mean)
 
 ((which.max(meds) - which.min(meds)) / N) %% 1
 
