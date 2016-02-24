@@ -68,6 +68,9 @@ for(ii in 1:length(tmss)){
         lc <- tmss[[ii]][[bands[jj]]]
         lc[,1] <- (lc[,1] %% rrlyrae[ii,3]) / rrlyrae[ii,3]
         temp <- supsmu(lc[,1],lc[,2],periodic=TRUE)
+        ymean <- mean(c(temp$y[1],temp$y[length(temp$y)]))
+        temp$y <- c(ymean,temp$y,ymean)
+        temp$x <- c(0,temp$x,1)
         out[[ii]][[jj]] <- temp
         lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
         params[ii,jj,] <- c(temp$x[which.max(temp$y)],temp$x[which.min(temp$y)],max(temp$y)-min(temp$y),mean(temp$y))
@@ -75,48 +78,98 @@ for(ii in 1:length(tmss)){
 }
 
 
+
+alphas <- apply(lc_grid,1,mean)
+lc_band_means <- apply(lc_grid,c(1,3),mean)
+betas <- colMeans(lc_band_means - alphas)
+
+
+for(ii in 1:length(tmss)){
+    lc_grid[ii,,] <- lc_grid[ii,,] - alphas[ii]
+    for(jj in 1:5){
+        lc_grid[ii,,jj] - betas[jj]
+    }
+}
+
+
 ## phase and amplitude align light curves in lc_grid
 for(ii in 1:length(tmss)){
-    for(jj in 1:5){
-        temp <- lc_grid[ii,,jj]
-        temp <- temp - mean(temp)
-        temp <- temp / (max(temp) - min(temp))
-        ix <- which.min(temp)
-        if(ix > 1.5){
-            lc_grid[ii,,jj] <- c(temp[ix:N],temp[1:(ix-1)])
-        } else {
-            lc_grid[ii,,jj] <- temp
+    temp <- lc_grid[ii,,1]
+    ##temp <- temp - mean(temp)
+    ##temp <- temp / (max(temp) - min(temp))
+    ix <- which.min(temp)
+    if(ix > 1.5){
+        for(jj in 1:5){
+            temp <- lc_grid[ii,,jj]
+            lc_grid[ii,,jj] <- (c(temp[ix:N],temp[1:(ix-1)]) - mean(temp))/(max(temp)-min(temp))
+        }
+    } else {
+        for(jj in 1:5){
+            temp <- lc_grid[ii,,jj]
+            lc_grid[ii,,jj] <- (temp - mean(temp))/(max(temp)-min(temp))
         }
     }
 }
 
-    
+cols <- brewer.pal(10,name="RdBu")
+decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
+dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
 
-JJ <- 1
+
+
+del <- phase(lc_grid[,,1])
+for(JJ in 1:5){
+    x_new <- list()
+    n <- nrow(lc_grid[,,JJ])
+    x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
+    dev.new()
+    par(mfcol=c(2,1))
+    ylim <- range(lc_grid[,,JJ])
+    plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
+    for(ii in 1:length(tmss)){
+        points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
+    }
+    ylim <- range(x_new[[JJ]])
+    plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
+    for(ii in 1:nrow(x_new[[JJ]])){
+        points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+JJ <- 2
+n <- nrow(lc_grid[,,JJ])
+x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
+dev.new()
+par(mfcol=c(2,1))
 ylim <- range(lc_grid[,,JJ])
-plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag")
+plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
 for(ii in 1:length(tmss)){
     points(t,lc_grid[ii,,JJ],type='l',col="#00000030")
 }
-
-
-x_new <- phase(lc_grid[,,JJ])
-
-dev.new()
-
-pdf("new_phased.pdf")
-ylim <- range(x_new)
-plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
-for(ii in 1:nrow(x_new)){
-    points(t,x_new[ii,],type='l',col="#00000050")
+ylim <- range(x_new[[JJ]])
+plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
+for(ii in 1:nrow(x_new[[JJ]])){
+    points(t,x_new[[JJ]][ii,],type='l',col="#00000030")
 }
-dev.off()
 
 
 
-meds <- apply(x_new,2,mean)
 
-((which.max(meds) - which.min(meds)) / N) %% 1
+
+
+
+
+
 
 
 ## construct lightcurve model from out
@@ -212,25 +265,6 @@ for(jj in 1:length(bands)){
 }
 
 
-## find cc
-phis <- (params[,,"min"] - params[,,"max"]) %% 1
-phis <- as.vector(phis)
-phis <- cbind(cos(2*pi*phis),sin(2*pi*phis))
-phis <- colSums(phis)
-phis_av <- phis / sqrt(sum(phis^2))
-cc <- atan2(phis_av[2],phis_av[1]) / (2*pi)
-
-
-######## find phij
-phis <- rep(0,length(bands))
-names(phis) <- bands
-for(jj in 1:length(bands)){
-    phis_temp <- (params[,bands[jj],"min"] - params[,1,"min"]) %% 1
-    phis_temp <- cbind(cos(2*pi*phis_temp),sin(2*pi*phis_temp))
-    phis_temp <- colSums(phis_temp)
-    phis_av <- phis_temp / sqrt(sum(phis_temp^2))
-    phis[jj] <- atan2(phis_av[2],phis_av[1]) / (2*pi)
-}
 
 
 save(betas,amps,phis,cc,file="sdss_eda.RData")
