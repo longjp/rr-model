@@ -54,6 +54,8 @@ If we cannot achieve this, we quit.
 
 == to do
 - run regsse phase regrestration (equation 7.1 of fda) on light curves and examine plots
+- estimate cc from these new plot, is it less than old cc?
+   - if so run algorithm again with new cc
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)

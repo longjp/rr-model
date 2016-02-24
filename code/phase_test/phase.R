@@ -40,16 +40,20 @@ phase <- function(x,niter=10){
     xs <- cbind(x[,N],x[,1:(N-1)])
     xd <- x - xs
     den <- rowSums(xd*xd)
+    del_total <- rep(0,length(den))
     ## compute numerator, updating mu each time
     for(jj in 1:niter){
         num <- rowSums((t(t(x) - mu))*xd)
         del <- round(-num/den %% N)
+        del_total <- (del + del_total) %% N
         x <- t(vapply(1:n,function(ii){phase_shift(x[ii,],del[ii])},rep(0,N)))
         xd <- t(vapply(1:n,function(ii){phase_shift(xd[ii,],del[ii])},rep(0,N)))
         mu <- colMeans(x)
     }
-    return(x)
+    return(del_total)
 }
+
+
 
 
 x_new <- phase(x,niter=10)
@@ -74,3 +78,17 @@ mu <- colMeans(x_new)
 points(t,mu,type='l',col='red',lwd=2)
 
 
+
+del <- phase(x,niter=10)
+n <- nrow(x)
+N <- ncol(x)
+x_new_new <- t(vapply(1:n,function(ii){phase_shift(x[ii,],del[ii])},rep(0,N)))
+
+dev.new()
+ylim <- range(x_new_new)
+plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="")
+for(ii in 1:nrow(x)){
+    points(t,x_new_new[ii,],type='l',col="#00000050")
+}
+mu <- colMeans(x_new_new)
+points(t,mu,type='l',col='red',lwd=2)
