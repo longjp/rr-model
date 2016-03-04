@@ -39,11 +39,13 @@
 - return top 5 periods
    DONE: NN=10, 0.1% accuracy now up to 80%
 
+
 === bigger adjustments
 - more accurate lc shape (2 days)
 - could algorithm be converging to local min / max (2 days)
   - NN = 5 with 2 (or more) chains
 - ridge penalty on amplitude, prior on period (1 day)
+
 
 === after doing all these we require
 - 90% of lcs have a top 5 estimate within .1% of truth
@@ -53,9 +55,15 @@ If we cannot achieve this, we quit.
 
 
 == to do
-- run regsse phase regrestration (equation 7.1 of fda) on light curves and examine plots
-- estimate cc from these new plot, is it less than old cc?
-   - if so run algorithm again with new cc
+- iterate regression and svd algorithm, do estimates / residuals improve
+- save output of program
+  - dust vector
+  - lc shape
+  - betas
+- write up brief note on regression / svd algorithm
+
+
+
 
 - papers
    - algorithm + results on panstarrs (astronomy paper)

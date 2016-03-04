@@ -84,6 +84,57 @@ lc_band_means <- apply(lc_grid,c(1,3),mean)
 betas <- colMeans(lc_band_means - alphas)
 
 
+colnames(lc_band_means) <- bands
+pairs(lc_band_means)
+
+
+
+
+
+cols <- brewer.pal(10,name="RdBu")
+decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
+dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
+
+
+lc_ix <- as.factor(rep(1:nrow(lc_band_means),ncol(lc_band_means)))
+bands_ix <- as.factor(rep(1:ncol(lc_band_means),each=nrow(lc_band_means)))
+lc_means <- as.vector(lc_band_means)
+
+lm.fit <- lm(lc_means ~ lc_ix + bands_ix)
+resid <- matrix(lm.fit$residuals,ncol=length(bands))
+colnames(resid) <- bands
+pairs(resid,col=cols[dec])
+
+
+resid_svd <- svd(resid)
+pred <- resid_svd$d[1]*resid_svd$u[,1,drop=FALSE]%*%matrix(resid_svd$v[,1],ncol=5)
+dev.new()
+pairs(resid - pred,col=cols[dec])
+
+
+pairs(cbind(resid - pred,log(rrlyrae[,3])),col=cols[dec])
+
+resid2 <- resid - pred
+
+## regress residuals on period and get residuals of residuals
+for(ii in 1:ncol(resid2)){
+    resid2[,ii] <- lm(resid2[,ii] ~ rrlyrae[,3])$residuals
+}
+
+dev.new()
+pairs(cbind(resid2,rrlyrae[,3]),col=cols[dec])
+
+
+
+
+
+
+#### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
+
+
+
+
+
 for(ii in 1:length(tmss)){
     lc_grid[ii,,] <- lc_grid[ii,,] - alphas[ii]
     for(jj in 1:5){
