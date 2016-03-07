@@ -77,19 +77,16 @@ for(ii in 1:length(tmss)){
     }
 }
 
+## ix <- 8
+## plot(tmss[[ix]][[1]][,1],tmss[[ix]][[1]][,2])
+## plot(lc_grid[ix,,1])
 
 
-alphas <- apply(lc_grid,1,mean)
+
+## get betas and dust
 lc_band_means <- apply(lc_grid,c(1,3),mean)
-betas <- colMeans(lc_band_means - alphas)
-
-
 colnames(lc_band_means) <- bands
 pairs(lc_band_means)
-
-
-
-
 
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
@@ -101,6 +98,10 @@ bands_ix <- as.factor(rep(1:ncol(lc_band_means),each=nrow(lc_band_means)))
 lc_means <- as.vector(lc_band_means)
 
 lm.fit <- lm(lc_means ~ lc_ix + bands_ix)
+l <- length(lm.fit$coefficients)
+betas <- c(0,lm.fit$coefficients[(l-3):l]) ## betas
+names(betas) <- bands
+
 resid <- matrix(lm.fit$residuals,ncol=length(bands))
 colnames(resid) <- bands
 pairs(resid,col=cols[dec])
@@ -109,39 +110,58 @@ pairs(resid,col=cols[dec])
 resid_svd <- svd(resid)
 pred <- resid_svd$d[1]*resid_svd$u[,1,drop=FALSE]%*%matrix(resid_svd$v[,1],ncol=5)
 dev.new()
+
+dust <- resid_svd$v[,1]
+names(dust) <- bands ## dust
+
 pairs(resid - pred,col=cols[dec])
-
-
 pairs(cbind(resid - pred,log(rrlyrae[,3])),col=cols[dec])
 
 resid2 <- resid - pred
 
-## regress residuals on period and get residuals of residuals
-for(ii in 1:ncol(resid2)){
-    resid2[,ii] <- lm(resid2[,ii] ~ rrlyrae[,3])$residuals
-}
-
-dev.new()
-pairs(cbind(resid2,rrlyrae[,3]),col=cols[dec])
 
 
-
-
-
+#### svd + regression can be done in one step because residuals are orthogonal
+#### to design column
 
 #### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 
 
-
-
+## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:length(tmss)){
-    lc_grid[ii,,] <- lc_grid[ii,,] - alphas[ii]
     for(jj in 1:5){
-        lc_grid[ii,,jj] - betas[jj]
+        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + resid2[ii,jj]
     }
 }
 
+
+##
+amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
+amps_band <- colMeans(amps)
+xtx.iv <- 1/sum(amps_band*amps_band)
+amps_lc <- as.vector(amps%*%matrix(amps_band,ncol=1)*xtx.iv)
+
+
+pred <- matrix(amps_lc,nrow=length(amps_lc))%*%matrix(amps_band,ncol=5)
+
+hist(amps - pred)
+
+colnames(amps) <- bands
+my_line <- function(x,y,...){
+    points(x,y,...)
+    abline(a = 0,b = 1,...)
+}
+pairs(amps,col="#00000030",ylim=c(0,max(amps)),xlim=c(0,max(amps)),lower.panel=my_line)
+abline(a=0,b=1)
+
+
+
+
+
+
+
+## lightcurves 8, 54, 59, 69, 72, 167 are screwed up
 
 ## phase and amplitude align light curves in lc_grid
 for(ii in 1:length(tmss)){
@@ -157,17 +177,19 @@ for(ii in 1:length(tmss)){
     } else {
         for(jj in 1:5){
             temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- (temp - mean(temp))/(max(temp)-min(temp))
+            lc_grid[ii,,jj] <- temp / (amps_band[jj] * amps_lc[ii])
         }
     }
 }
+
+
 
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
 dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
 
 
-
+yedge <- 0.6
 del <- phase(lc_grid[,,1])
 for(JJ in 1:5){
     x_new <- list()
@@ -176,11 +198,13 @@ for(JJ in 1:5){
     dev.new()
     par(mfcol=c(2,1))
     ylim <- range(lc_grid[,,JJ])
+    ylim <- c(-yedge,yedge)
     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
     for(ii in 1:length(tmss)){
         points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
     }
     ylim <- range(x_new[[JJ]])
+    ylim <- c(-yedge,yedge)
     plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
     for(ii in 1:nrow(x_new[[JJ]])){
         points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
@@ -189,131 +213,9 @@ for(JJ in 1:5){
 
 
 
+## what is causing 2 light curves to have close to 0 normalized amp (very large outliers)
 
 
-
-
-
-
-
-
-JJ <- 2
-n <- nrow(lc_grid[,,JJ])
-x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
-dev.new()
-par(mfcol=c(2,1))
-ylim <- range(lc_grid[,,JJ])
-plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-for(ii in 1:length(tmss)){
-    points(t,lc_grid[ii,,JJ],type='l',col="#00000030")
-}
-ylim <- range(x_new[[JJ]])
-plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
-for(ii in 1:nrow(x_new[[JJ]])){
-    points(t,x_new[[JJ]][ii,],type='l',col="#00000030")
-}
-
-
-
-
-
-
-
-
-
-
-
-## construct lightcurve model from out
-for(ii in 1:length(out)){
-    phase <- out[[ii]][[1]]$x[which.min(out[[ii]][[1]]$y)]
-    for(jj in 1:5){
-        out[[ii]][[jj]]$x <- (out[[ii]][[jj]]$x - phase) %% 1
-        out[[ii]][[jj]]$y <- (out[[ii]][[jj]]$y - params[ii,jj,4]) / params[ii,jj,3]
-    }
-}
-
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-    for(jj in 1:5){
-        ords <- order(out[[ii]][[jj]]$x)
-        points(out[[ii]][[jj]]$x[ords],out[[ii]][[jj]]$y[ords],col=alpha(jj, 0.1),type='l')
-    }
-}
-
-
-cols <- brewer.pal(10,name="RdBu")
-decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
-dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
-
-
-dev.new()
-JJ <- 1
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-    ords <- order(out[[ii]][[JJ]]$x)
-    points(out[[ii]][[JJ]]$x[ords],out[[ii]][[JJ]]$y[ords],type='l',col=cols[dec[ii]])
-}
-
-
-
-dev.new()
-JJ <- 2
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-    ords <- order(out[[ii]][[JJ]]$x)
-    points(out[[ii]][[JJ]]$x[ords],out[[ii]][[JJ]]$y[ords],col=cols[dec[ii]],type='l')
-}
-
-
-dev.new()
-JJ <- 3
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-        ords <- order(out[[ii]][[JJ]]$x)
-        points(out[[ii]][[JJ]]$x[ords],out[[ii]][[JJ]]$y[ords],col=alpha(JJ, 0.1),type='l')
-}
-
-
-dev.new()
-JJ <- 4
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-        ords <- order(out[[ii]][[JJ]]$x)
-        points(out[[ii]][[JJ]]$x[ords],out[[ii]][[JJ]]$y[ords],col=alpha(JJ, 0.1),type='l')
-}
-
-
-dev.new()
-JJ <- 5
-ylim <- c(-0.75,.75)
-plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="phase",ylab="mag")
-for(ii in 1:length(out)){
-        ords <- order(out[[ii]][[JJ]]$x)
-        points(out[[ii]][[JJ]]$x[ords],out[[ii]][[JJ]]$y[ords],col=alpha(JJ, 0.1),type='l')
-}
-
-
-
-
-
-### get ratio of amplitudes, g band is defined as 0
-amps <- rep(0,length(bands))
-names(amps) <- bands
-for(jj in 1:length(bands)){
-    amps[jj] <- lm(params[,bands[jj],"amp"] ~ params[,bands[1],"amp"]-1)$coefficients
-}
-
-### get median difference in mean mags across bands
-betas <- rep(0,length(bands))
-names(betas) <- bands
-for(jj in 1:length(bands)){
-    betas[jj] <- median(params[,bands[jj],"beta"] - params[,1,"beta"])
-}
 
 
 
