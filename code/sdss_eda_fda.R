@@ -126,8 +126,6 @@ resid2 <- resid - pred
 
 #### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
-
-
 ## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:length(tmss)){
     for(jj in 1:5){
@@ -135,33 +133,12 @@ for(ii in 1:length(tmss)){
     }
 }
 
-
-##
+## determine amplitude vector
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
-amps_band <- colMeans(amps)
-xtx.iv <- 1/sum(amps_band*amps_band)
-amps_lc <- as.vector(amps%*%matrix(amps_band,ncol=1)*xtx.iv)
-
-
-pred <- matrix(amps_lc,nrow=length(amps_lc))%*%matrix(amps_band,ncol=5)
-
-hist(amps - pred)
-
-colnames(amps) <- bands
-my_line <- function(x,y,...){
-    points(x,y,...)
-    abline(a = 0,b = 1,...)
-}
-pairs(amps,col="#00000030",ylim=c(0,max(amps)),xlim=c(0,max(amps)),lower.panel=my_line)
-abline(a=0,b=1)
-
-
-
-
-
-
-
-## lightcurves 8, 54, 59, 69, 72, 167 are screwed up
+sv <- resid_svd <- svd(amps)
+pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
+pairs(amps-pred)
+amps <- abs(sv$v[,1])
 
 ## phase and amplitude align light curves in lc_grid
 for(ii in 1:length(tmss)){
@@ -172,29 +149,36 @@ for(ii in 1:length(tmss)){
     if(ix > 1.5){
         for(jj in 1:5){
             temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- (c(temp[ix:N],temp[1:(ix-1)]) - mean(temp))/(max(temp)-min(temp))
+            lc_grid[ii,,jj] <- (c(temp[ix:N],temp[1:(ix-1)]) - mean(temp)) / pred[ii,jj]
         }
     } else {
         for(jj in 1:5){
             temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- temp / (amps_band[jj] * amps_lc[ii])
+            lc_grid[ii,,jj] <- temp / pred[ii,jj]
         }
     }
 }
 
+## compute medians for each band
+del <- phase(lc_grid[,,1])
+x_new <- list()
+templates <- matrix(0,nrow=5,ncol=length(t))
+for(JJ in 1:5){
+    n <- nrow(lc_grid[,,JJ])
+    x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
+    templates[JJ,] <- apply(x_new[[JJ]],2,median)
+}
 
 
+
+## visualize curves
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
 dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
-
-
-yedge <- 0.6
+yedge <- 2.5
 del <- phase(lc_grid[,,1])
 for(JJ in 1:5){
-    x_new <- list()
     n <- nrow(lc_grid[,,JJ])
-    x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
     dev.new()
     par(mfcol=c(2,1))
     ylim <- range(lc_grid[,,JJ])
@@ -209,15 +193,16 @@ for(JJ in 1:5){
     for(ii in 1:nrow(x_new[[JJ]])){
         points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
     }
+    points(t,templates[JJ,],lwd=3,type='l')
+}
+
+## plot of templates
+ylim <- range(templates)
+xlim <- range(t)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templates[ii,],type='l',lwd=2)
 }
 
 
-
-## what is causing 2 light curves to have close to 0 normalized amp (very large outliers)
-
-
-
-
-
-
-save(betas,amps,phis,cc,file="sdss_eda.RData")
+save(betas,amps,templates,file="sdss_eda.RData")
