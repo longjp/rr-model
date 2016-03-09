@@ -55,13 +55,10 @@ If we cannot achieve this, we quit.
 
 
 == to do
-- iterate regression and svd algorithm, do estimates / residuals improve
-- save output of program
-  - dust vector
-  - lc shape
-  - betas
-- write up brief note on regression / svd algorithm
-
+- write up note on what sdss_eda_fda.R is doing
+- comment / improve code based on note
+- write code to simulate from model
+  - should we create new code base specifically for this model?
 
 
 
