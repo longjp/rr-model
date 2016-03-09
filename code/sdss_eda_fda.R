@@ -5,14 +5,12 @@ source('func.R')
 
 library(RColorBrewer)
 library(scales)
-library(fda)
 
 rrlyrae <- read.table("apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
 
 folder <- "rrlyrae"
 fnames <- list.files(folder)
-
 
 
 ## order fnames and rrlyrae
@@ -56,14 +54,13 @@ to_use <- rowSums(nobs > 45) == 5
 tmss <- tmss[to_use]
 rrlyrae <- rrlyrae[to_use,]
 
+
+### smooth lightcurves using supersmoother
+### place on equally spaced grid
 N <- 100
 t <- (1:N)/N
-### extract location max, location min, amp, beta0 for each lc,band
-params <- array(0,dim=c(length(tmss),5,4),dimnames=list(NULL,bands,c("max","min","amp","beta")))
-out <- list()
 lc_grid <- array(0,c(length(tmss),N,5))
 for(ii in 1:length(tmss)){
-    out[[ii]] <- list()
     for(jj in 1:length(bands)){
         lc <- tmss[[ii]][[bands[jj]]]
         lc[,1] <- (lc[,1] %% rrlyrae[ii,3]) / rrlyrae[ii,3]
@@ -71,16 +68,9 @@ for(ii in 1:length(tmss)){
         ymean <- mean(c(temp$y[1],temp$y[length(temp$y)]))
         temp$y <- c(ymean,temp$y,ymean)
         temp$x <- c(0,temp$x,1)
-        out[[ii]][[jj]] <- temp
         lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
-        params[ii,jj,] <- c(temp$x[which.max(temp$y)],temp$x[which.min(temp$y)],max(temp$y)-min(temp$y),mean(temp$y))
     }
 }
-
-## ix <- 8
-## plot(tmss[[ix]][[1]][,1],tmss[[ix]][[1]][,2])
-## plot(lc_grid[ix,,1])
-
 
 
 ## get betas and dust
@@ -91,7 +81,6 @@ pairs(lc_band_means)
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
 dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
-
 
 lc_ix <- as.factor(rep(1:nrow(lc_band_means),ncol(lc_band_means)))
 bands_ix <- as.factor(rep(1:ncol(lc_band_means),each=nrow(lc_band_means)))
@@ -106,7 +95,6 @@ resid <- matrix(lm.fit$residuals,ncol=length(bands))
 colnames(resid) <- bands
 pairs(resid,col=cols[dec])
 
-
 resid_svd <- svd(resid)
 pred <- resid_svd$d[1]*resid_svd$u[,1,drop=FALSE]%*%matrix(resid_svd$v[,1],ncol=5)
 dev.new()
@@ -118,7 +106,6 @@ pairs(resid - pred,col=cols[dec])
 pairs(cbind(resid - pred,log(rrlyrae[,3])),col=cols[dec])
 
 resid2 <- resid - pred
-
 
 
 #### svd + regression can be done in one step because residuals are orthogonal
@@ -133,18 +120,17 @@ for(ii in 1:length(tmss)){
     }
 }
 
-## determine amplitude vector
+## determine amplitude vector by computing svd of amps
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
 sv <- resid_svd <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 pairs(amps-pred)
 amps <- abs(sv$v[,1])
 
-## phase and amplitude align light curves in lc_grid
+## phase (initial) and amplitude registration
+## improved phase registration using squared differences next
 for(ii in 1:length(tmss)){
     temp <- lc_grid[ii,,1]
-    ##temp <- temp - mean(temp)
-    ##temp <- temp / (max(temp) - min(temp))
     ix <- which.min(temp)
     if(ix > 1.5){
         for(jj in 1:5){
@@ -159,7 +145,7 @@ for(ii in 1:length(tmss)){
     }
 }
 
-## compute medians for each band
+## phase align and compute templates for each band
 del <- phase(lc_grid[,,1])
 x_new <- list()
 templates <- matrix(0,nrow=5,ncol=length(t))
@@ -169,9 +155,7 @@ for(JJ in 1:5){
     templates[JJ,] <- apply(x_new[[JJ]],2,median)
 }
 
-
-
-## visualize curves
+## visualize curves with templates
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
 dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
@@ -203,6 +187,5 @@ plot(0,0,col=0,ylim=ylim,xlim=xlim)
 for(ii in 1:5){
     points(t,templates[ii,],type='l',lwd=2)
 }
-
 
 save(betas,amps,templates,file="sdss_eda.RData")
