@@ -59,7 +59,7 @@ rrlyrae <- rrlyrae[to_use,]
 ### place on equally spaced grid
 N <- 100
 t <- (1:N)/N
-lc_grid <- array(0,c(length(tmss),N,5))
+lc_grid <- array(0,c(length(tmss),N,5),dimnames=list(NULL,NULL,bands))
 for(ii in 1:length(tmss)){
     for(jj in 1:length(bands)){
         lc <- tmss[[ii]][[bands[jj]]]
@@ -73,50 +73,25 @@ for(ii in 1:length(tmss)){
 }
 
 
-## get betas and dust
-lc_band_means <- apply(lc_grid,c(1,3),mean)
-colnames(lc_band_means) <- bands
-pairs(lc_band_means)
-
-cols <- brewer.pal(10,name="RdBu")
-decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
-dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
-
-lc_ix <- as.factor(rep(1:nrow(lc_band_means),ncol(lc_band_means)))
-bands_ix <- as.factor(rep(1:ncol(lc_band_means),each=nrow(lc_band_means)))
-lc_means <- as.vector(lc_band_means)
-
-lm.fit <- lm(lc_means ~ lc_ix + bands_ix)
-l <- length(lm.fit$coefficients)
-betas <- c(0,lm.fit$coefficients[(l-3):l]) ## betas
-names(betas) <- bands
-
-resid <- matrix(lm.fit$residuals,ncol=length(bands))
-colnames(resid) <- bands
-pairs(resid,col=cols[dec])
-
-resid_svd <- svd(resid)
-pred <- resid_svd$d[1]*resid_svd$u[,1,drop=FALSE]%*%matrix(resid_svd$v[,1],ncol=5)
-dev.new()
-
-dust <- resid_svd$v[,1]
-names(dust) <- bands ## dust
-
-pairs(resid - pred,col=cols[dec])
-pairs(cbind(resid - pred,log(rrlyrae[,3])),col=cols[dec])
-
-resid2 <- resid - pred
-
-
-#### svd + regression can be done in one step because residuals are orthogonal
-#### to design column
+## get betas and dust, see explanation in document
+m <- apply(lc_grid,c(1,3),mean)
+alphas <- rowMeans(m)
+mtemp <- m - alphas
+betas <- colMeans(mtemp)
+mtemp <- t(t(mtemp) - betas)
+pairs(mtemp)
+sv <- svd(mtemp)
+dust <- sv$v[,1]
+resid <- mtemp - sv$d[1]*sv$u[,1,drop=FALSE]%*%t(sv$v[,1,drop=FALSE])
 
 #### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
+
+
 
 ## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:length(tmss)){
     for(jj in 1:5){
-        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + resid2[ii,jj]
+        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + resid[ii,jj]
     }
 }
 
@@ -183,9 +158,11 @@ for(JJ in 1:5){
 ## plot of templates
 ylim <- range(templates)
 xlim <- range(t)
+pdf("templates2.pdf",width=8,height=4)
 plot(0,0,col=0,ylim=ylim,xlim=xlim)
 for(ii in 1:5){
     points(t,templates[ii,],type='l',lwd=2)
 }
+dev.off()
 
 save(betas,amps,templates,file="sdss_eda.RData")
