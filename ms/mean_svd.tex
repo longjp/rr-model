@@ -75,19 +75,62 @@
 \textbf{\today}\\
 \textbf{Estimating Band Means and Dust}
 
+\section{Model}
+
 Let $m_{ib}$ be the mean magnitude of light curve $i$ in band $b$. We model
 \begin{equation*}
 m_{ib} = \beta_b + \alpha_i + d_i\delta_b + \sigma_{ib}
 \end{equation*}
-where $\beta_b$ is the mean offset for band $b$, $\alpha_i$ is the mean brightness of light curve $i$, $d_i$ is the amount of dust, $\delta_b$ is the extinction due to dust in band $b$, and $\sigma_{ib} \sim N(0,\sigma^2)$ independent. For identifiability we require $\sum \beta_b = 0$ (sum contrasts?). We can rewrite this model as
+where $\beta_b$ is the mean offset for band $b$, $\alpha_i$ is the mean brightness of light curve $i$, $d_i$ is the amount of dust, $\delta_b$ is the extinction due to dust in band $b$, and $\sigma_{ib} \sim N(0,\sigma^2)$ independent. We can rewrite the model in vector form as
 \begin{equation*}
-  m_i \sim N(\beta + \alpha_i\V{1} + d_i\V{\delta},\sigma^2\M{I})
+\V{m}_i = \V{\beta} + \alpha_i \V{1} + d_i \V{\delta} + \V{\sigma}_i
 \end{equation*}
+where $\V{\sigma}_i \sim N(0,\sigma^2I)$. The model is not identifiable. For example,
+\begin{align*}
+\V{m}_i &= (\V{\beta} + c\V{\delta}) + \alpha_i \V{1} + (d_i - c) \V{\delta} + \V{\sigma}_i\\
+\V{m}_i &= (\V{\beta} - c\V{1}) + (\alpha_i + c)\V{1} + d_i\V{\delta} + \V{\sigma}_i\\
+\V{m}_i &= \V{\beta} + (\alpha_i - d_i)\V{1} + d_i(\V{\delta} + 1) + \V{\sigma}_i\\
+\end{align*}
+For identifiability we assume $\V{\delta} \perp \V{1}$, $\V{\beta} \perp \V{1}$, and $\V{d} \perp \V{1}$ where $\V{d} = (d_1,\ldots,d_n)^T$.
 
 
+\section{Intuitive Idea Behind Maximum Likelihood}
+
+Let $\M{M} \in \mathbb{R}^{n \times B}$ where $\M{M}_{ib} = m_{ib}$. Consider principal components analysis with a row centering. Let $\widehat{\alpha}_i = \frac{1}{B} \sum m_{ib}$ and $\widehat{\V{\alpha}} = (\widehat{\alpha}_1,\ldots,\widehat{\alpha}_n)^T$. The row centered $\M{M}$ is
 \begin{equation*}
-  m_i \sim N(\beta + \alpha_i\V{1},\sigma^2\M{I} + d\V{\delta}\V{\delta}^T)
+\M{M}' = \M{M} - \V{\alpha}\V{1}^T.
 \end{equation*}
+Let $\widehat{\V{\beta}}$ be the column means of $\M{M}'$, $\widehat{\V{d}}$ be the first singular values of the column centered $\M{M}'$, and $\widehat{\V{\delta}}$ be the first singular vector.
+
+\section{Formal Derivation of Maximum Likelihood Estimates}
+
+We seek
+\begin{equation*}
+\argmin{\V{\alpha},\V{\beta},\V{\delta},\V{d}} \sum_{i=1}^n || \V{m}_i - \V{\beta} - \alpha_i\V{1} - d_i\V{\delta}||_2^2.
+\end{equation*}
+Fixing all other parameters we have
+\begin{align*}
+\widehat{\alpha}_i &= \frac{1}{B} \sum_{b=1}^B (m_{ib} - \beta_{b} - d_i\delta_b)\\
+&= \frac{1}{B} \sum_{b=1}^B m_{ib} - \frac{1}{B}\sum_{b=1}^B \beta_{b} - d_i\frac{1}{B}\sum_{b=1}^B\delta_b\\
+&= \frac{1}{B} \sum_{b=1}^B m_{ib}\\
+&= \bar{m}_i
+\end{align*}
+Now we must find
+\begin{equation*}
+\argmin{\V{\beta},\V{\delta},\V{d}} \sum_{i=1}^n || \V{x}_i - \V{\beta} - d_i\V{\delta}||_2^2.
+\end{equation*}
+where $\V{x}_i = \V{m}_{i} - \widehat{\alpha}_i\V{1}$. We have
+\begin{align*}
+\widehat{\beta}_b &= \frac{1}{n}\sum_{i=1}^n (x_{ib} - d_i\delta_b)\\
+&= \frac{1}{n}\sum_{i=1}^n x_{ib} - \delta_b \frac{1}{n} \sum_{i=1}^n d_i)\\
+&= \frac{1}{n}\sum_{i=1}^n x_{ib}\\
+&= \left(\frac{1}{n}\sum_{i=1}^n m_{ib}\right) - n\widehat{\alpha}_b
+\end{align*}
+Finally we have
+\begin{equation*}
+\argmin{\V{\delta},\V{d}} \sum_{i=1}^n || \V{x}_i - d_i\V{\delta}||_2^2.
+\end{equation*}
+where $\V{x}_i = \V{m}_{i} - \widehat{\alpha}_i\V{1} - \widehat{\V{\beta}}$. This final minimization is achieved using a singular value decomposition where $\V{\delta}$ is the first singular vector and $\V{d}$ is the vector of first singular values.
 
 
 
