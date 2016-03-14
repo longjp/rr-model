@@ -72,7 +72,6 @@ for(ii in 1:length(tmss)){
     }
 }
 
-
 ## get betas and dust, see explanation in document
 m <- apply(lc_grid,c(1,3),mean)
 alphas <- rowMeans(m)
@@ -97,7 +96,7 @@ for(ii in 1:length(tmss)){
 
 ## determine amplitude vector by computing svd of amps
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
-sv <- resid_svd <- svd(amps)
+sv <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 pairs(amps-pred)
 amps <- abs(sv$v[,1])
@@ -110,7 +109,7 @@ for(ii in 1:length(tmss)){
     if(ix > 1.5){
         for(jj in 1:5){
             temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- (c(temp[ix:N],temp[1:(ix-1)]) - mean(temp)) / pred[ii,jj]
+            lc_grid[ii,,jj] <- c(temp[ix:N],temp[1:(ix-1)]) / pred[ii,jj]
         }
     } else {
         for(jj in 1:5){
