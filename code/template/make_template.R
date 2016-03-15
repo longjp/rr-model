@@ -1,6 +1,6 @@
 rm(list=ls())
 
-source('func_sine.R')
+## source('func_sine.R')
 source('func.R')
 
 library(RColorBrewer)
@@ -9,7 +9,7 @@ library(scales)
 rrlyrae <- read.table("apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
 
-folder <- "rrlyrae"
+folder <- "../rrlyrae"
 fnames <- list.files(folder)
 
 
@@ -81,6 +81,7 @@ mtemp <- t(t(mtemp) - betas)
 pairs(mtemp)
 sv <- svd(mtemp)
 dust <- sv$v[,1]
+names(dust) <- bands
 resid <- mtemp - sv$d[1]*sv$u[,1,drop=FALSE]%*%t(sv$v[,1,drop=FALSE])
 
 #### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
@@ -100,6 +101,7 @@ sv <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 pairs(amps-pred)
 amps <- abs(sv$v[,1])
+names(amps) <- bands
 
 ## phase (initial) and amplitude registration
 ## improved phase registration using squared differences next
@@ -123,6 +125,7 @@ for(ii in 1:length(tmss)){
 del <- phase(lc_grid[,,1])
 x_new <- list()
 templates <- matrix(0,nrow=5,ncol=length(t))
+rownames(templates) <- bands
 for(JJ in 1:5){
     n <- nrow(lc_grid[,,JJ])
     x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
@@ -130,38 +133,38 @@ for(JJ in 1:5){
 }
 
 ## visualize curves with templates
-cols <- brewer.pal(10,name="RdBu")
-decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
-dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
-yedge <- 2.5
-del <- phase(lc_grid[,,1])
-for(JJ in 1:5){
-    n <- nrow(lc_grid[,,JJ])
-    dev.new()
-    par(mfcol=c(2,1))
-    ylim <- range(lc_grid[,,JJ])
-    ylim <- c(-yedge,yedge)
-    plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-    for(ii in 1:length(tmss)){
-        points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
-    }
-    ylim <- range(x_new[[JJ]])
-    ylim <- c(-yedge,yedge)
-    plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
-    for(ii in 1:nrow(x_new[[JJ]])){
-        points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
-    }
-    points(t,templates[JJ,],lwd=3,type='l')
-}
+## cols <- brewer.pal(10,name="RdBu")
+## decLocations <- quantile(rrlyrae[,3], probs = seq(0.1,0.9,by=0.1),type=4)
+## dec <- findInterval(rrlyrae[,3],c(-Inf,decLocations, Inf))
+## yedge <- 2.5
+## del <- phase(lc_grid[,,1])
+## for(JJ in 1:5){
+##     n <- nrow(lc_grid[,,JJ])
+##     dev.new()
+##     par(mfcol=c(2,1))
+##     ylim <- range(lc_grid[,,JJ])
+##     ylim <- c(-yedge,yedge)
+##     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
+##     for(ii in 1:length(tmss)){
+##         points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
+##     }
+##     ylim <- range(x_new[[JJ]])
+##     ylim <- c(-yedge,yedge)
+##     plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
+##     for(ii in 1:nrow(x_new[[JJ]])){
+##         points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
+##     }
+##     points(t,templates[JJ,],lwd=3,type='l')
+## }
 
 ## plot of templates
-ylim <- range(templates)
-xlim <- range(t)
-pdf("templates2.pdf",width=8,height=4)
-plot(0,0,col=0,ylim=ylim,xlim=xlim)
-for(ii in 1:5){
-    points(t,templates[ii,],type='l',lwd=2)
-}
-dev.off()
+## ylim <- range(templates)
+## xlim <- range(t)
+## pdf("templates2.pdf",width=8,height=4)
+## plot(0,0,col=0,ylim=ylim,xlim=xlim)
+## for(ii in 1:5){
+##     points(t,templates[ii,],type='l',lwd=2)
+## }
+## dev.off()
 
-save(betas,amps,templates,file="sdss_eda.RData")
+save(betas,amps,dust,templates,file="make_template.RData")
