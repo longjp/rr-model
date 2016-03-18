@@ -1,0 +1,107 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim, amsmath,amssymb,amsthm,graphicx}
+\usepackage[margin=1in,nohead]{geometry}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{bbm}
+\usepackage{bm}
+
+\sectionfont{\normalsize}
+\subsectionfont{\small}
+
+\title{}
+\date{}
+\author{}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\newcommand{\Remark}[2]{{\color{red}Remark from #1: #2}\xspace}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\newcommand{\minimax}[2]{\argmin{#1}\underset{#2}{\operatorname{max}}}
+\newcommand{\bb}{\textbf{b}}
+
+\newcommand{\Var}{\text{Var }}
+\newcommand{\Cov}{\text{Cov }}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
+
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+\newenvironment{my_enumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}}{\end{enumerate}
+}
+
+
+
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of [yas] elisp error!TeX Unbound'' for suggested values.
+% See pp. 199-200 of Lamport's [yas] elisp error!LaTeX'' book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}% require fuller float pages
+
+% remember to use [htp] or [htpb] for placement
+
+
+
+
+
+\begin{document}
+\noindent
+\textbf{James Long}\\
+\textbf{\today}\\
+\textbf{Newton Algorithm with Templates}
+
+Let $m_{ib}$ be the magnitude at time $t_{ib}$ in band $b$. We model this as
+\begin{equation*}
+m_{ib} = \alpha + \beta_b + d\delta_b + a\gamma_b(t_{ib}\omega + \phi) + \epsilon_{ib}
+\end{equation*}
+where $\epsilon_{ib} \sim N(0,\sigma^2)$ independent. $\beta_b$, $\delta_b$, and $\gamma_b$ are known. Our goal is to perform maximum likelihood for $\theta = (\alpha,d,a,\omega,\phi)$. We perform a grid search across $\omega$ with a warm start Newton algorithm.
+
+\section{$\phi$ Update}
+
+Fix $(\alpha,d,a,\omega)$. Let $m_{ib}' = m_{ib} - \alpha - \beta_b - d\delta_b$ and $\gamma_{ib}(\phi) = a\phi_b(t_{ib}\omega + \phi)$. Then we seek to minimize
+\begin{equation*}
+g(\phi) = \sum_{b=1}^B\sum_{i=1}^{n_b} (m_{ib}' - \gamma_{bi}(\phi))^2
+\end{equation*}
+Consider using a newton like algorithm where
+\begin{equation*}
+\phi^{(m+1)} = \phi^{(m)} - H(g)^{-1}(\phi^{(m)})\nabla(g)(\phi^{(m)})
+\end{equation*}
+We need to compute $H(g)$ and $\nabla(g)$ (the first and second derivatives of $g$). We have
+\begin{equation*}
+\nabla(g) = \frac{\partial g}{\partial \phi} = - 2\sum \sum (m_{ib}' - \gamma_{bi}(\phi))\gamma_{bi}'(\phi).
+\end{equation*}
+and
+\begin{equation*}
+H(g) = \frac{\partial^2 g}{\partial \phi^2} = 2 \sum \sum \left(\gamma'_{bi}(\phi)^2 - (m_{ib}' - \gamma_{bi}(\phi))\gamma''_{bi}(\phi)\right)
+\end{equation*}
+%\bibliographystyle{plainnat}
+%\bibliography{refs}
+
+
+\end{document}
+
