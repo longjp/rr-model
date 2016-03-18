@@ -124,7 +124,7 @@ for(ii in 1:length(tmss)){
 ## phase align and compute templates for each band
 del <- phase(lc_grid[,,1])
 x_new <- list()
-templates <- matrix(0,nrow=5,ncol=length(t))
+templates <- matrix(0,nrow=5,ncol=N)
 rownames(templates) <- bands
 for(JJ in 1:5){
     n <- nrow(lc_grid[,,JJ])
@@ -167,4 +167,72 @@ for(JJ in 1:5){
 ## }
 ## dev.off()
 
-save(betas,amps,dust,templates,file="make_template.RData")
+
+## scale templates by amps, don't save amps
+for(ii in 1:length(amps)){
+    templates[ii,] <- amps[ii]*templates[ii,]
+}
+
+
+##plot of templates
+ylim <- range(templates)
+xlim <- range(t)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templates[ii,],type='l',lwd=2)
+}
+
+
+
+
+
+ComputeDerivative <- function(x,len,gap=2){
+    n <- length(x)
+    x <- c(x[(n-gap+1):n],x,x[1:gap])
+    return((x[(2*gap+1):(n+2*gap)] - x[1:n]) / (2*gap*len))
+}
+
+
+
+len <- t[2] - t[1]
+x <- templates[1,]
+deriv <- ComputeDerivative(x,len)
+plot(t,deriv,type='l')
+
+templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
+templatesd2 <- t(apply(templatesd,1,function(x){ComputeDerivative(x,len)}))
+
+
+##plot of templates
+ylim <- range(templates)
+xlim <- range(t)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templates[ii,],type='l',lwd=2)
+}
+
+
+##plot of templates
+dev.new()
+ylim <- range(templatesd)
+xlim <- range(t)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templatesd[ii,],type='l',lwd=2)
+}
+
+
+dev.new()
+ylim <- range(templatesd2)
+xlim <- range(t)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templatesd2[ii,],type='l',lwd=2)
+}
+
+
+
+save(betas,dust,templates,file="make_template.RData")
+
+
+
