@@ -1,7 +1,14 @@
 ## code simulate RR Lyrae from model with sdss cadence
 rm(list=ls())
 load("make_template.RData")
-load("make_tms.RData")
+
+f <- list.files("../rrlyrae/",full.names=TRUE)
+tms <- list()
+for(ii in 1:length(f)){
+    tms[[ii]] <- read.table(f[ii])
+    names(tms[[ii]]) <- c("time","band","mag","error")
+}
+
 
 bands <- names(dust)
 t <- seq(0,1,length.out=ncol(templates))
@@ -37,4 +44,5 @@ for(ii in 1:N){
 ## plot((tms_sim[[ii]][,1] %% period[ii])/period[ii],tms_sim[[ii]][,3],col=as.numeric(tms_sim[[ii]][,2]))
 
 tms <- tms_sim
-save(tms,alpha,a,period,d,phase,file="sim.RData")
+param <- list(period=period,alpha=alpha,a=a,d=d,phase=phase)
+save(tms,param,file="sim.RData")

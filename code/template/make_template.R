@@ -1,6 +1,5 @@
 rm(list=ls())
 
-## source('func_sine.R')
 source('func.R')
 
 library(RColorBrewer)
@@ -231,8 +230,8 @@ for(ii in 1:5){
 }
 
 
-
-save(betas,dust,templates,file="make_template.RData")
+tem <- list(betas=betas,dust=dust,templates=templates)
+save(tem,file="make_template.RData")
 
 
 
