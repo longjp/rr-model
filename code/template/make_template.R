@@ -77,7 +77,7 @@ alphas <- rowMeans(m)
 mtemp <- m - alphas
 betas <- colMeans(mtemp)
 mtemp <- t(t(mtemp) - betas)
-pairs(mtemp)
+##pairs(mtemp)
 sv <- svd(mtemp)
 dust <- sv$v[,1]
 names(dust) <- bands
@@ -98,7 +98,7 @@ for(ii in 1:length(tmss)){
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
 sv <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
-pairs(amps-pred)
+##pairs(amps-pred)
 amps <- abs(sv$v[,1])
 names(amps) <- bands
 
@@ -173,13 +173,13 @@ for(ii in 1:length(amps)){
 }
 
 
-##plot of templates
-ylim <- range(templates)
-xlim <- range(t)
-plot(0,0,col=0,ylim=ylim,xlim=xlim)
-for(ii in 1:5){
-    points(t,templates[ii,],type='l',lwd=2)
-}
+## ##plot of templates
+## ylim <- range(templates)
+## xlim <- range(t)
+## plot(0,0,col=0,ylim=ylim,xlim=xlim)
+## for(ii in 1:5){
+##     points(t,templates[ii,],type='l',lwd=2)
+## }
 
 
 
@@ -194,43 +194,42 @@ ComputeDerivative <- function(x,len,gap=2){
 
 
 len <- t[2] - t[1]
-x <- templates[1,]
-deriv <- ComputeDerivative(x,len)
-plot(t,deriv,type='l')
-
 templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
-templatesd2 <- t(apply(templatesd,1,function(x){ComputeDerivative(x,len)}))
 
 
-##plot of templates
-ylim <- range(templates)
-xlim <- range(t)
-plot(0,0,col=0,ylim=ylim,xlim=xlim)
-for(ii in 1:5){
-    points(t,templates[ii,],type='l',lwd=2)
-}
+##templatesd2 <- t(apply(templatesd,1,function(x){ComputeDerivative(x,len)}))
 
 
-##plot of templates
-dev.new()
-ylim <- range(templatesd)
-xlim <- range(t)
-plot(0,0,col=0,ylim=ylim,xlim=xlim)
-for(ii in 1:5){
-    points(t,templatesd[ii,],type='l',lwd=2)
-}
+## ##plot of templates
+## ylim <- range(templates)
+## xlim <- range(t)
+## plot(0,0,col=0,ylim=ylim,xlim=xlim)
+## for(ii in 1:5){
+##     points(t,templates[ii,],type='l',lwd=2)
+## }
 
 
-dev.new()
-ylim <- range(templatesd2)
-xlim <- range(t)
-plot(0,0,col=0,ylim=ylim,xlim=xlim)
-for(ii in 1:5){
-    points(t,templatesd2[ii,],type='l',lwd=2)
-}
+## ##plot of templates
+## dev.new()
+## ylim <- range(templatesd)
+## xlim <- range(t)
+## plot(0,0,col=0,ylim=ylim,xlim=xlim)
+## for(ii in 1:5){
+##     points(t,templatesd[ii,],type='l',lwd=2)
+## }
 
 
-tem <- list(betas=betas,dust=dust,templates=templates)
+## dev.new()
+## ylim <- range(templatesd2)
+## xlim <- range(t)
+## plot(0,0,col=0,ylim=ylim,xlim=xlim)
+## for(ii in 1:5){
+##     points(t,templatesd2[ii,],type='l',lwd=2)
+## }
+
+
+tem <- list(betas=betas,dust=dust,
+            templates=templates,templatesd=templatesd)
 save(tem,file="make_template.RData")
 
 
