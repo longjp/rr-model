@@ -19,38 +19,16 @@ plot((tms[[ii]]$time %% param$period[ii]) / param$period[ii],tms[[1]]$mag)
 
 
 
-NewtonUpdate <- function(m,t,params,omega){
-    ## 1. condition on phi, omega, closed for update for amp,beta0
-    beta0 <- params[1]
-    amp <- params[2]
-    phi <- params[3]
-    beta <- ComputeBeta(m,t,phi,omega)
-    beta0 <- beta[1]
-    amp <- beta[2]
-    ## 2. condition on amp,beta0,omega, newton update phi (see sim.R for code)
-    ## if amp = 0 we are at a (bad) stationary point, so choose random phase
-    if(amp > 0){
-        gp <- SawPrime(omega*t+phi)
-        g <- Saw(omega*t+phi)
-        del <- sum(gp*(g-(m-beta0)/amp))
-        h <- sum(gp*gp)
-        phi <- (phi - h^{-1}*del) %% 1
-    } else {
-        amp <- 0
-        phi <- runif(1)
-    }
-    out <- c(beta0,amp,phi)
-    return(out)
-}
 
 
-
-t <- dat[[1]]$time
-nb <- dat[[2]]
-phi <- param$phase[ii]
-per <- param$period[ii]
 m <- dat[[1]]$mag
 dust <- dat[[1]]$dust
+t <- dat[[1]]$time
+
+nb <- dat[[2]]
+
+phi <- param$phase[ii]
+per <- param$period[ii]
 
 gammaf <- ConstructGamma(t,nb,phi,per,tem$templates,temp_time)
 
@@ -78,24 +56,25 @@ for(jj in 1:nrow(templatesd)){
 
 
 
-
-
-gammaf <- ConstructGamma(t,nb,phi,per,template_funcs)
-est <- ComputeBeta(m,dust,gammaf)
-alpha <- est["alpha"]
-a <- est["a"]
-d <- est["d"]
-if(a > 0){
-    ## write newton update here
-    gp <- SawPrime(omega*t+phi)
-    g <- Saw(omega*t+phi)
-    del <- sum(gp*(g-(m-beta0)/amp))
-    h <- sum(gp*gp)
-    phi <- (phi - h^{-1}*del) %% 1
-} else {
-    a <- 0
-    phi <- runif(1)
-}
-out <- c(alpha,d,a,phi)
+## work on this
+NewtonUpdate <- function(m,t,dust,nb,omega,template_funcs,templated_funcs){
+    
+    gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
+    est <- ComputeBeta(m,dust,gammaf)
+    alpha <- est["alpha"]
+    a <- est["a"]
+    d <- est["d"]
+    if(a > 0){
+        ## write newton update here
+        gammafd <- ConstructGamma(t,nb,phi,per,templated_funcs)
+        mp <- m - alpha - d*dust
+        del <- sum(gammafd*(mp-a*gammaf))
+        h <- a*sum(gp*gp)
+        phi <- (phi + h^{-1}*del) %% 1
+    } else {
+        a <- 0
+        phi <- runif(1)
+    }
+    out <- c(alpha,d,a,phi)
 
 
