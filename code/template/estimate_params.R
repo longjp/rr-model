@@ -1,71 +1,61 @@
 rm(list=ls())
-load("sim.RData")
+source("rrab_fit.R")
+load("tms_params.RData")
 load("make_template.RData")
 
-temp_time <- seq(0,1,length.out=ncol(templates))
+temp_time <- seq(0,1,length.out=ncol(tem$templates))
 
 
 
-
-AugmentData <- function(tm,dust,betas,use.errors=FALSE){
-    tm <- tm[order(tm[,2]),]
-    nb <- table(tm[,2])
-    tm$dust <- rep.int(dust,nb)
-    tm$mag <- tm$mag - rep.int(betas,nb)
-    tm$band <- NULL
-    if(!use.errors){
-        tm$error <- 1
-    }
-    return(list(tm=tm,nb=nb))
-}
 
 
 ii <- 1
-dat <- AugmentData(tms[[ii]],dust,betas)
+dat <- AugmentData(tms[[ii]],tem$dust,tem$betas)
 
 
 par(mfcol=c(2,1))
-plot((dat[[1]]$time %% period[ii]) / period[ii],dat[[1]]$mag - dat[[1]]$dust*d[ii])
-plot((tms[[ii]]$time %% period[ii]) / period[ii],tms[[1]]$mag)
+plot((dat[[1]]$time %% param$period[ii]) / param$period[ii],dat[[1]]$mag - dat[[1]]$dust*param$d[ii])
+plot((tms[[ii]]$time %% param$period[ii]) / param$period[ii],tms[[1]]$mag)
 
 
 
-
-
-ConstructGamma <- function(t,nb,phi,per,templates,temp_time){
-    t <- (t/per + phi) %% 1
-    bix <- c(0,cumsum(nb))
-    gammaf <- rep(0,length(t))
-    for(jj in 1:(length(bix)-1)){
-        ix1 <- (bix[jj]+1)
-        ix2 <- bix[jj+1]
-        gammaf[ix1:ix2] <-  approx(temp_time,templates[jj,],xout=t[ix1:ix2])$y
+NewtonUpdate <- function(m,t,params,omega){
+    ## 1. condition on phi, omega, closed for update for amp,beta0
+    beta0 <- params[1]
+    amp <- params[2]
+    phi <- params[3]
+    beta <- ComputeBeta(m,t,phi,omega)
+    beta0 <- beta[1]
+    amp <- beta[2]
+    ## 2. condition on amp,beta0,omega, newton update phi (see sim.R for code)
+    ## if amp = 0 we are at a (bad) stationary point, so choose random phase
+    if(amp > 0){
+        gp <- SawPrime(omega*t+phi)
+        g <- Saw(omega*t+phi)
+        del <- sum(gp*(g-(m-beta0)/amp))
+        h <- sum(gp*gp)
+        phi <- (phi - h^{-1}*del) %% 1
+    } else {
+        amp <- 0
+        phi <- runif(1)
     }
-    return(gammaf)
-}
-
-
-## computes beta
-ComputeBeta <- function(m,dust,gammaf){
-    X <- cbind(1,dust,gammaf)
-    B <- t(X)%*%X
-    d <- t(X)%*%m
-    z <- solve(B,d)
-   return(z)
+    out <- c(beta0,amp,phi)
+    return(out)
 }
 
 
 
 t <- dat[[1]]$time
 nb <- dat[[2]]
-phi <- phase[ii]
-per <- period[ii]
+phi <- param$phase[ii]
+per <- param$period[ii]
 m <- dat[[1]]$mag
+dust <- dat[[1]]$dust
 
-gammaf <- ConstructGamma(t,nb,phi,per,templates,temp_time)
+gammaf <- ConstructGamma(t,nb,phi,per,tem$templates,temp_time)
 
 
-pred <- gammaf*a[ii] + d[ii]*dat[[1]]$dust + rep(alpha[ii],length(gammaf)) + rep.int(betas,nb)
+pred <- gammaf*param$a[ii] + param$d[ii]*dat[[1]]$dust + rep(param$alpha[ii],length(gammaf)) + rep.int(tem$betas,nb)
 
 tms[[ii]] <- tms[[ii]][order(tms[[ii]][,2]),]
 
@@ -73,6 +63,39 @@ plot((tms[[ii]][,1] %% per) / per,tms[[ii]][,3])
 points((tms[[ii]][,1] %% per) / per,pred,col='red')
 
 
+templates <- tem$templates
+templatesd <- tem$templatesd
 
 
-params <- ComputeBeta(m,dat[[1]]$dust,gammaf)
+template_funcs <- list()
+for(jj in 1:nrow(templates)){
+    template_funcs[[jj]] <- approxfun(temp_time,templates[jj,])
+}
+templated_funcs <- list()
+for(jj in 1:nrow(templatesd)){
+    templated_funcs[[jj]] <- approxfun(temp_time,templatesd[jj,])
+}
+
+
+
+
+
+gammaf <- ConstructGamma(t,nb,phi,per,template_funcs)
+est <- ComputeBeta(m,dust,gammaf)
+alpha <- est["alpha"]
+a <- est["a"]
+d <- est["d"]
+if(a > 0){
+    ## write newton update here
+    gp <- SawPrime(omega*t+phi)
+    g <- Saw(omega*t+phi)
+    del <- sum(gp*(g-(m-beta0)/amp))
+    h <- sum(gp*gp)
+    phi <- (phi - h^{-1}*del) %% 1
+} else {
+    a <- 0
+    phi <- runif(1)
+}
+out <- c(alpha,d,a,phi)
+
+

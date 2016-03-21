@@ -10,8 +10,8 @@ for(ii in 1:length(f)){
 }
 
 
-bands <- names(dust)
-t <- seq(0,1,length.out=ncol(templates))
+bands <- names(tem$dust)
+t <- seq(0,1,length.out=ncol(tem$templates))
 
 ## simulate parameters all at once
 N <- 500 # number of light curves to simulate
@@ -33,8 +33,8 @@ for(ii in 1:N){
     t_temp <- (t_temp + phase[ii]) %% 1
     for(jj in 1:length(bands)){
         to_use <- tms_sim[[ii]][,2] == bands[jj]
-        m <- approx(t,templates[jj,],xout=t_temp[to_use])$y
-        m <- betas[jj] + alpha[ii] + d[ii]*dust[jj] + a[ii]*m + 3*rnorm(length(m),mean=0,sd=tms_sim[[ii]][,4])
+        m <- approx(t,tem$templates[jj,],xout=t_temp[to_use])$y
+        m <- tem$betas[jj] + alpha[ii] + d[ii]*tem$dust[jj] + a[ii]*m + (1/5)*rnorm(length(m),mean=0,sd=tms_sim[[ii]][,4])
         tms_sim[[ii]][to_use,3] <- m
     }
 }
@@ -45,4 +45,4 @@ for(ii in 1:N){
 
 tms <- tms_sim
 param <- list(period=period,alpha=alpha,a=a,d=d,phase=phase)
-save(tms,param,file="sim.RData")
+save(tms,param,file="tms_params.RData")
