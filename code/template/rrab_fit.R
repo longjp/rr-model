@@ -33,4 +33,23 @@ ComputeBeta <- function(m,dust,gammaf){
    return(z[,1])
 }
 
-
+NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
+    gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
+    est <- ComputeBeta(m,dust,gammaf)
+    alpha <- est["alpha"]
+    a <- est["a"]
+    d <- est["d"]
+    if(a > 0){
+        gammafd <- ConstructGamma(t,nb,phi,omega,templated_funcs)
+        mp <- m - alpha - d*dust
+        del <- sum(gammafd*(mp-a*gammaf))
+        h <- a*sum(gammafd*gammafd)
+        phi <- (phi + h^{-1}*del) %% 1
+    } else {
+        a <- 0
+        phi <- runif(1)
+    }
+    out <- c(alpha,d,a,phi=phi)
+    names(out) <- NULL
+    return(out)
+}
