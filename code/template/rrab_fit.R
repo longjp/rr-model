@@ -53,3 +53,30 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
     names(out) <- NULL
     return(out)
 }
+
+
+
+ComputeRSS <- function(tm,omegas,tem,NN=1){
+    dat <- AugmentData(tm,tem$dust,tem$betas)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    nb <- dat[[2]]
+    coeffs <- c(0,0,0,runif(1))
+    rss_max <- sum(lm(m~dust)$residuals^2)
+    rss <- rep(0,length(omegas))
+    for(ii in 1:length(omegas)){
+        for(jj in 1:NN){
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+        }
+        gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
+        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
+    }
+    return(rss)
+}
+
+get_freqs <-function(period_min,period_max,freq_del = 0.1/4000){
+    freq_max <- 1/period_min
+    freq_min <- 1/period_max
+    return(seq(freq_min, freq_max, freq_del))
+}
