@@ -4,7 +4,7 @@ load("make_template.RData")
 load("estimate_params.RData")
 source("rrab_fit.R")
 
-N <- 10
+N <- length(period_est)
 
 print("accuracies:")
 print(paste("1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.01)))
