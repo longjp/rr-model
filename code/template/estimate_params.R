@@ -1,5 +1,6 @@
 library('parallel')
 source("rrab_fit.R")
+source("func.R")
 load("tms_params.RData")
 load("make_template.RData")
 
@@ -17,7 +18,7 @@ ComputePeriod <- function(ii){
     print(ii)
     rss <- ComputeRSS(tms[[ii]],omegas,tem,NN=NN)
     return(1/omegas[sort_local_min(1:length(rss),rss)[1:5]])
-    return(1/omegas[which.min(rss)])
+    ##return(1/omegas[which.min(rss)])
 }
 
 ## parameters for simulation
@@ -29,6 +30,6 @@ mc.cores <- 12
 
 ## estimate periods
 period_est <- mclapply(1:N,ComputePeriod,mc.cores=mc.cores)
-period_est <- as.numeric(period_est)
+period_est <- matrix(unlist(period_est),ncol=5,byrow=TRUE)
 
 save(period_est,file="estimate_params.RData")

@@ -3,17 +3,18 @@ load("tms_params.RData")
 load("make_template.RData")
 load("estimate_params.RData")
 source("rrab_fit.R")
-source('funcs.R')
+source('func.R')
 
 unlink("figs",recursive=TRUE)
 dir.create("figs")
 
 ## report accuracies
-N <- length(period_est)
-print("accuracies:")
-print(paste("1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.01)))
-print(paste("0.1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.001)))
-print(paste("0.01%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.0001)))
+N <- nrow(period_est)
+print("accuracies")
+print(paste("1%:",mean(within_x(period_est,param$period[1:N],0.01))))
+print(paste("0.1%:",mean(within_x(period_est,param$period[1:N],0.001))))
+print(paste("0.01%:",mean(within_x(period_est,param$period[1:N],0.0001))))
+print("")
 
 ## create template functions
 temp_time <- seq(0,1,length.out=ncol(tem$templates))
@@ -42,7 +43,10 @@ ComputeCoeffs <- function(tm,omega,tem,NN=10){
     return(coeffs)
 }
 
+
+
 ## plot all bands with best fit parameters, store in figs
+period_est <- period_est[,1] ## just use best fit period
 for(ii in 1:N){
     tm <- tms[[ii]]
     omega <- 1/period_est[ii]

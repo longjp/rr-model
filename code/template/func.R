@@ -1,3 +1,7 @@
+within_x <- function(estimates,truth,thres){
+    return(apply(abs((estimates - truth)/truth),1,min) < thres)
+}
+
 SplitData <- function(tm){
     levs <- levels(tm$band)
     lc <- list()
@@ -6,12 +10,6 @@ SplitData <- function(tm){
     }
     names(lc) <- levs
     return(lc)
-}
-
-get_freqs <-function(period_min,period_max,freq_del = 0.1/4000){
-    freq_max <- 1/period_min
-    freq_min <- 1/period_max
-    return(2 * pi * seq(freq_min, freq_max, freq_del))
 }
 
 is_local_min <- function(x){
