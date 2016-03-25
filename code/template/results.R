@@ -34,8 +34,10 @@ ComputeCoeffs <- function(tm,omega,tem,NN=10){
     t <- dat[[1]]$time
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
-    for(jj in 1:NN){
-        coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+    while(coeffs[3]==0){
+        for(jj in 1:NN){
+            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+        }
     }
     return(coeffs)
 }

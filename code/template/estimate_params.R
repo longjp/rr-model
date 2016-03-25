@@ -1,4 +1,3 @@
-rm(list=ls())
 library('parallel')
 source("rrab_fit.R")
 load("tms_params.RData")
@@ -21,10 +20,11 @@ ComputePeriod <- function(ii){
 }
 
 ## parameters for simulation
-N <- length(tms) ## number of light curves to run
+##N <- length(tms) ## number of light curves to run
+N <- 3
 NN <- 4
 omegas <- get_freqs(0.2,1)
-mc.cores <- 12
+mc.cores <- 2
 
 ## estimate periods
 period_est <- mclapply(1:N,ComputePeriod,mc.cores=mc.cores)
