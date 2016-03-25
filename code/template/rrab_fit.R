@@ -19,7 +19,9 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
     for(jj in 1:(length(bix)-1)){
         ix1 <- (bix[jj]+1)
         ix2 <- bix[jj+1]
-        gammaf[ix1:ix2] <-  temp_funcs[[jj]](t[ix1:ix2])
+        if(ix2 >= ix1){
+            gammaf[ix1:ix2] <-  temp_funcs[[jj]](t[ix1:ix2])
+        }
     }
     return(gammaf)
 }
