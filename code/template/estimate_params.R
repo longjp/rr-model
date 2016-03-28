@@ -25,7 +25,7 @@ ComputePeriod <- function(ii){
 ## parameters for simulation
 ##N <- length(tms) ## number of light curves to run
 N <- length(tms)
-NN <- 4
+NN <- 5
 omegas <- get_freqs(0.2,1)
 mc.cores <- 12
 
