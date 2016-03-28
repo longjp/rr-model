@@ -35,7 +35,7 @@ ComputeBeta <- function(m,dust,gammaf){
    return(z[,1])
 }
 
-NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
+NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,NN){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     est <- ComputeBeta(m,dust,gammaf)
     alpha <- est["alpha"]
@@ -49,7 +49,11 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
         phi <- (phi + h^{-1}*del) %% 1
     } else {
         a <- 0
-        phi <- (phi + 1/2 + runif(1,min=-.25,max=0.25)) %% 1
+        if(NN > 1){
+            phi <- (phi + 1/NN) %% 1
+        } else {
+            phi <- runif(1)
+        }
     }
     out <- c(alpha,d,a,phi=phi)
     names(out) <- NULL
@@ -67,7 +71,7 @@ FitTemplate <- function(tm,omegas,tem,NN=1){
     rss <- rep(0,length(omegas))
     for(ii in 1:length(omegas)){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs,NN)
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
