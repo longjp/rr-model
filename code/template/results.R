@@ -30,8 +30,8 @@ print("")
 ## how often is algorithm (as opposed to model) is failing
 ## ie true period has lower rss than rss of top 5
 ## but true period is not in top 5
-rss_true <- rep(0,length(tms))
-rss_est <- rep(0,length(tms))
+rss_true <- rep(0,N)
+rss_est <- rep(0,N)
 phis <- (1:100)/100
 for(ii in 1:length(rss_true)){
     tm <- tms[[ii]]
@@ -42,10 +42,6 @@ is_correct <- within_x(period_est,param$period[1:N],0.01)
 print(paste0("fraction time wrong and correct period has lower rss: ",
              round(mean((rss_true < rss_est) & !is_correct),4)))
 print("")
-
-print(paste0("fraction time wrong and correct period has lower rss: ",
-             round(mean((rss_true > rss_est) & !is_correct),4)))
-
 
 ## fraction of times period is best
 print("accuracies, top period:")
@@ -70,10 +66,3 @@ for(ii in 1:N){
     }
     dev.off()
 }
-
-
-
-N <- 5
-t <- 0.9
-x <- c(5,5.05,6,5.99,6.01,6.12,19,20,21,22,19.01)
-SeparateBest(x,t,N)
