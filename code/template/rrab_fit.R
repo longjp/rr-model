@@ -49,14 +49,12 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
         phi <- (phi + h^{-1}*del) %% 1
     } else {
         a <- 0
-        phi <- runif(1)
+        phi <- (phi + 1/2 + runif(1,min=-.25,max=0.25)) %% 1
     }
     out <- c(alpha,d,a,phi=phi)
     names(out) <- NULL
     return(out)
 }
-
-
 
 FitTemplate <- function(tm,omegas,tem,NN=1){
     dat <- AugmentData(tm,tem$dust,tem$betas)

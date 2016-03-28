@@ -38,7 +38,7 @@ for(ii in 1:length(rss_true)){
     rss_est[ii] <- min(ComputeRSSPhase(tm,1/param$period[ii],tem,phis))
     rss_true[ii] <- min(vapply(1/period_est[ii,],function(x){ComputeRSSPhase(tm,x,tem,phis)},rep(0,length(phis))))
 }
-is_correct <- within_x(period_est,param$period[1:N],0.01)
+is_correct <- within_x(period_est,param$period[1:N],0.0001)
 print(paste0("fraction time wrong and correct period has lower rss: ",
              round(mean((rss_true < rss_est) & !is_correct),4)))
 print("")
