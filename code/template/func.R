@@ -29,6 +29,22 @@ sort_local_min <- function(x,y){
     return(x)
 }
 
+## returns first N elements of x which are
+## all separate from each other by t
+SeparateBest <- function(x,t,N){
+    out <- rep(x[1],N)
+    ii <- 2
+    while((length(x) >= 2) & (ii <= N)){
+        x <- x[2:length(x)]
+        x <- x[abs(x - out[ii-1]) > t]
+        if(length(x > 0)){
+            out[ii] <- x[1]
+        }
+        ii <- ii + 1
+    }
+    return(out)
+}
+
 ## phase shift elements in mu by ix
 phase_shift <- function(mu,ix){
     n <- length(mu)

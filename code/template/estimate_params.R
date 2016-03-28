@@ -16,9 +16,10 @@ for(jj in 1:nrow(tem$templatesd)){
 
 ComputePeriod <- function(ii){
     print(ii)
-    rss <- ComputeRSS(tms[[ii]],omegas,tem,NN=NN)
-    return(1/omegas[sort_local_min(1:length(rss),rss)[1:5]])
-    ##return(1/omegas[which.min(rss)])
+    rss <- FitTemplate(tms[[ii]],omegas,tem,NN=NN)
+    ps <- 1/omegas[sort_local_min(1:length(rss),rss)]
+    ps <- SeparateBest(ps,0.0002,5)
+    return(ps)
 }
 
 ## parameters for simulation

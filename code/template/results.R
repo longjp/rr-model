@@ -8,21 +8,6 @@ source('func.R')
 unlink("figs",recursive=TRUE)
 dir.create("figs")
 
-## report accuracies
-N <- nrow(period_est)
-print("accuracies, top 5:")
-print(paste("1%:",mean(within_x(period_est,param$period[1:N],0.01))))
-print(paste("0.1%:",mean(within_x(period_est,param$period[1:N],0.001))))
-print(paste("0.01%:",mean(within_x(period_est,param$period[1:N],0.0001))))
-print("")
-
-print("accuracies, top period:")
-period_est <- period_est[,1] ## just use best fit period
-print(paste("1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.01)))
-print(paste("0.1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.001)))
-print(paste("0.01%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.0001)))
-
-
 ## create template functions
 temp_time <- seq(0,1,length.out=ncol(tem$templates))
 tem$template_funcs <- list()
@@ -34,23 +19,40 @@ for(jj in 1:nrow(tem$templatesd)){
     tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
 }
 
-## for a given omega, find coefficients
-ComputeCoeffs <- function(tm,omega,tem,NN=10){
-    dat <- AugmentData(tm,tem$dust,tem$betas)
-    m <- dat[[1]]$mag
-    dust <- dat[[1]]$dust
-    t <- dat[[1]]$time
-    nb <- dat[[2]]
-    coeffs <- c(0,0,0,runif(1))
-    while(coeffs[3]==0){
-        for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
-        }
-    }
-    return(coeffs)
+## fraction of times true period in top 5
+N <- nrow(period_est)
+print("accuracies, top 5:")
+print(paste("1%:",mean(within_x(period_est,param$period[1:N],0.01))))
+print(paste("0.1%:",mean(within_x(period_est,param$period[1:N],0.001))))
+print(paste("0.01%:",mean(within_x(period_est,param$period[1:N],0.0001))))
+print("")
+
+## how often is algorithm (as opposed to model) is failing
+## ie true period has lower rss than rss of top 5
+## but true period is not in top 5
+rss_true <- rep(0,length(tms))
+rss_est <- rep(0,length(tms))
+phis <- (1:100)/100
+for(ii in 1:length(rss_true)){
+    tm <- tms[[ii]]
+    rss_est[ii] <- min(ComputeRSSPhase(tm,1/param$period[ii],tem,phis))
+    rss_true[ii] <- min(vapply(1/period_est[ii,],function(x){ComputeRSSPhase(tm,x,tem,phis)},rep(0,length(phis))))
 }
+is_correct <- within_x(period_est,param$period[1:N],0.01)
+print(paste0("fraction time wrong and correct period has lower rss: ",
+             round(mean((rss_true < rss_est) & !is_correct),4)))
+print("")
+
+print(paste0("fraction time wrong and correct period has lower rss: ",
+             round(mean((rss_true > rss_est) & !is_correct),4)))
 
 
+## fraction of times period is best
+print("accuracies, top period:")
+period_est <- period_est[,1] ## just use best fit period
+print(paste("1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.01)))
+print(paste("0.1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.001)))
+print(paste("0.01%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.0001)))
 
 ## plot all bands with best fit parameters, store in figs
 for(ii in 1:N){
@@ -68,3 +70,10 @@ for(ii in 1:N){
     }
     dev.off()
 }
+
+
+
+N <- 5
+t <- 0.9
+x <- c(5,5.05,6,5.99,6.01,6.12,19,20,21,22,19.01)
+SeparateBest(x,t,N)
