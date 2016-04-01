@@ -73,6 +73,9 @@ for(ii in 1:length(tmss)){
 
 ## get betas and dust, see explanation in document
 m <- apply(lc_grid,c(1,3),mean)
+pdf("band_means.pdf")
+pairs(m)
+
 alphas <- rowMeans(m)
 mtemp <- m - alphas
 betas <- colMeans(mtemp)
@@ -95,7 +98,11 @@ for(ii in 1:length(tmss)){
 }
 
 ## determine amplitude vector by computing svd of amps
+
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
+
+pairs(cbind(amps,period=rrlyrae[,3]))
+
 sv <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 ##pairs(amps-pred)
@@ -173,15 +180,17 @@ for(ii in 1:length(amps)){
 }
 
 
-## ##plot of templates
-## ylim <- range(templates)
-## xlim <- range(t)
-## plot(0,0,col=0,ylim=ylim,xlim=xlim)
-## for(ii in 1:5){
-##     points(t,templates[ii,],type='l',lwd=2)
-## }
-
-
+##plot of templates
+ylim <- range(templates)
+xlim <- range(t)
+pdf("templates.pdf",height=8,width=12)
+par(mar=c(5,5,1,1))
+plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab="Normalized Mag",cex.lab=1.5)
+for(ii in 1:5){
+    points(t,templates[ii,],type='l',lwd=3,col=ii,lty=ii)
+}
+legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=2,cex=1.5)
+dev.off()
 
 
 
@@ -196,19 +205,6 @@ ComputeDerivative <- function(x,len,gap=2){
 len <- t[2] - t[1]
 templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 
-
-##templatesd2 <- t(apply(templatesd,1,function(x){ComputeDerivative(x,len)}))
-
-
-## ##plot of templates
-## ylim <- range(templates)
-## xlim <- range(t)
-## plot(0,0,col=0,ylim=ylim,xlim=xlim)
-## for(ii in 1:5){
-##     points(t,templates[ii,],type='l',lwd=2)
-## }
-
-
 ## ##plot of templates
 ## dev.new()
 ## ylim <- range(templatesd)
@@ -217,16 +213,6 @@ templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 ## for(ii in 1:5){
 ##     points(t,templatesd[ii,],type='l',lwd=2)
 ## }
-
-
-## dev.new()
-## ylim <- range(templatesd2)
-## xlim <- range(t)
-## plot(0,0,col=0,ylim=ylim,xlim=xlim)
-## for(ii in 1:5){
-##     points(t,templatesd2[ii,],type='l',lwd=2)
-## }
-
 
 tem <- list(betas=betas,dust=dust,
             templates=templates,templatesd=templatesd)

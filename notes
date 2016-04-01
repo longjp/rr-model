@@ -71,3 +71,33 @@ If we cannot achieve this, we quit.
    - quasi-newton implementation
    - code in c
    - posterior approximations
+
+
+
+
+- clean up code
+- physical interpretation of terms in model
+- importance of problem to cosmology
+- prepare presentation
+
+
+- code up in c
+- compute MAP rather than MLE
+- return posterior on parameters
+  - use idea of mixture models from mike west
+- classification ranking based on evidence
+- numerical comparisons to other methods
+- comparison of classification performance
+
+
+= questions for lucas
+- how do we determine distances once we estimate periods
+- what to do about degeneracies
+- I have amplitude parameter, cepheids do not, amplitude is a function of period
+  - some evidence amplitude being function of period for rr lyrae
+- will priors change for rr lyrae in different regions of sky
+  - amplitude distribution probably will not change
+  - but dust will
+  - and distance will too
+  - parameters are degenerate, so may not be able to separate 
+
