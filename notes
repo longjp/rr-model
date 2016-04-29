@@ -55,22 +55,21 @@ If we cannot achieve this, we quit.
 
 
 == to do
-- write up note on what sdss_eda_fda.R is doing
-- comment / improve code based on note
-- write code to simulate from model
-  - should we create new code base specifically for this model?
+- remove dust parameter from template fitting, use lucas' number, rerun code
+- consider effect of removing dust completely
+- bayesianize model
+
+
+= outline for talk
+- intro to varianble stars
+- cosmological motivation
+- existing methods for period estimation / classification
+- semi--physical model for RR Lyrae in DES
+- period estimation tests
+- model as classifier
 
 
 
-- papers
-   - algorithm + results on panstarrs (astronomy paper)
-   - classification of rr lyrae in 
-
-- learning
-   - assessing model fit
-   - quasi-newton implementation
-   - code in c
-   - posterior approximations
 
 
 

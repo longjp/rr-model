@@ -61,7 +61,7 @@ for(ii in 1:N){
     for(jj in 1:length(tem$dust)){
         pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
             + coeffs[3]*tem$template_funcs[[jj]]((temp_time + coeffs[4]) %% 1))
-        plot(temp_time/omega,pred,type='l',xlab="Phase",ylab="Mag")
+        plot(temp_time/omega,pred,type='l',xlab="Phase",ylab="Mag",ylim=rev(range(pred)),main=paste0(names(tem$betas)[jj]," band"))
         points((dat[[jj]]$time %% (1/omega)),dat[[jj]]$mag)
     }
     dev.off()
