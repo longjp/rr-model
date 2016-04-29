@@ -91,7 +91,7 @@ where $\V{\sigma}_i \sim N(0,\sigma^2I)$. The model is not identifiable. For exa
 \V{m}_i &= (\V{\beta} - c\V{1}) + (\alpha_i + c)\V{1} + d_i\V{\delta} + \V{\sigma}_i\\
 \V{m}_i &= \V{\beta} + (\alpha_i - d_i)\V{1} + d_i(\V{\delta} + 1) + \V{\sigma}_i\\
 \end{align*}
-For identifiability we assume $\V{\delta} \perp \V{1}$, $\V{\beta} \perp \V{1}$, and $\V{d} \perp \V{1}$ where $\V{d} = (d_1,\ldots,d_n)^T$.
+For identifiability we assume $\V{\delta} \perp \V{1}$, $\V{\beta} \perp \V{1}$, and $\V{\delta} \perp \V{\beta}$.
 
 
 \section{Intuitive Idea Behind Maximum Likelihood}
@@ -134,9 +134,38 @@ where $\V{x}_i = \V{m}_{i} - \widehat{\alpha}_i\V{1} - \widehat{\V{\beta}}$. Thi
 
 
 
+\section{Case Where $\V{\delta}$ Is Known}
+
 %\bibliographystyle{plainnat}
 %\bibliography{refs}
+Recall the model is
+\begin{equation*}
+\V{m}_i = \V{\beta} + \alpha_i \V{1} + d_i \V{\delta} + \V{\sigma}_i.
+\end{equation*}
+With $\V{\delta}$ known, the model is still not identifiable. For example,
+\begin{align*}
+\V{m}_i &= (\V{\beta} + c\V{\delta}) + \alpha_i \V{1} + (d_i - c) \V{\delta} + \V{\sigma}_i\\
+\V{m}_i &= (\V{\beta} - c\V{1}) + (\alpha_i + c)\V{1} + d_i\V{\delta} + \V{\sigma}_i\\
+\end{align*}
+Note that the third equation in the original identifiability problem is no longer an issue because $\V{\delta}$ is known. For identifiability we assume $\V{\beta} \perp \V{1}$ and $\V{\beta} \perp \V{\delta}$.
 
-
+Let $\M{Y}_i=\V{m}_i$ and $\M{X}_i = (\V{1},\V{\delta})$. Then our estimates of $\alpha_i$ and $d_i$ are
+\begin{equation*}
+\begin{pmatrix}
+\widehat{\alpha}_i \\\widehat{d}_i
+\end{pmatrix}
+ = (\M{X}_i^T\M{X}_i)^{-1}\M{X}_i^T\M{Y}_i
+\end{equation*}
+The residuals for the fit are
+\begin{equation*}
+\V{r}_i = \M{Y}_i - \M{X}_i\begin{pmatrix}
+\widehat{\alpha}_i \\\widehat{d}_i
+\end{pmatrix}
+\end{equation*}
+and 
+\begin{equation*}
+\V{\beta} = \frac{1}{n}\sum \V{r}_i
+\end{equation*}
+$\V{\beta}$ is orthogonal to $\V{\delta}$ and $\V{1}$ because the $\V{r}_i$ are orthogonal to $\V{\delta}$ and $\V{1}$ because these are the columns of the design matrix and $\V{r}_i$ are the residuals.
 \end{document}
 
