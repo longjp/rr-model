@@ -149,16 +149,16 @@ With $\V{\delta}$ known, the model is still not identifiable. For example,
 \end{align*}
 Note that the third equation in the original identifiability problem is no longer an issue because $\V{\delta}$ is known. For identifiability we assume $\V{\beta} \perp \V{1}$ and $\V{\beta} \perp \V{\delta}$.
 
-Let $\M{Y}_i=\V{m}_i$ and $\M{X}_i = (\V{1},\V{\delta})$. Then our estimates of $\alpha_i$ and $d_i$ are
+Let $\M{Y}_i=\V{m}_i$ and $\M{X} = (\V{1},\V{\delta})$. Then our estimates of $\alpha_i$ and $d_i$ are
 \begin{equation*}
 \begin{pmatrix}
 \widehat{\alpha}_i \\\widehat{d}_i
 \end{pmatrix}
- = (\M{X}_i^T\M{X}_i)^{-1}\M{X}_i^T\M{Y}_i
+ = (\M{X}^T\M{X})^{-1}\M{X}^T\M{Y}_i
 \end{equation*}
 The residuals for the fit are
 \begin{equation*}
-\V{r}_i = \M{Y}_i - \M{X}_i\begin{pmatrix}
+\V{r}_i = \M{Y}_i - \M{X}\begin{pmatrix}
 \widehat{\alpha}_i \\\widehat{d}_i
 \end{pmatrix}
 \end{equation*}
