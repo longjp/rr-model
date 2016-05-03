@@ -57,6 +57,10 @@ If we cannot achieve this, we quit.
 == to do
 - remove dust parameter from template fitting, use lucas' number, rerun code
 - consider effect of removing dust completely
+
+
+- make note including an explanation of how amplitude is computed
+- how to classify, in either bayesian or freqentist framework
 - bayesianize model
 
 

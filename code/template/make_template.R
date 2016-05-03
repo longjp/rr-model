@@ -71,29 +71,40 @@ for(ii in 1:length(tmss)){
     }
 }
 
-## get betas and dust, see explanation in document
+
+
+
+## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
 pdf("band_means.pdf")
 pairs(m)
+dev.off()
 
-alphas <- rowMeans(m)
-mtemp <- m - alphas
-betas <- colMeans(mtemp)
-mtemp <- t(t(mtemp) - betas)
-##pairs(mtemp)
-sv <- svd(mtemp)
-dust <- sv$v[,1]
-names(dust) <- bands
-resid <- mtemp - sv$d[1]*sv$u[,1,drop=FALSE]%*%t(sv$v[,1,drop=FALSE])
+## load extinction parameters
+dat <- read.table("extc.dat")
+dat <- dat[dat$V1=="SDSS",c(2,3)]
+dust <- dat[,2]
+names(dust) <- dat[,1]
+dust <- dust[order(names(dust))]
 
-#### CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
+## estimate d and alpha for each lc
+rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
+for(ii in 1:nrow(m)){
+    rs[ii,] <- lm(m[ii,]~dust)$residuals
+}
+## betas is the mean of the residuals (see note)
+betas <- colMeans(rs)
+colnames(rs) <- names(dust)
+rs <- t(t(rs) - betas)
+
+#### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 
 ## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:length(tmss)){
     for(jj in 1:5){
-        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + resid[ii,jj]
+        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + rs[ii,jj]
     }
 }
 
@@ -192,20 +203,16 @@ for(ii in 1:5){
 legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=2,cex=1.5)
 dev.off()
 
-
-
 ComputeDerivative <- function(x,len,gap=2){
     n <- length(x)
     x <- c(x[(n-gap+1):n],x,x[1:gap])
     return((x[(2*gap+1):(n+2*gap)] - x[1:n]) / (2*gap*len))
 }
 
-
-
 len <- t[2] - t[1]
 templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 
-## ##plot of templates
+## ##plot of template derivatives
 ## dev.new()
 ## ylim <- range(templatesd)
 ## xlim <- range(t)
@@ -217,6 +224,3 @@ templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 tem <- list(betas=betas,dust=dust,
             templates=templates,templatesd=templatesd)
 save(tem,file="make_template.RData")
-
-
-
