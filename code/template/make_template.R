@@ -196,11 +196,11 @@ ylim <- range(templates)
 xlim <- range(t)
 pdf("templates.pdf",height=8,width=12)
 par(mar=c(5,5,1,1))
-plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab="Normalized Mag",cex.lab=1.5)
+plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5)
 for(ii in 1:5){
-    points(t,templates[ii,],type='l',lwd=3,col=ii,lty=ii)
+    points(t,templates[ii,],type='l',lwd=4,col=ii,lty=ii)
 }
-legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=2,cex=1.5)
+legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
 
 ComputeDerivative <- function(x,len,gap=2){
