@@ -65,23 +65,23 @@
 
 \begin{multicols}{2} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
 
-%----------------------------------------------------------------------------------------
-%	ABSTRACT
-%----------------------------------------------------------------------------------------
+%% %----------------------------------------------------------------------------------------
+%% %	ABSTRACT
+%% %----------------------------------------------------------------------------------------
 
-\color{Navy} % Navy color for the abstract
+%% \color{Navy} % Navy color for the abstract
 
-\begin{abstract}
+%% \begin{abstract}
 
-Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
+%% Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
 
-\end{abstract}
+%% \end{abstract}
 
 %----------------------------------------------------------------------------------------
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 
-\section*{Motivation: Missing Satellites Problem}
+\section*{Motivation}
 
 \begin{itemize}
 \item Cosmological simulations predict the existence of many dwarf satellite galaxies.
@@ -93,24 +93,36 @@ Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci lu
 
 
 
-\section*{Dark Energy Survey}
+\section*{RR Lyrae in the Dark Energy Survey}
 
 \begin{itemize}
-\item Easy to estimate parameters for well observed RR Lyrae.
-\item The Dark Energy Survey will collect sparsely sampled RR Lyrae.
-\item Distance determination to structures in the Milky Way halo is difficult.
-\item Variable stars such as RR Lyrae can 
-\end{itemize}
-
-
-\section*{Construct RR Lyrae Model Using SDSS Stripe 82 Data}
+\item Easy to estimate parameters for well observed RR Lyrae. For example,
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.49\linewidth]{unfolded.pdf}
 \includegraphics[width=0.49\linewidth]{folded.pdf}
-\captionof{figure}{\color{Blue} An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$.}
+\captionof{figure}{An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$.}
 \end{center}\vspace{1cm}
 
+
+\item The Dark Energy Survey will collect sparsely sampled RR Lyrae.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.45\linewidth]{unfolded_panstarrs.pdf}
+\captionof{figure}{A PanSTARRS RR Lyrae. The Dark Energy Survey (DES) is collecting similar quality light curves. \cite{hernitschek2016finding} \label{fig:panstarrs}}
+\end{center}\vspace{1cm}
+
+
+\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}.
+
+
+\end{itemize}
+
+
+\section*{RR Lyrae Model Constructed with SDSS Stripe 82 Data}
+
+\begin{itemize}
+\item Proposed model: The brightness in band $b$ at time $t$ is
 
 {\Large
 \begin{equation*}
@@ -118,24 +130,76 @@ m_b(t) = \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)
 \end{equation*}
 }
 
+where the \underline{global parameters} common for all RR Lyrae are
+\begin{align*}
+\beta_b &=  \text{ magnitude off--set in band $b$ }\\
+\delta_b &= \text{ attenuation caused by dust in band $b$ }\\
+\gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
+\end{align*}
+and the \underline{individual parameters} specific to each RR Lyrae are
+\begin{align*}
+\alpha &= \text{ mean brighness across all bands }\\
+E[B-V] &= \text{ amount of dust }\\
+a &= \text{ amplitude of variation }\\
+\omega &= \text{ frequency of variation }\\
+\phi &= \text{ phase of variation }
+\end{align*}
+
+This is a \underline{parsimoneous} model because it only has five free parameters to fit to each star.
+
+\item For a specific RR Lyrae the data is $\{\{(m_{jb},t_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$ where $B$ is the number of filters and $m_{jb}$ is the star brightness measured at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$. The data is connected to the model through
+\begin{equation*}
+m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
+\end{equation*}
+where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$. 
+
+\item The \underline{global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example, the $\gamma_b$ functions are shown in Figure \ref{fig:gamma}.
+
 \begin{center}\vspace{1cm}
-\includegraphics[width=0.8\linewidth]{templates.pdf}
-\captionof{figure}{\color{Green} $\gamma_b$ functions for bands $b=g,i,r,u,z$.}
+\includegraphics[width=0.7\linewidth]{templates.pdf}
+\captionof{figure}{$\gamma_b$ functions for bands $b=g,i,r,u,z$. \label{fig:gamma}}
 \end{center}\vspace{1cm}
+
+
+\end{itemize}
 
 %%% results table
 
-\section*{Fit Model to New Light Curve}
+\section*{Fitting Model to Light Curve}
+
+\begin{itemize}
+
+\item Use grid search and Newton algorithm
+
+\item Examples of Fit
+
+\end{itemize}
 
 
-\begin{center}\vspace{1cm}
-\includegraphics[width=0.45\linewidth]{unfolded_panstarrs.pdf}
-\captionof{figure}{\color{Blue} A PanSTARRS RR Lyrae.}
-\end{center}\vspace{1cm}
+\section*{Results}
 
 
-Examples of Fits to PanStarrs and SDSS LC
+\begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
+\begin{tabular}{l l l}
+\toprule
+\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+\midrule
+Treatment 1 & 0.0003262 & 0.562 \\
+Treatment 2 & 0.0015681 & 0.910 \\
+Treatment 3 & 0.0009271 & 0.296 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{\color{Green} Table caption}
+\end{wraptable}
 
+
+\section*{Ongoing Work}
+
+\begin{itemize}
+\item Quantify uncertainty in parameter estimates.
+\item Classification of RR Lyrae.
+\item Mapping of Halo Structures, detection of satellites.
+\end{itemize}
 
 
 
