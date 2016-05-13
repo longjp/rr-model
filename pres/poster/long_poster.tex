@@ -24,6 +24,9 @@
 \columnsep=100pt % This is the amount of white space between the columns in the poster
 \columnseprule=3pt % This is the thickness of the black line between the columns in the poster
 
+\usepackage{algorithm,algpseudocode,ifpdf}
+
+
 \usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
 
 \usepackage{times} % Use the times font
@@ -35,6 +38,10 @@
 \usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
 \usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
 \usepackage{wrapfig} % Allows wrapping text around tables and figures
+
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+
 
 \begin{document}
 
@@ -88,7 +95,7 @@
 \item Few Milky Way satellite galaxies have been observed: \textbf{Missing satellites problem} \cite{kauffmann1993formation,klypin1999missing,moore1999dark}
 \item Finding satellite galaxies is difficult due to low surface brightness and diffuse nature.
 \item Distance determination to structures in the Milky Way halo is difficult.
-\item Finding RR Lyrae in halo enable distance determination, detection of structure. \cite{baker2015charting}
+\item Finding RR Lyrae in halo enables distance determination, detection of structure. \cite{baker2015charting}
 \end{itemize}
 
 
@@ -153,7 +160,7 @@ m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 \end{equation*}
 where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$. 
 
-\item The \underline{global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example, the $\gamma_b$ functions are shown in Figure \ref{fig:gamma}.
+\item The \underline{global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example, the estimated $\gamma_b$ functions are shown in Figure \ref{fig:gamma}.
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.7\linewidth]{templates.pdf}
@@ -169,29 +176,97 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 
 \begin{itemize}
 
-\item Use grid search and Newton algorithm
+\item Define
 
-\item Examples of Fit
+\begin{equation*}
+g(\omega,\alpha,E[B-V],a,\phi) = \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]d_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+\end{equation*}
+
+\item Estimate parameters through maximum likelihood:
+\begin{itemize}
+\item Likelihood is highly multimodal in $\omega$, so perform grid search on frequency.
+\item Model is linear in $\alpha$,$E[B-V]$, and $a$, so closed form updates.
+\item Newton--Raphson updates for $\phi$ parameter.
+\end{itemize}
+
+\item Pseduocode
+
+\begin{algorithmic}[1]
+  \State $\Omega \gets (\omega_1,\ldots,\omega_N)$ \Comment{Grid for Frequency}
+  \State $\phi \gets Unif[0,1]$ \Comment{Random Initial Phase}
+  \For{$k = 1,\ldots,N$}
+  \For{$l = 1,\ldots,10$}
+  \State $\alpha,E[B-V],d \gets \argmin{\alpha,E[B-V],a} g(\omega,\alpha,E[B-V],a,\phi)$  \Comment{Closed form solutions}
+  \State $\phi = \phi - \left[\frac{d^2}{d\phi^2}g(\omega_k,\alpha,E[B-V],a,\phi)\right]^{-1}\left[\frac{d}{d\phi}g(\omega_k,\alpha,E[B-V],a,\phi)\right] $ \Comment{Newton update for $\phi$}
+  %% \State $p \gets p + 1$
+  %% %% \Until{$||\theta_{l,p} - \theta_{l,p-1}|| < \epsilon$}
+  %% \State $\theta_{l} \gets \theta_{l,p}$
+  \EndFor
+  \State $\text{RSS}(\omega_k) = g(\omega_k,\alpha,E[B-V],a,\phi)$
+  \EndFor
+  \State $\widehat{\omega} = \min \text{RSS}(\omega)$
+\end{algorithmic}
+
+
+%% \begin{equation*}
+%% \widehat{\omega} = \argmin{\omega} \min_{\phi} \min_{\alpha,E[B-V],a} \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]d_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+%% \end{equation*}
+
+%% \item For fixed $\omega$ and $\phi$, model is linear, so closed for solutions for parameters $\alpha,E[B-V],a$.
+
+%% \item Likelihood is highly multimodel in $\omega$ parameter, so perform grid search on $\omega$.
+
+%% \item At fixed $\omega,\alpha,E[B-V],a$, update $\phi$ using Newton Raphson: warm start
+
+%% \begin{align*}
+%% \phi^{(m)} &= \\
+%% H(g) &=
+%% \end{align*}
 
 \end{itemize}
 
 
 \section*{Results}
 
+\begin{itemize}
+\item Example of Model Fit to PanSTARRS light curve.
 
-\begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.6\linewidth]{unfolded_panstarrs.pdf}
+\captionof{figure}{PanSTARRS RR Lyrae with Model Fit\cite{hernitschek2016finding} \label{fig:panstarrs_fit}}
+\end{center}\vspace{1cm}
+
+\item We conduct a simulation study to compare model performance to the Generalized Lomb Scargle (GLS) for estimating periods. We downsampled a set of 307 SDSS-III Stripe 82 RR Lyrae to 10 observations per band and then computed the fraction of time each method estimated the period correctly (within $0.2\%$) or in the top five period estimates.
+
+\begin{center}
+\begin{wraptable}{c}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
 \begin{tabular}{l l l}
 \toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+\textbf{Method} & \textbf{Fraction Top Period} & \textbf{Fraction Top 5}\\
 \midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
+Proposed Model  & 0.0003262 & 0.562 \\
+Generalized Lomb Scargle & 0.0015681 & 0.910 \\
 \bottomrule
 \end{tabular}
 \captionof{table}{\color{Green} Table caption}
 \end{wraptable}
+\end{center}
 
+%% \begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
+%% \begin{tabular}{l l l}
+%% \toprule
+%% \textbf{Method} & \textbf{Fraction Top Period} & \textbf{Fraction Top 5}\\
+%% \midrule
+%% Proposed Model  & 0.0003262 & 0.562 \\
+%% Generalized Lomb Scargle & 0.0015681 & 0.910 \\
+%% \bottomrule
+%% \end{tabular}
+%% \captionof{table}{\color{Green} Table caption}
+%% \end{wraptable}
+
+
+
+\end{itemize}
 
 \section*{Ongoing Work}
 
@@ -331,26 +406,26 @@ Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut a
 %	CONCLUSIONS
 %----------------------------------------------------------------------------------------
 
-\color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
+%% \color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
 
-\section*{Conclusions}
+%% \section*{Conclusions}
 
-\begin{itemize}
-\item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
-\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
-\item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
-\item Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-\end{itemize}
+%% \begin{itemize}
+%% \item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
+%% \item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
+%% \item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
+%% \item Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
+%% \end{itemize}
 
-\color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
+%% \color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
 
 %----------------------------------------------------------------------------------------
 %	FORTHCOMING RESEARCH
 %----------------------------------------------------------------------------------------
 
-\section*{Forthcoming Research}
+%% \section*{Forthcoming Research}
 
-Vivamus molestie, risus tempor vehicula mattis, libero arcu volutpat purus, sed blandit sem nibh eget turpis. Maecenas rutrum dui blandit lorem vulputate gravida. Praesent venenatis mi vel lorem tempor at varius diam sagittis. Nam eu leo id turpis interdum luctus a sed augue. Nam tellus.
+%% Vivamus molestie, risus tempor vehicula mattis, libero arcu volutpat purus, sed blandit sem nibh eget turpis. Maecenas rutrum dui blandit lorem vulputate gravida. Praesent venenatis mi vel lorem tempor at varius diam sagittis. Nam eu leo id turpis interdum luctus a sed augue. Nam tellus.
 
  %----------------------------------------------------------------------------------------
 %	REFERENCES
@@ -364,11 +439,11 @@ Vivamus molestie, risus tempor vehicula mattis, libero arcu volutpat purus, sed 
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
 
-\section*{Acknowledgements}
+%% \section*{Acknowledgements}
 
-Etiam fermentum, arcu ut gravida fringilla, dolor arcu laoreet justo, ut imperdiet urna arcu a arcu. Donec nec ante a dui tempus consectetur. Cras nisi turpis, dapibus sit amet mattis sed, laoreet.
+%% Etiam fermentum, arcu ut gravida fringilla, dolor arcu laoreet justo, ut imperdiet urna arcu a arcu. Donec nec ante a dui tempus consectetur. Cras nisi turpis, dapibus sit amet mattis sed, laoreet.
 
-%----------------------------------------------------------------------------------------
+%% %----------------------------------------------------------------------------------------
 
 \end{multicols}
 \end{document}
