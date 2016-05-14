@@ -22,7 +22,7 @@ ComputePeriod <- function(ii){
 }
 
 
-N <- length(tms)
+N <- 2
 periods <- (2*pi) / get_freqs(0.2,1)
 mc.cores <- 1
 

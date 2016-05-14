@@ -24,7 +24,7 @@ for(ii in 1:length(fnames)){
 for(ii in 1:length(tms)) names(tms[[ii]]) <- c("time","band","mag","error")
 
 ## downsampled to total of Nobs observations
-Nobs <- 25
+Nobs <- 40
 for(ii in 1:length(tms)){
     ix <- sample(1:nrow(tms[[ii]]),Nobs)
     tms[[ii]] <- tms[[ii]][ix,]
