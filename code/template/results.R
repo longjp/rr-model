@@ -2,6 +2,8 @@ rm(list=ls())
 load("tms_params.RData")
 load("make_template.RData")
 load("estimate_params.RData")
+load("estimate_params_lomb.RData")
+
 source("rrab_fit.R")
 source('func.R')
 
@@ -27,6 +29,15 @@ print(paste("0.1%:",mean(within_x(period_est,param$period[1:N],0.001))))
 print(paste("0.01%:",mean(within_x(period_est,param$period[1:N],0.0001))))
 print("")
 
+
+N <- nrow(period_est)
+print("accuracies, top 5 for lomb:")
+print(paste("1%:",mean(within_x(period_est_lomb,param$period[1:N],0.01))))
+print(paste("0.1%:",mean(within_x(period_est_lomb,param$period[1:N],0.001))))
+print(paste("0.01%:",mean(within_x(period_est_lomb,param$period[1:N],0.0001))))
+print("")
+
+
 ## how often is algorithm (as opposed to model) is failing
 ## ie true period has lower rss than rss of top 5
 ## but true period is not in top 5
@@ -50,6 +61,13 @@ print(paste("1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) <
 print(paste("0.1%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.001)))
 print(paste("0.01%:",mean(abs((param$period[1:N] - period_est)/param$period[1:N]) < 0.0001)))
 
+## fraction of times period is best
+print("accuracies, top period:")
+period_est_lomb <- period_est_lomb[,1]  ## just use best fit period
+print(paste("1%:",mean(abs((param$period[1:N] - period_est_lomb)/param$period[1:N]) < 0.01)))
+print(paste("0.1%:",mean(abs((param$period[1:N] - period_est_lomb)/param$period[1:N]) < 0.001)))
+print(paste("0.01%:",mean(abs((param$period[1:N] - period_est_lomb)/param$period[1:N]) < 0.0001)))
+
 ## plot all bands with best fit parameters, store in figs
 for(ii in 1:N){
     tm <- tms[[ii]]
@@ -64,5 +82,33 @@ for(ii in 1:N){
         plot(temp_time/omega,pred,type='l',xlab="Phase",ylab="Mag",ylim=rev(range(pred)),main=paste0(names(tem$betas)[jj]," band"))
         points((dat[[jj]]$time %% (1/omega)),dat[[jj]]$mag)
     }
+    dev.off()
+}
+
+## make all plots together
+for(ii in 1:N){
+    bands <- names(tem$dust)
+    bands <- sort(bands)
+    omega <- 1/period_est[ii]
+    tm <- tms[[ii]]
+    coeffs <- ComputeCoeffs(tm,omega,tem)
+    preds <- list()
+    for(jj in 1:length(bands)){
+        preds[[jj]] <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
+            + coeffs[3]*tem$template_funcs[[jj]]((temp_time + coeffs[4]) %% 1))
+    }
+    ylim <- range(range(preds),range(tm$mag))
+    xlim <- range((tm$time %% (1/omega))*omega)
+    pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=12)
+    par(mar=c(5,5,1,1))
+    plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab="Magnitude",cex.lab=1.5)
+    for(jj in 1:length(bands)){
+        temp <- tm[tm$band==bands[jj],]
+        if(nrow(temp) > 0.5){
+            points((temp$time %% (1/omega)) * omega,temp$mag,col=jj,pch=jj,cex=1.5)
+        }
+        points(temp_time,preds[[jj]],type='l',col=jj,lwd=3,lty=jj)
+    }
+    legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=3,cex=1.5)
     dev.off()
 }
