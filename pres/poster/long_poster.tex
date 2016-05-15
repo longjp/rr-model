@@ -92,24 +92,24 @@
 \section*{RR Lyrae in the Dark Energy Survey}
 
 \begin{itemize}
-\item Easy to estimate parameters for well observed RR Lyrae. For example,
+\item Easy to estimate parameters for well observed RR Lyrae. For example with $>50$ observations per filter we used the Generalized Lomb Scargle to determine the period for an RR Lyrae observed by SDSS-III in Stripe 82. Based on the folded light curve, the period estimate appears correct:
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.49\linewidth]{unfolded.pdf}
 \includegraphics[width=0.49\linewidth]{folded.pdf}
-\captionof{figure}{An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by PanSTARRS and DES.}
+\captionof{figure}{An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by Pan--STARRS and DES.}
 \end{center}\vspace{1cm}
 
 
-\item The \textbf{Dark Energy Survey} (DES) will collect sparsely sampled RR Lyrae.
+\item The \textbf{Dark Energy Survey} (DES) will sparsely sample RR Lyrae. An example of this type of sampling is shown in Figure \ref{fig:panstarrs}.
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.5\linewidth]{unfolded_panstarrs.pdf}
-\captionof{figure}{A PanSTARRS RR Lyrae. The Dark Energy Survey (DES) is collecting similar quality light curves. \cite{hernitschek2016finding} \label{fig:panstarrs}}
+\captionof{figure}{A Pan--STARRS RR Lyrae. The Dark Energy Survey (DES) is collecting similar quality light curves. \cite{hernitschek2016finding} \label{fig:panstarrs}}
 \end{center}\vspace{1cm}
 
 
-\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}.
+\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}. Methods such as Generalized Lomb Scargle (GLS), which work well (estimate period correctly with high probability) for well--observed light curves, perform poorly for sparsely observed light curves.
 
 
 \end{itemize}
@@ -149,10 +149,10 @@ m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 \end{equation*}
 where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$. 
 
-\item \underline{Global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. 
+\item \underline{Global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example the $\gamma_b$ (functional) parameters are shown in Figure \ref{fig:gamma}. 
 
 \begin{center}\vspace{1cm}
-\includegraphics[width=0.7\linewidth]{templates.pdf}
+\includegraphics[width=0.55\linewidth]{templates.pdf}
 \captionof{figure}{$\gamma_b$ functions for bands $b=g,i,r,u,z$ estimated from SDSS Stripe 82 RR Lyrae. \label{fig:gamma}}
 \end{center}\vspace{1cm}
 
@@ -205,7 +205,7 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
 
 \item We conduct a simulation study to compare model performance to the Generalized Lomb Scargle (GLS) method for estimating periods. GLS models the light curve as a sinusoid function.
 
-\item We downsampled a set of 350 SDSS-III Stripe 82 RR Lyrae to 50 observations (total, across all bands) and then computed the fraction of time each method estimated the period correctly (within $0.2\%$) or the true period was within the top five candidate periods given by the method.
+\item We downsampled a set of 350 SDSS-III Stripe 82 RR Lyrae to 50 observations (total across all bands) and then computed the fraction of time each method estimated the period correctly (within $0.2\%$) or the true period was within the top five candidate periods given by the method.
 
 \begin{center}
 \begin{tabular}{l l l}
@@ -229,13 +229,13 @@ Generalized Lomb Scargle & 0.49  &  0.90\\
 
 \end{itemize}
 
-\section*{Ongoing Work}
+\section*{Ongoing and Future Work}
 
 \begin{itemize}
 \item Current algorithm for maximizing likelihood only returns parameter estimates. Future implementation will quantify uncertainty in parameter estimates.
 \item Develop goodness--of--fit statistics so algorithm can report probability that light curve is in fact RR Lyrae.
-\item The Dark Energy Survey is currently collecting data. Will apply model to $\sim$ 10 million DES variable stars.
-\item Use result of DES RR Lyrae search to construct maps of Milky Way halo. Possible discovery of Milky Way satellite galaxies or other structures. Results compared with cosmological simulations.
+\item The Dark Energy Survey is currently collecting data. Will apply model to $\sim$ 1 million DES variable stars.
+\item Use result of DES RR Lyrae search to construct maps of Milky Way halo. Possible discovery of Milky Way satellite galaxies or other structures. Compare results with cosmological simulations.
 \end{itemize}
 
 
