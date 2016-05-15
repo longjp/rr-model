@@ -22,9 +22,9 @@ ComputePeriod <- function(ii){
 }
 
 
-N <- 2
+N <- length(tms)
 periods <- (2*pi) / get_freqs(0.2,1)
-mc.cores <- 1
+mc.cores <- 12
 
 period_est_lomb <- mclapply(1:N,ComputePeriod,mc.cores=mc.cores)
 period_est_lomb <- matrix(unlist(period_est_lomb),ncol=5,byrow=TRUE)

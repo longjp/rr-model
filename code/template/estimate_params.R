@@ -24,10 +24,10 @@ ComputePeriod <- function(ii){
 
 ## parameters for simulation
 ##N <- length(tms) ## number of light curves to run
-N <- 2
+N <- length(tms)
 NN <- 10
 omegas <- get_freqs(0.2,1)
-mc.cores <- 1
+mc.cores <- 12
 
 ## estimate periods
 period_est <- mclapply(1:N,ComputePeriod,mc.cores=mc.cores)
