@@ -5,7 +5,6 @@ library('parallel')
 load("tms_params.RData")
 
 ComputePeriod <- function(ii){
-    print(ii)
     tm <- tms[[ii]]
     bands <- unique(tm$band)
     lc <- list()
@@ -14,6 +13,7 @@ ComputePeriod <- function(ii){
             lc[[jj]] <- cbind(tm[tm$band==bands[jj],c(1,3)],1)
         }
     }
+    lc <- lc[!vapply(lc,is.null,c(TRUE))]
     out <- pgls(lc,periods=periods,BCD_flag=FALSE)
     rss <- out$rss_ls
     ps <- periods[sort_local_min(1:length(rss),rss)]
@@ -23,7 +23,7 @@ ComputePeriod <- function(ii){
 
 
 N <- length(tms)
-periods <- (2*pi) / get_freqs(0.2,1)
+periods <- rev((2*pi) / get_freqs(0.2,1))
 mc.cores <- 12
 
 period_est_lomb <- mclapply(1:N,ComputePeriod,mc.cores=mc.cores)
