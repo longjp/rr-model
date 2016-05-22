@@ -97,7 +97,7 @@
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.49\linewidth]{unfolded.pdf}
 \includegraphics[width=0.49\linewidth]{folded.pdf}
-\captionof{figure}{An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by Pan--STARRS and DES.}
+\captionof{figure}{An SDSS Stripe 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by Pan--STARRS and DES.}
 \end{center}\vspace{1cm}
 
 
@@ -109,7 +109,7 @@
 \end{center}\vspace{1cm}
 
 
-\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}. Methods such as Generalized Lomb Scargle (GLS), which work well (estimate period correctly with high probability) for well--observed light curves, perform poorly for sparsely observed light curves.
+\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}. Methods such as Generalized Lomb Scargle (GLS), which work well (estimate period correctly with high probability) for well--observed light curves, perform poorly for sparsely observed light curves. \textbf{We develop a parsimonious model for RR Lyrae light curves that is capable of estimating parameters such as period in this difficult regime.}
 
 
 \end{itemize}
@@ -138,7 +138,7 @@ and the \underline{individual parameters} specific to each RR Lyrae are
 E[B-V] &= \text{ amount of dust }\\
 a &= \text{ amplitude of variation }\\
 \omega &= \text{ frequency of variation }\\
-\phi &= \text{ phase of variation }
+\phi &= \text{ phase }
 \end{align*}
 
 This is a \underline{parsimonious} model because it only has five free parameters to fit to each star.
@@ -152,7 +152,7 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 \item \underline{Global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example the $\gamma_b$ (functional) parameters are shown in Figure \ref{fig:gamma}. 
 
 \begin{center}\vspace{1cm}
-\includegraphics[width=0.55\linewidth]{templates.pdf}
+\includegraphics[width=0.5\linewidth]{templates.pdf}
 \captionof{figure}{$\gamma_b$ functions for bands $b=g,i,r,u,z$ estimated from SDSS Stripe 82 RR Lyrae. \label{fig:gamma}}
 \end{center}\vspace{1cm}
 
@@ -168,7 +168,7 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 \item Define
 
 \begin{equation*}
-g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]d_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]\delta_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
 \end{equation*}
 
 \item Estimate parameters through maximum likelihood:
@@ -183,9 +183,10 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
 \begin{algorithmic}[1]
   \State $\Omega \gets (\omega_1,\ldots,\omega_N)$ \Comment{Grid for Frequency}
   \State $\phi \gets Unif[0,1]$ \Comment{Random Initial Phase}
+  \State $L \gets 10$ \Comment{Number of Newton Steps at Each Frequency}
   \For{$k = 1,\ldots,N$}
-  \For{$l = 1,\ldots,10$}
-  \State $\alpha,E[B-V],d \gets \argmin{\alpha,E[B-V],a} g(\omega,\alpha,E[B-V],a,\phi)$  \Comment{Closed form solutions}
+  \For{$l = 1,\ldots,L$}
+  \State $\alpha,E[B-V],a \gets \argmin{\alpha,E[B-V],a} g(\omega,\alpha,E[B-V],a,\phi)$  \Comment{Closed Form Solution}
   \State $\phi = \phi - \left[\frac{d^2}{d\phi^2}g(\omega_k,\alpha,E[B-V],a,\phi)\right]^{-1}\left[\frac{d}{d\phi}g(\omega_k,\alpha,E[B-V],a,\phi)\right] $ \Comment{Newton update for $\phi$}
   %% \State $p \gets p + 1$
   %% %% \Until{$||\theta_{l,p} - \theta_{l,p-1}|| < \epsilon$}
@@ -193,7 +194,7 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
   \EndFor
   \State $\text{RSS}(\omega_k) = g(\omega_k,\alpha,E[B-V],a,\phi)$
   \EndFor
-  \State $\widehat{\omega} = \min \text{RSS}(\omega)$
+  \State $\widehat{\omega} = \argmin{\omega \in \Omega} \text{RSS}(\omega)$
 \end{algorithmic}
 
 \end{itemize}
