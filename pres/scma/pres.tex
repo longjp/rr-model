@@ -41,7 +41,7 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{bibliography item}[text]
 
-\title{Modeling Variable Star Light Curves}
+\title{Parsimonious Models for Functional Data: Discovering and Characterizing RR Lyrae from Sparsely Sampled Light Curves}
 \author{James Long}
 %%\institute{UC Berkeley}
 \date{\today}
@@ -70,14 +70,12 @@
 \begin{frame}{Periodic Variable Stars}
 \textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
 \begin{center}
-\includegraphics[scale=.4]{figs/unfolded.pdf}
+\includegraphics[scale=.3]{figs/unfolded_13350.pdf}
 \end{center}
 \begin{itemize}
-\item Star observed $n=367$ times.
-\item Data for star is $D=\{t_i,m_i,\sigma_i\}_{i=1}^n$.
-\begin{itemize}
-\item Observe star brightness $m_i$ at time $t_i$ with uncertainty $\sigma_i$.
-\end{itemize}
+\item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
+\item Data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$.
+\item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$.
 \end{itemize}
 \end{frame}
 
@@ -85,56 +83,77 @@
 \begin{frame}{Folded Light Curve of Periodic Variable}
 \textbf{Folded light curve:} Brightness versus time modulo period.
 \begin{center}
-\includegraphics[scale=.4]{figs/folded.pdf}
+\includegraphics[scale=.3]{figs/folded_13350.pdf}
 \end{center}
 \end{frame}
 
 
-\begin{frame}{The OGLE III Survey \cite{udalski2008optical}}
+\begin{frame}{SDSS--III Stripe 82 \cite{ivezic2007sloan}}
 \begin{itemize}
-\item Collected 100,000s periodic variables in Large Magellanic Cloud
-\item Periodic variables belong to different \textbf{classes}
-\item Class is related to astrophysical reason for variation
+\item Collected $\approx 60,000$ variables in Stripe 82 Region
+\item Variables belong to different \textbf{classes}
+\item Some periodic, some not
 \end{itemize}
+
 
 \underline{Two Examples}
-\begin{center}
-Mira Variable\\
-\includegraphics[scale=.2]{figs/mira1_unfolded.pdf}
-\includegraphics[scale=.2]{figs/mira1_folded.pdf}
-\end{center}
 
-\vspace{.1in}
+\vspace{-.2in}
 
 \begin{center}
-RR Lyrae AB Variable\\
-\includegraphics[scale=.2]{figs/rra_unfolded.pdf}
-\includegraphics[scale=.2]{figs/rra_folded.pdf}
+Eclipsing Binary\\
+\includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
+\includegraphics[scale=.15]{figs/folded_4183016.pdf}
 \end{center}
+
+\vspace{-.2in}
+
+%% \begin{center}
+%% RR Lyrae\\
+%% \includegraphics[scale=.15]{figs/unfolded_4099.pdf}
+%% \includegraphics[scale=.15]{figs/folded_4099.pdf}
+%% \end{center}
+
+
+\begin{center}
+Quasar\\
+\includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
+\end{center}
+
 
 \end{frame}
 
 
-\begin{frame}{Size of Variable Star Data Sets is Growing}
+\begin{frame}{Variable Star Analysis Pipeline}
 \begin{itemize}
-\item \textit{Hipparcos} (1989--1993): 2712 
-\item \textit{OGLE} (1992--present): 100,000s
-\item \textit{DES} (ongoing): $\sim$ 10 million
-\item \textit{LSST} (starting 2020): $\sim$ 1 billion
-
-\vspace{.4in}
-
-Data sets of varying quality:
-\begin{center}
-\includegraphics[scale=.3]{figs/m33_unfolded.pdf}
-\end{center}
-
-
+\item Identify Variable Stars.
+\item Estimate parameters for variables: period, amplitude, shape, etc.
+\item Classify stars.
+\item Do science: period luminosity relations, distance determination.
 \end{itemize}
-
-%\textbf{Dramatic Differences in Data Quality:}
-
 \end{frame}
+
+
+%% \begin{frame}{Size of Variable Star Data Sets is Growing}
+%% \begin{itemize}
+%% \item \textit{Hipparcos} (1989--1993): 2712 
+%% \item \textit{OGLE} (1992--present): 100,000s
+%% \item \textit{DES} (ongoing): $\sim$ 10 million
+%% \item \textit{LSST} (starting 2020): $\sim$ 1 billion
+
+%% \vspace{.4in}
+
+%% Data sets of varying quality:
+%% \begin{center}
+%% \includegraphics[scale=.3]{figs/m33_unfolded.pdf}
+%% \end{center}
+
+
+%% \end{itemize}
+
+%% %\textbf{Dramatic Differences in Data Quality:}
+
+%% \end{frame}
 
 
 
@@ -142,14 +161,62 @@ Data sets of varying quality:
 %%%%%%%% TODO: discuss panstarrs / DES, performance of lomb scargle
 %%%%%%%%
 
-\section{Pan--STARRS and Lomb Scargle}
+\section{Period Estimation Methods}
+
+
+
+\begin{frame}{Sinusoid Based Models}
+
+\textbf{Method:} Model light curve variation in each filter as sinusoid with $K$ harmonics. \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}
+
+\begin{equation*}
+m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \epsilon_{jb}
+\end{equation*}
+
+\begin{itemize}
+\item $(2K + 1)B + 1$ parameters
+\item Maximum likelihood has closed form solution at fixed $\omega$
+\begin{itemize}
+\item Maximization strategy: Grid search on $\omega$.
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Example of Maximum Likelihood Fit with $K=2$}
+
+\begin{center}
+Total of $26$ parameters.
+\end{center}
+
+\end{frame}
+
+
+\begin{frame}{Dark Energy Survey (DES) and Pan--STARRS Data}
+
+\begin{itemize}
+\item some statistics on panstarrs and des lightcurves
+\end{itemize}
+
+
+Example of Pan--STARRS lightcurve.
+
+\end{frame}
+
+
+
+
+
+
+
 
 %%%%%%%%
 %%%%%%%% TODO: introduce model, discuss fitting
 %%%%%%%%
 
 
-\section{Parsimoneous Model for RR Lyrae Variables}
+\section{Parsimonious Model for RR Lyrae Variables}
 
 \section{Conclusions and Future Work}
 
@@ -346,149 +413,149 @@ $\widehat{\beta} = (X^T\Sigma^{-1}X)^{-1}X^T\Sigma^{-1}Y$ not efficient.
 
 
 
-\section{Period Estimation and Classification for M33 Miras}
+%% \section{Period Estimation and Classification for M33 Miras}
 
-\begin{frame}{Collaboration}
-%% astronomers
-  \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
-\begin{center}
-\textbf{Astronomy}
-\end{center}
-\end{textblock*}
-  \begin{textblock*}{3cm}(3.5cm,2cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
-Lucas Macri
-\end{textblock*}
-  \begin{textblock*}{3cm}(7cm,2cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/yuan.jpg}\\
-Wenlong Yuan
-\end{textblock*}
-
-
-%% statisticians
-  \begin{textblock*}{12cm}(0cm,5.1cm) % {block width} (coords)
-\begin{center}
-\textbf{Statistics}
-\end{center}
-\end{textblock*}
-
-  \begin{textblock*}{3cm}(1.5cm,6.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/he.jpg}\\
-Shiyuan He
-\end{textblock*}
-
-
-  \begin{textblock*}{3cm}(5cm,6.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/Huang2.jpg}\\
-Jianhua Huang
-\end{textblock*}
-
-  \begin{textblock*}{3cm}(8.5cm,6.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/long2.jpg}\\
-James Long
-\end{textblock*}
-\end{frame}
-
-
-\begin{frame}{Period Luminosity Relation for Miras in the LMC}
-
-
-%% \begin{textblock*}{3cm}(8cm,1.5cm) % {block width} (coords)
-%% \includegraphics[scale=.25]{figs/lmc2.jpg}\\
+%% \begin{frame}{Collaboration}
+%% %% astronomers
+%%   \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
+%% \begin{center}
+%% \textbf{Astronomy}
+%% \end{center}
+%% \end{textblock*}
+%%   \begin{textblock*}{3cm}(3.5cm,2cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% Lucas Macri
+%% \end{textblock*}
+%%   \begin{textblock*}{3cm}(7cm,2cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/yuan.jpg}\\
+%% Wenlong Yuan
 %% \end{textblock*}
 
-\begin{textblock*}{3cm}(1cm,1.5cm) % {block width} (coords)
-\includegraphics[scale=.25]{figs/lmc2.jpg}
-\end{textblock*}
+
+%% %% statisticians
+%%   \begin{textblock*}{12cm}(0cm,5.1cm) % {block width} (coords)
+%% \begin{center}
+%% \textbf{Statistics}
+%% \end{center}
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(1.5cm,6.1cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/he.jpg}\\
+%% Shiyuan He
+%% \end{textblock*}
+
+
+%%   \begin{textblock*}{3cm}(5cm,6.1cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/Huang2.jpg}\\
+%% Jianhua Huang
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(8.5cm,6.1cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/long2.jpg}\\
+%% James Long
+%% \end{textblock*}
+%% \end{frame}
+
+
+%% \begin{frame}{Period Luminosity Relation for Miras in the LMC}
+
+
+%% %% \begin{textblock*}{3cm}(8cm,1.5cm) % {block width} (coords)
+%% %% \includegraphics[scale=.25]{figs/lmc2.jpg}\\
+%% %% \end{textblock*}
+
+%% \begin{textblock*}{3cm}(1cm,1.5cm) % {block width} (coords)
+%% \includegraphics[scale=.25]{figs/lmc2.jpg}
+%% \end{textblock*}
 
 
 
 
-\begin{textblock*}{3cm}(6cm,1.5cm) % {block width} (coords)
-\includegraphics[scale=.22]{figs/period_luminosity_miras.pdf}
-\end{textblock*}
+%% \begin{textblock*}{3cm}(6cm,1.5cm) % {block width} (coords)
+%% \includegraphics[scale=.22]{figs/period_luminosity_miras.pdf}
+%% \end{textblock*}
 
 
 
-\begin{textblock*}{3cm}(3cm,5.5cm) % {block width} (coords)
-\includegraphics[scale=.25]{figs/mira1_unfolded.pdf}\\
-\end{textblock*}
+%% \begin{textblock*}{3cm}(3cm,5.5cm) % {block width} (coords)
+%% \includegraphics[scale=.25]{figs/mira1_unfolded.pdf}\\
+%% \end{textblock*}
 
 
-\end{frame}
+%% \end{frame}
 
 
-\begin{frame}{PL Relation for Miras in M33}
+%% \begin{frame}{PL Relation for Miras in M33}
 
-\begin{textblock*}{3cm}(8cm,2.5cm) % {block width} (coords)
-\includegraphics[scale=.1]{figs/m33.jpg}
-\end{textblock*}
-
-
-
-
-\textbf{Estimating PL Relation requires:}
+%% \begin{textblock*}{3cm}(8cm,2.5cm) % {block width} (coords)
+%% \includegraphics[scale=.1]{figs/m33.jpg}
+%% \end{textblock*}
 
 
 
-\begin{itemize}
-\item Estimating periods and luminosities accurately.
-\item Classifying stars.
-\end{itemize}
+
+%% \textbf{Estimating PL Relation requires:}
 
 
-\vspace{.3in}
 
-\textbf{Challenging case:}
-\begin{center}
-\includegraphics[scale=.4]{figs/m33_unfolded.pdf}
-\end{center}
-
-\end{frame}
+%% \begin{itemize}
+%% \item Estimating periods and luminosities accurately.
+%% \item Classifying stars.
+%% \end{itemize}
 
 
-\begin{frame}{Sinusoid Fit to LMC Mira}
+%% \vspace{.3in}
 
-\begin{center}
-\includegraphics[scale=.3]{figs/mira4_unfolded_fit.pdf}\\
-\includegraphics[scale=.3]{figs/mira4_folded_fit.pdf}
-\end{center}
+%% \textbf{Challenging case:}
+%% \begin{center}
+%% \includegraphics[scale=.4]{figs/m33_unfolded.pdf}
+%% \end{center}
 
-\end{frame}
-
-
-\begin{frame}{Fit to M33 Mira}
-
-\begin{center}
-\includegraphics[scale=.3]{figs/m33_unfolded_fit.pdf}\\
-\includegraphics[scale=.3]{figs/m33_folded_fit.pdf}
-\end{center}
-
-\vspace{.05in}
-
-Improve sinusoidal model to accurately estimate periods with M33.
-
-\end{frame}
+%% \end{frame}
 
 
-\begin{frame}{Gaussian Process Fit to OGLE Mira}
-\begin{center}
-\includegraphics[scale=.4]{figs/mira3_GP.pdf}
-\end{center}
+%% \begin{frame}{Sinusoid Fit to LMC Mira}
 
-%% \begin{align*}
-%% \widehat{\theta}_{1} &= 1.4\\
-%% \widehat{\beta}_{1} &= 1.4\\
-%% \widehat{\beta}_{2} &= 2.4\\
-%% \end{align*}
-\end{frame}
+%% \begin{center}
+%% \includegraphics[scale=.3]{figs/mira4_unfolded_fit.pdf}\\
+%% \includegraphics[scale=.3]{figs/mira4_folded_fit.pdf}
+%% \end{center}
+
+%% \end{frame}
 
 
-\begin{frame}{Bayes Factors for Separating Different Classes}
-\begin{center}
-\includegraphics[scale=0.2]{figs/bayes_factor.png}
-\end{center}
-\end{frame}
+%% \begin{frame}{Fit to M33 Mira}
+
+%% \begin{center}
+%% \includegraphics[scale=.3]{figs/m33_unfolded_fit.pdf}\\
+%% \includegraphics[scale=.3]{figs/m33_folded_fit.pdf}
+%% \end{center}
+
+%% \vspace{.05in}
+
+%% Improve sinusoidal model to accurately estimate periods with M33.
+
+%% \end{frame}
+
+
+%% \begin{frame}{Gaussian Process Fit to OGLE Mira}
+%% \begin{center}
+%% \includegraphics[scale=.4]{figs/mira3_GP.pdf}
+%% \end{center}
+
+%% %% \begin{align*}
+%% %% \widehat{\theta}_{1} &= 1.4\\
+%% %% \widehat{\beta}_{1} &= 1.4\\
+%% %% \widehat{\beta}_{2} &= 2.4\\
+%% %% \end{align*}
+%% \end{frame}
+
+
+%% \begin{frame}{Bayes Factors for Separating Different Classes}
+%% \begin{center}
+%% \includegraphics[scale=0.2]{figs/bayes_factor.png}
+%% \end{center}
+%% \end{frame}
 
 
 \begin{frame}[allowframebreaks]{Bibliography}
