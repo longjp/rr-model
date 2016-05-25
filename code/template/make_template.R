@@ -196,7 +196,7 @@ ylim <- range(templates)
 xlim <- range(t)
 pdf("templates.pdf",height=8,width=12)
 par(mar=c(5,5,1,1))
-plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5)
+plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
 for(ii in 1:5){
     points(t,templates[ii,],type='l',lwd=4,col=ii,lty=ii)
 }
