@@ -172,9 +172,10 @@ Quasar\\
 \begin{equation*}
 m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \epsilon_{jb}
 \end{equation*}
+where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 
 \begin{itemize}
-\item $(2K + 1)B + 1$ parameters
+\item $(2K + 1)B + 1$ parameters. Pure sine $3B + 1$ parameters.
 \item Maximum likelihood has closed form solution at fixed $\omega$
 \begin{itemize}
 \item Maximization strategy: Grid search on $\omega$.
@@ -186,9 +187,19 @@ m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \epsilon
 
 \begin{frame}{Example of Maximum Likelihood Fit with $K=2$}
 
+\vspace{-.1in}
+
 \begin{center}
-Total of $26$ parameters.
+\includegraphics[scale=.25]{figs/rrlyrae_nomodel_fit.pdf}\\
+\includegraphics[scale=.25]{figs/rrlyrae_model_fit.pdf}\\
+Total of $26$ parameters, model estimates period well.
 \end{center}
+
+\end{frame}
+
+\begin{frame}{Output from Model Useful for Classification}
+
+%%% TODO: make scatterplot of two features
 
 \end{frame}
 
@@ -198,7 +209,6 @@ Total of $26$ parameters.
 \begin{itemize}
 \item some statistics on panstarrs and des lightcurves
 \end{itemize}
-
 
 Example of Pan--STARRS lightcurve.
 
@@ -218,43 +228,109 @@ Example of Pan--STARRS lightcurve.
 
 \section{Parsimonious Model for RR Lyrae Variables}
 
-\section{Conclusions and Future Work}
+\begin{frame}{RR Lyrae Model}
 
-\begin{frame}{Folded Light Curve using Two Sinusoidal Models}
+\begin{equation*}
+m_b(t) = \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)
+\end{equation*}
+
+\underline{global parameters} common for all RR Lyrae are
+\begin{align*}
+\beta_b &=  \text{ magnitude off--set in band $b$ }\\
+\delta_b &= \text{ attenuation caused by dust in band $b$ }\\
+\gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
+\end{align*}
+\underline{individual parameters} specific to each RR Lyrae are
+\begin{align*}
+\alpha &= \text{ mean brightness across all bands }\\
+E[B-V] &= \text{ amount of dust }\\
+a &= \text{ amplitude of variation }\\
+\omega &= \text{ frequency of variation }\\
+\phi &= \text{ phase }
+\end{align*}
+
+\end{frame}
+
+
+
+\begin{frame}{$\gamma_b$ functions}
+
 \begin{center}
-\includegraphics[scale=0.32]{figs/unfolded_single.pdf}\\
-\includegraphics[scale=0.32]{figs/folded_single.pdf}
+\includegraphics[scale=.3]{figs/templates.pdf}
 \end{center}
-\end{frame}
 
-\begin{frame}{Period Estimation for Variable Stars}
-\textbf{Common Model:} 
-\begin{equation*}
-m_i = \beta_0 + \sum_{k=1}^K a_k \sin(t_i\omega k + \phi_k) + \epsilon_i
-\end{equation*}
-where $\epsilon_i \sim N(0,\sigma_i^2)$ {\tiny Zechmeister \cite{zechmeister2009generalised}, Schwarzenberg \cite{schwarzenberg1996fast}}
-
-\vspace{.2in}
-
-\textbf{Maximum likelihood estimator:}
-\begin{equation*}
-\widehat{\omega} = \argmin{\omega} \min_{\phi,a,\beta_0} \sum_{i=1}^n\left(\frac{m_i - \beta_0 - \sum_{k=1}^K a_k\sin(\omega t_ik + \phi_k)}{\sigma_i}\right)^2
-\end{equation*}
 \end{frame}
 
 
+\begin{frame}{Parameter Estimation}
 
-\begin{frame}{Question}
+Define
+\begin{align*}
+&g(\omega,\alpha,E[B-V],a,\phi) \\
+= &\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \beta_b - \alpha - E[B-V]\delta_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+\end{align*}
+
+Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \begin{itemize}
-\item Misspecified models are common and can be useful.
-\item Heteroskedasticity in responses is common.
-\item Typically we weight observations by inverse of variance.
+\item Likelihood is highly multimodal in $\omega$, grid search on frequency.
+\item Model is linear in $\alpha$,$E[B-V]$, and $a$, closed form updates.
+\item Newton--Raphson updates for $\phi$ parameter.
 \end{itemize}
 
-\vspace{.3in}
-\textbf{Question:} Is this weighting helpful when the model is misspecified?
+\end{frame}
+
+
+\section{Results}
+
+\begin{frame}{Simulation Results for Period Estimation}
+
 
 \end{frame}
+
+
+\begin{frame}{Simulation Results for Classification}
+
+
+\end{frame}
+
+
+\section{Conclusions and Future Work}
+
+%% \begin{frame}{Folded Light Curve using Two Sinusoidal Models}
+%% \begin{center}
+%% \includegraphics[scale=0.32]{figs/unfolded_single.pdf}\\
+%% \includegraphics[scale=0.32]{figs/folded_single.pdf}
+%% \end{center}
+%% \end{frame}
+
+%% \begin{frame}{Period Estimation for Variable Stars}
+%% \textbf{Common Model:} 
+%% \begin{equation*}
+%% m_i = \beta_0 + \sum_{k=1}^K a_k \sin(t_i\omega k + \phi_k) + \epsilon_i
+%% \end{equation*}
+%% where $\epsilon_i \sim N(0,\sigma_i^2)$ {\tiny Zechmeister \cite{zechmeister2009generalised}, Schwarzenberg \cite{schwarzenberg1996fast}}
+
+%% \vspace{.2in}
+
+%% \textbf{Maximum likelihood estimator:}
+%% \begin{equation*}
+%% \widehat{\omega} = \argmin{\omega} \min_{\phi,a,\beta_0} \sum_{i=1}^n\left(\frac{m_i - \beta_0 - \sum_{k=1}^K a_k\sin(\omega t_ik + \phi_k)}{\sigma_i}\right)^2
+%% \end{equation*}
+%% \end{frame}
+
+
+
+%% \begin{frame}{Question}
+%% \begin{itemize}
+%% \item Misspecified models are common and can be useful.
+%% \item Heteroskedasticity in responses is common.
+%% \item Typically we weight observations by inverse of variance.
+%% \end{itemize}
+
+%% \vspace{.3in}
+%% \textbf{Question:} Is this weighting helpful when the model is misspecified?
+
+%% \end{frame}
 
 
 %% \begin{frame}{Example: Period Estimation for Variable Stars}
@@ -298,17 +374,17 @@ where $\epsilon_i \sim N(0,\sigma_i^2)$ {\tiny Zechmeister \cite{zechmeister2009
 %% \end{center}
 %% \end{frame}
 
-\begin{frame}{Correct Model: Weighted Fit}
-\begin{center}
-\includegraphics[scale=.5]{code/figs/sd3.pdf}
-\end{center}
-\end{frame}
+%% \begin{frame}{Correct Model: Weighted Fit}
+%% \begin{center}
+%% \includegraphics[scale=.5]{code/figs/sd3.pdf}
+%% \end{center}
+%% \end{frame}
 
-\begin{frame}{Correct Model: Unweighted Fit}
-\begin{center}
-\includegraphics[scale=.5]{code/figs/sine_unweight.pdf}
-\end{center}
-\end{frame}
+%% \begin{frame}{Correct Model: Unweighted Fit}
+%% \begin{center}
+%% \includegraphics[scale=.5]{code/figs/sine_unweight.pdf}
+%% \end{center}
+%% \end{frame}
 
 
 %% \begin{frame}{Correct Model}
@@ -319,16 +395,16 @@ where $\epsilon_i \sim N(0,\sigma_i^2)$ {\tiny Zechmeister \cite{zechmeister2009
 
 
 
-\begin{frame}{Summary}
-\begin{itemize}
-\item The fitted curve (orange line) is close to observations with small  error (small $\sigma_i$).
-\item This is good \textbf{when the actual light curve variation is sinusoidal.}
-\end{itemize}
+%% \begin{frame}{Summary}
+%% \begin{itemize}
+%% \item The fitted curve (orange line) is close to observations with small  error (small $\sigma_i$).
+%% \item This is good \textbf{when the actual light curve variation is sinusoidal.}
+%% \end{itemize}
 
-\vspace{.2in}
-\textbf{Question:} What happens for misspecified models (light curves that are not actually sinusoids)?
+%% \vspace{.2in}
+%% \textbf{Question:} What happens for misspecified models (light curves that are not actually sinusoids)?
 
-\end{frame}
+%% \end{frame}
 
 
 %% \begin{frame}{Simulate negative sawtooth (RR Lyrae like shape)}
@@ -354,62 +430,21 @@ where $\epsilon_i \sim N(0,\sigma_i^2)$ {\tiny Zechmeister \cite{zechmeister2009
 %% \end{center}
 %% \end{frame}
 
-\begin{frame}{Misspecified Model -- Weighted Fit}
-\begin{center}
-\includegraphics[scale=.5]{code/figs/sd3wrong.pdf}
-\end{center}
-\end{frame}
+%% \begin{frame}{Misspecified Model -- Weighted Fit}
+%% \begin{center}
+%% \includegraphics[scale=.5]{code/figs/sd3wrong.pdf}
+%% \end{center}
+%% \end{frame}
 
-\begin{frame}{Misspecified Model -- Unweighted Fit}
-\begin{center}
-\includegraphics[scale=.5]{code/figs/sd_unweight.pdf}
-\end{center}
-\end{frame}
-
-
+%% \begin{frame}{Misspecified Model -- Unweighted Fit}
+%% \begin{center}
+%% \includegraphics[scale=.5]{code/figs/sd_unweight.pdf}
+%% \end{center}
+%% \end{frame}
 
 
 
 
-
-
-\begin{frame}{Application to Variable Star Period Estimation}
-\begin{itemize}
-\item g--band light curves of 238 bright sources in Stripe 82 SDSS-III
-\item Downsampled all light curves to 10,20,30, and 40 observations
-\begin{itemize}
-\item Simulates difficult period recovery settings encountered by PanStarrs, DES
-\end{itemize}
-\item Compare period estimation using weighted, unweighted estimators
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Results}
-Fraction of periods estimated correctly for different models ($K=1,2,3$) and using weights ($\Sigma^{-1}$) and unweighted ($I$).
-
-\input{figs/period_est_results_simple.tex}
-
-\vspace{.1in}
-\textbf{Conclusion:} Ignoring heteroskedasticity can improve model fits.
-\end{frame}
-
-\begin{frame}{Notes}
-%% 1. $\Delta$ idea
-%% 2. link to paper
-\begin{itemize}
-\item linear model case:
-\begin{align*}
-x_i &\sim f_X, \, \, \, \sigma_i \sim f_\sigma, \, \, \, \sigma_i \indep x_i\\
-y_i &= f(x_i) + \epsilon_i \text{ where } \epsilon_i \sim N(0,\sigma_i^2)\\
-\beta &\equiv \argmin{\beta} \E[(f(x) - x^T\beta)^2] = \E[xx^T]^{-1}\E[xf(x)].
-\end{align*}
-$\widehat{\beta} = (X^T\Sigma^{-1}X)^{-1}X^T\Sigma^{-1}Y$ not efficient.
-\item Adaptively choose optimal weights: $(\sigma_i^2 + \Delta)^{-1}$
-\item close connections with Y. Ma \cite{ma2006efficient,ma2013doubly}
-\item many more details: ``Parameter Estimation for Misspecified Regression Models with Heteroskedastic Errors'' \url{http://arxiv.org/abs/1509.05810}
-\end{itemize}
-\end{frame}
 
 
 
