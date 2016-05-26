@@ -188,6 +188,7 @@ tem <- list(betas=betas,dust=dust,
 
 ## functions for interpolating templates
 temp_time <- seq(0,1,length.out=ncol(tem$templates))
+tem$temp_time <- temp_time
 tem$template_funcs <- list()
 for(jj in 1:nrow(tem$templates)){
     tem$template_funcs[[jj]] <- approxfun(temp_time,tem$templates[jj,])

@@ -2,16 +2,6 @@ within_x <- function(estimates,truth,thres){
     return(apply(abs((estimates - truth)/truth),1,min) < thres)
 }
 
-SplitData <- function(tm){
-    levs <- levels(tm$band)
-    lc <- list()
-    for(ii in 1:length(levs)){
-        lc[[ii]] <- tm[tm$band==levs[ii],c("time","mag","error")]
-    }
-    names(lc) <- levs
-    return(lc)
-}
-
 is_local_min <- function(x){
     x.max <- max(x)
     x.extend <- c(x.max+1,x,x.max+1)
