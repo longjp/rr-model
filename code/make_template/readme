@@ -1,0 +1,6 @@
+======= description of files
+== make_template.R makes the template
+== *.pdf figure output from making templates
+== *.RData R data files containing templates
+== extc.dat, rrmag.dat
+  - external data used for creating templates, see Macri email

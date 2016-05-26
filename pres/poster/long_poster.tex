@@ -56,7 +56,7 @@
 
 \begin{minipage}[b]{0.75\linewidth}
 \veryHuge \color{NavyBlue} \textbf{Near Field Cosmology with RR Lyrae Variables} \color{Black}\\ % Title
-\Huge\textit{Building and Testing Parsimoneous Models}\\[2cm] % Subtitle
+\Huge\textit{Building and Testing Parsimonious Models}\\[2cm] % Subtitle
 \huge \textbf{James Long \& Jennifer Marshall \& Lucas Macri}\\[0.5cm] % Author(s)
 \huge Texas A\&M University, Department of Statistics and Physics \& Astronomy\\[0.4cm] % University/organization
 \Large \texttt{jlong@stat.tamu.edu}\\% --- 1 (000) 111 1111\\
@@ -72,17 +72,6 @@
 
 \begin{multicols}{2} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
 
-%% %----------------------------------------------------------------------------------------
-%% %	ABSTRACT
-%% %----------------------------------------------------------------------------------------
-
-%% \color{Navy} % Navy color for the abstract
-
-%% \begin{abstract}
-
-%% Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-%% \end{abstract}
 
 %----------------------------------------------------------------------------------------
 %	INTRODUCTION
@@ -103,24 +92,24 @@
 \section*{RR Lyrae in the Dark Energy Survey}
 
 \begin{itemize}
-\item Easy to estimate parameters for well observed RR Lyrae. For example,
+\item Easy to estimate parameters for well observed RR Lyrae. For example with $>50$ observations per filter we used the Generalized Lomb Scargle to determine the period for an RR Lyrae observed by SDSS-III in Stripe 82. Based on the folded light curve, the period estimate appears correct:
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.49\linewidth]{unfolded.pdf}
 \includegraphics[width=0.49\linewidth]{folded.pdf}
-\captionof{figure}{An SDSS Stript 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by PanSTARRS and DES.}
+\captionof{figure}{An SDSS Stripe 82 RR Lyrae unfolded (left) and folded (right) observed in bands $g,i,r,u,z$. The fitted curves use the Generalized Lomb Scargle (GLS) method for estimating period. This method works well when light curves are well sampled, but poorly for sparsely sampled light curves like those collected by Pan--STARRS and DES.}
 \end{center}\vspace{1cm}
 
 
-\item The \textbf{Dark Energy Survey} (DES) will collect sparsely sampled RR Lyrae.
+\item The \textbf{Dark Energy Survey} (DES) will sparsely sample RR Lyrae. An example of this type of sampling is shown in Figure \ref{fig:panstarrs}.
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.5\linewidth]{unfolded_panstarrs.pdf}
-\captionof{figure}{A PanSTARRS RR Lyrae. The Dark Energy Survey (DES) is collecting similar quality light curves. \cite{hernitschek2016finding} \label{fig:panstarrs}}
+\captionof{figure}{A Pan--STARRS RR Lyrae. The Dark Energy Survey (DES) is collecting similar quality light curves. \cite{hernitschek2016finding} \label{fig:panstarrs}}
 \end{center}\vspace{1cm}
 
 
-\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}.
+\item Distance determination using RR Lyrae requires identifying light curves as RR Lyrae and estimating parameters such as period. This is difficult with light curves sampled at the quality of Figure \ref{fig:panstarrs}. Methods such as Generalized Lomb Scargle (GLS), which work well (estimate period correctly with high probability) for well--observed light curves, perform poorly for sparsely observed light curves. \textbf{We develop a parsimonious model for RR Lyrae light curves that is capable of estimating parameters such as period in this difficult regime.}
 
 
 \end{itemize}
@@ -145,14 +134,14 @@ where the \underline{global parameters} common for all RR Lyrae are
 \end{align*}
 and the \underline{individual parameters} specific to each RR Lyrae are
 \begin{align*}
-\alpha &= \text{ mean brighness across all bands }\\
+\alpha &= \text{ mean brightness across all bands }\\
 E[B-V] &= \text{ amount of dust }\\
 a &= \text{ amplitude of variation }\\
 \omega &= \text{ frequency of variation }\\
-\phi &= \text{ phase of variation }
+\phi &= \text{ phase }
 \end{align*}
 
-This is a \underline{parsimoneous} model because it only has five free parameters to fit to each star.
+This is a \underline{parsimonious} model because it only has five free parameters to fit to each star.
 
 \item For a specific RR Lyrae the data is $\{\{(m_{jb},t_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$ where $B$ is the number of filters and $m_{jb}$ is the star brightness measured at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$. The data is connected to the model through
 \begin{equation*}
@@ -160,10 +149,10 @@ m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 \end{equation*}
 where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$. 
 
-\item \underline{Global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. 
+\item \underline{Global parameters} are estimated from a set of 309 well--observed SDSS Stripe 82 RR Lyrae AB \cite{sesar2010light}. For example the $\gamma_b$ (functional) parameters are shown in Figure \ref{fig:gamma}. 
 
 \begin{center}\vspace{1cm}
-\includegraphics[width=0.7\linewidth]{templates.pdf}
+\includegraphics[width=0.5\linewidth]{templates.pdf}
 \captionof{figure}{$\gamma_b$ functions for bands $b=g,i,r,u,z$ estimated from SDSS Stripe 82 RR Lyrae. \label{fig:gamma}}
 \end{center}\vspace{1cm}
 
@@ -179,7 +168,7 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 \item Define
 
 \begin{equation*}
-g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]d_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]\delta_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
 \end{equation*}
 
 \item Estimate parameters through maximum likelihood:
@@ -189,14 +178,15 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
 \item Newton--Raphson updates for $\phi$ parameter.
 \end{itemize}
 
-\item Pseduocode
+\item Pseudocode
 
 \begin{algorithmic}[1]
   \State $\Omega \gets (\omega_1,\ldots,\omega_N)$ \Comment{Grid for Frequency}
   \State $\phi \gets Unif[0,1]$ \Comment{Random Initial Phase}
+  \State $L \gets 10$ \Comment{Number of Newton Steps at Each Frequency}
   \For{$k = 1,\ldots,N$}
-  \For{$l = 1,\ldots,10$}
-  \State $\alpha,E[B-V],d \gets \argmin{\alpha,E[B-V],a} g(\omega,\alpha,E[B-V],a,\phi)$  \Comment{Closed form solutions}
+  \For{$l = 1,\ldots,L$}
+  \State $\alpha,E[B-V],a \gets \argmin{\alpha,E[B-V],a} g(\omega,\alpha,E[B-V],a,\phi)$  \Comment{Closed Form Solution}
   \State $\phi = \phi - \left[\frac{d^2}{d\phi^2}g(\omega_k,\alpha,E[B-V],a,\phi)\right]^{-1}\left[\frac{d}{d\phi}g(\omega_k,\alpha,E[B-V],a,\phi)\right] $ \Comment{Newton update for $\phi$}
   %% \State $p \gets p + 1$
   %% %% \Until{$||\theta_{l,p} - \theta_{l,p-1}|| < \epsilon$}
@@ -204,24 +194,8 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
   \EndFor
   \State $\text{RSS}(\omega_k) = g(\omega_k,\alpha,E[B-V],a,\phi)$
   \EndFor
-  \State $\widehat{\omega} = \min \text{RSS}(\omega)$
+  \State $\widehat{\omega} = \argmin{\omega \in \Omega} \text{RSS}(\omega)$
 \end{algorithmic}
-
-
-%% \begin{equation*}
-%% \widehat{\omega} = \argmin{\omega} \min_{\phi} \min_{\alpha,E[B-V],a} \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \alpha - E[B-V]d_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
-%% \end{equation*}
-
-%% \item For fixed $\omega$ and $\phi$, model is linear, so closed for solutions for parameters $\alpha,E[B-V],a$.
-
-%% \item Likelihood is highly multimodel in $\omega$ parameter, so perform grid search on $\omega$.
-
-%% \item At fixed $\omega,\alpha,E[B-V],a$, update $\phi$ using Newton Raphson: warm start
-
-%% \begin{align*}
-%% \phi^{(m)} &= \\
-%% H(g) &=
-%% \end{align*}
 
 \end{itemize}
 
@@ -230,17 +204,17 @@ g(\omega,\alpha,E[B-V],a,\phi) = \sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb}
 
 \begin{itemize}
 
-\item We conduct a simulation study to compare model performance to the Generalized Lomb Scargle (GLS) for estimating periods. GLS models the light curve as as sinusoid function.
+\item We conduct a simulation study to compare model performance to the Generalized Lomb Scargle (GLS) method for estimating periods. GLS models the light curve as a sinusoid function.
 
-\item We downsampled a set of 350 SDSS-III Stripe 82 RR Lyrae to 25 observations and then computed the fraction of time each method estimated the period correctly (within $0.2\%$) or in the top five period estimates.
+\item We downsampled a set of 350 SDSS-III Stripe 82 RR Lyrae to 50 observations (total across all bands) and then computed the fraction of time each method estimated the period correctly (within $0.2\%$) or the true period was within the top five candidate periods given by the method.
 
 \begin{center}
 \begin{tabular}{l l l}
 \toprule
-\textbf{Method} & \textbf{Fraction Correct} & \textbf{Fraction Correct in Top 5}\\
+\textbf{Method} & \textbf{Correct} & \textbf{Correct in Top 5}\\
 \midrule
-RR Lyrae Model  &  &  \\
-Generalized Lomb Scargle &  &  \\
+RR Lyrae Model  & 0.89 & 0.99 \\
+Generalized Lomb Scargle & 0.49  &  0.90\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -248,186 +222,26 @@ Generalized Lomb Scargle &  &  \\
 \item Example of model fit to downsampled SDSS Stripe 82 RR Lyrae.
 
 \begin{center}\vspace{1cm}
-\includegraphics[width=0.7\linewidth]{1_one.pdf}
+\includegraphics[width=0.7\linewidth]{2_one.pdf}
 \captionof{figure}{Downsampled SDSS Strip 82 RR Lyrae with Model Fit \label{fig:sdss_down_fit}}
 \end{center}\vspace{1cm}
 
 
-%% \begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
-%% \begin{tabular}{l l l}
-%% \toprule
-%% \textbf{Method} & \textbf{Fraction Top Period} & \textbf{Fraction Top 5}\\
-%% \midrule
-%% Proposed Model  & 0.0003262 & 0.562 \\
-%% Generalized Lomb Scargle & 0.0015681 & 0.910 \\
-%% \bottomrule
-%% \end{tabular}
-%% \captionof{table}{\color{Green} Table caption}
-%% \end{wraptable}
-
-
 
 \end{itemize}
 
-\section*{Ongoing Work}
+\section*{Ongoing and Future Work}
 
 \begin{itemize}
 \item Current algorithm for maximizing likelihood only returns parameter estimates. Future implementation will quantify uncertainty in parameter estimates.
 \item Develop goodness--of--fit statistics so algorithm can report probability that light curve is in fact RR Lyrae.
-\item The Dark Energy Survey is currently collecting data. Will apply model to $\sim$ 10 million DES variable stars.
-\item Use result of DES RR Lyrae search to construct maps of Milky Way halo. Possible discovery of Milky Way satellite galaxies or other structures. Results compared with cosmological simulations.
+\item The Dark Energy Survey is currently collecting data. Will apply model to $\sim$ 1 million DES variable stars.
+\item Use result of DES RR Lyrae search to construct maps of Milky Way halo. Possible discovery of Milky Way satellite galaxies or other structures. Compare results with cosmological simulations.
 \end{itemize}
 
 
 
 
-%----------------------------------------------------------------------------------------
-%	INTRODUCTION
-%----------------------------------------------------------------------------------------
-
-%% \color{SaddleBrown} % SaddleBrown color for the introduction
-
-%% \section*{Introduction}
-
-%% Aliquam non lacus dolor, \textit{a aliquam quam} \cite{Smith:2012qr}. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla in nibh mauris. Donec vel ligula nisi, a lacinia arcu. Sed mi dui, malesuada vel consectetur et, egestas porta nisi. Sed eleifend pharetra dolor, et dapibus est vulputate eu. \textbf{Integer faucibus elementum felis vitae fringilla.} In hac habitasse platea dictumst. Duis tristique rutrum nisl, nec vulputate elit porta ut. Donec sodales sollicitudin turpis sed convallis. Etiam mauris ligula, blandit adipiscing condimentum eu, dapibus pellentesque risus.
-
-%% \textit{Aliquam auctor}, metus id ultrices porta, risus enim cursus sapien, quis iaculis sapien tortor sed odio. Mauris ante orci, euismod vitae tincidunt eu, porta ut neque. Aenean sapien est, viverra vel lacinia nec, venenatis eu nulla. Maecenas ut nunc nibh, et tempus libero. Aenean vitae risus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-
-%----------------------------------------------------------------------------------------
-%	OBJECTIVES
-%----------------------------------------------------------------------------------------
-
-%% \color{DarkSlateGray} % DarkSlateGray color for the rest of the content
-
-%% \section*{Main Objectives}
-
-%% \begin{enumerate}
-%% \item Lorem ipsum dolor sit amet, consectetur.
-%% \item Nullam at mi nisl. Vestibulum est purus, ultricies cursus volutpat sit amet, vestibulum eu.
-%% \item Praesent tortor libero, vulputate quis elementum a, iaculis.
-%% \item Phasellus a quam mauris, non varius mauris. Fusce tristique, enim tempor varius porta, elit purus commodo velit, pretium mattis ligula nisl nec ante.
-%% \item Ut adipiscing accumsan sapien, sit amet pretium.
-%% \item Estibulum est purus, ultricies cursus volutpat
-%% \item Nullam at mi nisl. Vestibulum est purus, ultricies cursus volutpat sit amet, vestibulum eu.
-%% \item Praesent tortor libero, vulputate quis elementum a, iaculis.
-%% \end{enumerate}
-
-%----------------------------------------------------------------------------------------
-%	MATERIALS AND METHODS
-%----------------------------------------------------------------------------------------
-
-%% \section*{Materials and Methods}
-
-%% Fusce magna risus, molestie ut porttitor in, consectetur sed mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque consectetur blandit pellentesque. Sed odio justo, viverra nec porttitor vel, lacinia a nunc. Suspendisse pulvinar euismod arcu, sit amet accumsan enim fermentum quis. In id mauris ut dui feugiat egestas. Vestibulum ac turpis lacinia nisl commodo sagittis eget sit amet sapien.
-
-%% %------------------------------------------------
-
-%% \subsection*{Mathematical Section}
-
-%% Nulla vel nisl sed mauris auctor mollis non sed. 
-
-%% \begin{equation}
-%% E = mc^{2}
-%% \label{eqn:Einstein}
-%% \end{equation}
-
-%% Curabitur mi sem, pulvinar quis aliquam rutrum. (1) edf (2)
-%% , $\Omega=[-1,1]^3$, maecenas leo est, ornare at. $z=-1$ edf $z=1$ sed interdum felis dapibus sem. $x$ set $y$ ytruem. 
-%% Turpis $j$ amet accumsan enim $y$-lacina; 
-%% ref $k$-viverra nec porttitor $x$-lacina. 
-
-%% Vestibulum ac diam a odio tempus congue. Vivamus id enim nisi:
-
-%% \begin{eqnarray}
-%% \cos\bar{\phi}_k Q_{j,k+1,t} + Q_{j,k+1,x}+\frac{\sin^2\bar{\phi}_k}{T\cos\bar{\phi}_k} Q_{j,k+1} &=&\nonumber\\ 
-%% -\cos\phi_k Q_{j,k,t} + Q_{j,k,x}-\frac{\sin^2\phi_k}{T\cos\phi_k} Q_{j,k}\label{edgek}
-%% \end{eqnarray}
-%% and
-%% \begin{eqnarray}
-%% \cos\bar{\phi}_j Q_{j+1,k,t} + Q_{j+1,k,y}+\frac{\sin^2\bar{\phi}_j}{T\cos\bar{\phi}_j} Q_{j+1,k}&=&\nonumber \\
-%% -\cos\phi_j Q_{j,k,t} + Q_{j,k,y}-\frac{\sin^2\phi_j}{T\cos\phi_j} Q_{j,k}.\label{edgej}
-%% \end{eqnarray} 
-
-%% Nulla sed arcu arcu. Duis et ante gravida orci venenatis tincidunt. Fusce vitae lacinia metus. Pellentesque habitant morbi. $\mathbf{A}\underline{\xi}=\underline{\beta}$ Vim $\underline{\xi}$ enum nidi $3(P+2)^{2}$ lacina. Id feugain $\mathbf{A}$ nun quis; magno.
-
-%% %----------------------------------------------------------------------------------------
-%% %	RESULTS 
-%% %----------------------------------------------------------------------------------------
-
-%% \section*{Results}
-
-%% Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan. Aenean vitae risus ante.
-%% %
-%% \begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
-%% \begin{tabular}{l l l}
-%% \toprule
-%% \textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-%% \midrule
-%% Treatment 1 & 0.0003262 & 0.562 \\
-%% Treatment 2 & 0.0015681 & 0.910 \\
-%% Treatment 3 & 0.0009271 & 0.296 \\
-%% \bottomrule
-%% \end{tabular}
-%% \captionof{table}{\color{Green} Table caption}
-%% \end{wraptable}
-%% %
-%% Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-%% Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin.
-
-%% \begin{center}\vspace{1cm}
-%% \includegraphics[width=0.8\linewidth]{placeholder}
-%% \captionof{figure}{\color{Green} Figure caption}
-%% \end{center}\vspace{1cm}
-
-%% In hac habitasse platea dictumst. Etiam placerat, risus ac.
-
-%% Adipiscing lectus in magna blandit:
-
-%% \begin{center}\vspace{1cm}
-%% \begin{tabular}{l l l l}
-%% \toprule
-%% \textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2} \\
-%% \midrule
-%% Treatment 1 & 0.0003262 & 0.562 \\
-%% Treatment 2 & 0.0015681 & 0.910 \\
-%% Treatment 3 & 0.0009271 & 0.296 \\
-%% \bottomrule
-%% \end{tabular}
-%% \captionof{table}{\color{Green} Table caption}
-%% \end{center}\vspace{1cm}
-
-%% Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut arcu fringilla et adipiscing ligula rutrum. Aenean turpis velit, placerat eget tincidunt nec, ornare in nisl. In placerat.
-
-%% \begin{center}\vspace{1cm}
-%% \includegraphics[width=0.8\linewidth]{placeholder}
-%% \captionof{figure}{\color{Green} Figure caption}
-%% \end{center}\vspace{1cm}
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSIONS
-%----------------------------------------------------------------------------------------
-
-%% \color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
-
-%% \section*{Conclusions}
-
-%% \begin{itemize}
-%% \item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
-%% \item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
-%% \item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
-%% \item Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-%% \end{itemize}
-
-%% \color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
-
-%----------------------------------------------------------------------------------------
-%	FORTHCOMING RESEARCH
-%----------------------------------------------------------------------------------------
-
-%% \section*{Forthcoming Research}
-
-%% Vivamus molestie, risus tempor vehicula mattis, libero arcu volutpat purus, sed blandit sem nibh eget turpis. Maecenas rutrum dui blandit lorem vulputate gravida. Praesent venenatis mi vel lorem tempor at varius diam sagittis. Nam eu leo id turpis interdum luctus a sed augue. Nam tellus.
 
  %----------------------------------------------------------------------------------------
 %	REFERENCES
@@ -437,15 +251,6 @@ Generalized Lomb Scargle &  &  \\
 \bibliographystyle{plain} % Plain referencing style
 \bibliography{sample} % Use the example bibliography file sample.bib
 
-%----------------------------------------------------------------------------------------
-%	ACKNOWLEDGEMENTS
-%----------------------------------------------------------------------------------------
-
-%% \section*{Acknowledgements}
-
-%% Etiam fermentum, arcu ut gravida fringilla, dolor arcu laoreet justo, ut imperdiet urna arcu a arcu. Donec nec ante a dui tempus consectetur. Cras nisi turpis, dapibus sit amet mattis sed, laoreet.
-
-%% %----------------------------------------------------------------------------------------
 
 \end{multicols}
 \end{document}
