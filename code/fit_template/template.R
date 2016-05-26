@@ -75,13 +75,6 @@ FitTemplate <- function(tm,omegas,tem,NN=1){
     return(rss)
 }
 
-get_freqs <-function(period_min,period_max,freq_del = 0.1/4000){
-    freq_max <- 1/period_min
-    freq_min <- 1/period_max
-    return(seq(freq_min, freq_max, freq_del))
-}
-
-
 ## for a given omega, find coefficients
 ComputeCoeffs <- function(tm,omega,tem,NN=10){
     dat <- AugmentData(tm,tem$dust,tem$betas)

@@ -1,6 +1,6 @@
 ## downsample sdss stripe 82 rr lyrae ab to 50 total observations
 rm(list=ls())
-source('funcs.R')
+source('../common/funcs.R')
 
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
