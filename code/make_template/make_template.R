@@ -197,4 +197,4 @@ for(jj in 1:nrow(tem$templatesd)){
     tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
 }
 
-save(tem,file="template.RData")
+save(tem,file="../fit_template/template.RData")
