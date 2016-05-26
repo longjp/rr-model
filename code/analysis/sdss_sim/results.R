@@ -31,23 +31,6 @@ print(paste("0.1%:",mean(within_x(period_est_lomb,periods[1:N],0.001))))
 print(paste("0.01%:",mean(within_x(period_est_lomb,periods[1:N],0.0001))))
 print("")
 
-
-## ## how often is algorithm (as opposed to model) is failing
-## ## ie true period has lower rss than rss of top 5
-## ## but true period is not in top 5
-## rss_true <- rep(0,N)
-## rss_est <- rep(0,N)
-## phis <- (1:100)/100
-## for(ii in 1:length(rss_true)){
-##     tm <- tms[[ii]]
-##     rss_est[ii] <- min(ComputeRSSPhase(tm,1/param$period[ii],tem,phis))
-##     rss_true[ii] <- min(vapply(1/period_est[ii,],function(x){ComputeRSSPhase(tm,x,tem,phis)},rep(0,length(phis))))
-## }
-## is_correct <- within_x(period_est,periods[1:N],0.0001)
-## print(paste0("fraction time wrong and correct period has lower rss: ",
-##              round(mean((rss_true < rss_est) & !is_correct),4)))
-## print("")
-
 ## fraction of times period is best
 print("accuracies, top period:")
 period_est <- period_est[,1] ## just use best fit period
