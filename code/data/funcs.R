@@ -1,4 +1,4 @@
-LCtoTMS <- function(lc){
+LCtoTM <- function(lc){
     lc[,1] <- lc[,1] - min(lc[,1])
     levs <- as.character(levels(lc$b))
     levs <- levs[order(levs)]
@@ -10,3 +10,13 @@ LCtoTMS <- function(lc){
     names(tm) <- levs
     return(tm)
 }
+
+TMtoLC <- function(tm){
+    nb <- vapply(tm,nrow,c(0))
+    bs <- rep.int(names(tm),nb)
+    lc <- do.call(rbind,tm)
+    lc <- data.frame(time=lc[,1],band=bs,mag=lc[,2],sigma=lc[,3])
+    return(lc)
+}
+
+    

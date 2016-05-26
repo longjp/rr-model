@@ -29,7 +29,7 @@ for(ii in 1:length(lcs)){
     ix <- sample(1:nrow(lcs[[ii]]),Nobs)
     lcs[[ii]] <- lcs[[ii]][ix,]
 }
-tms <- lapply(lcs,LCtoTMS)
+tms <- lapply(lcs,LCtoTM)
 names(tms) <- rrlyrae[,1]
 
 ## output lightcurves and periods

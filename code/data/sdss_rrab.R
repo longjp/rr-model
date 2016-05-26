@@ -1,6 +1,6 @@
 ## select RR ab for template creation, template creation selects well sampled
 rm(list=ls())
-source('funcs.R')
+source('../common/funcs.R')
 
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
@@ -21,8 +21,8 @@ lcs <- list()
 for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }
-for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","b","mag","sigma")
-tms <- lapply(lcs,LCtoTMS)
+for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
+tms <- lapply(lcs,LCtoTM)
 names(tms) <- rrlyrae[,1]
 
 ## save
