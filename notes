@@ -55,7 +55,6 @@ If we cannot achieve this, we quit.
 
 
 == to do
-- remove dust parameter from template fitting, use lucas' number, rerun code
 - consider effect of removing dust completely
 
 
