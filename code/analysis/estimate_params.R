@@ -13,10 +13,10 @@ load("../data/clean/sdss_sim.RData")
 
 
 ## parameters for simulation
-N <- 2
+N <- length(tms)
 NN <- 10
 omegas <- GetFreqs(0.2,1)
-mc.cores <- 1
+mc.cores <- 12
 
 
 ## TODO: parameter for number of periods to return
