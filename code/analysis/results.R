@@ -17,7 +17,7 @@ dir.create("figs")
 
 ## fraction of times true period in top 5
 N <- nrow(period_est)
-print("accuracies, top 5:")
+print(paste0("accuracies, top ",topN,":"))
 print(paste("1%:",mean(within_x(period_est,periods[1:N],0.01))))
 print(paste("0.1%:",mean(within_x(period_est,periods[1:N],0.001))))
 print(paste("0.01%:",mean(within_x(period_est,periods[1:N],0.0001))))
@@ -25,7 +25,7 @@ print("")
 
 
 N <- nrow(period_est)
-print("accuracies, top 5 for lomb:")
+print(paste0("accuracies, top ",topN," for lomb:"))
 print(paste("1%:",mean(within_x(period_est_lomb,periods[1:N],0.01))))
 print(paste("0.1%:",mean(within_x(period_est_lomb,periods[1:N],0.001))))
 print(paste("0.01%:",mean(within_x(period_est_lomb,periods[1:N],0.0001))))

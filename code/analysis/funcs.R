@@ -1,4 +1,10 @@
-FitTemplateParallel <- function(ii,tms,omegas,tem,NN){
+GetFreqs <-function(period_min,period_max,freq_del = 0.1/4000){
+    freq_max <- 1/period_min
+    freq_min <- 1/period_max
+    return(seq(freq_min, freq_max, freq_del))
+}
+
+FitTemplateParallel <- function(ii,tms,omegas,tem,NN,topN){
     print(ii)
     lc <- TMtoLC(tms[[ii]])
     rss <- FitTemplate(lc,omegas,tem,NN=NN)
@@ -7,14 +13,7 @@ FitTemplateParallel <- function(ii,tms,omegas,tem,NN){
     return(ps)
 }
 
-
-GetFreqs <-function(period_min,period_max,freq_del = 0.1/4000){
-    freq_max <- 1/period_min
-    freq_min <- 1/period_max
-    return(seq(freq_min, freq_max, freq_del))
-}
-
-FitLombParallel <- function(ii,tms,omegas){
+FitLombParallel <- function(ii,tms,omegas,topN){
     print(ii)
     tm <- tms[[ii]]
     p_grid <- rev(1/omegas)
