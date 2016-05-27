@@ -4,15 +4,15 @@ rm(list=ls())
 library('parallel')
 library('multiband')
 load("../fit_template/template.RData")
-source("../fit_template/template.R")
-source("../common/funcs.R")
-source("funcs.R")
+source("../../fit_template/template.R")
+source("../../common/funcs.R")
+source("../funcs.R")
 
 ## data source
-load("../data/clean/sdss_sim.RData")
+load("../../data/clean/sdss_sim.RData")
 
 ## parameters for simulation
-source("params.R")
+source("../params.R")
 
 ## estimate periods
 period_est <- mclapply(1:N,FitTemplateParallel,
@@ -26,4 +26,4 @@ period_est_lomb <- mclapply(1:N,FitLombParallel,
                             mc.cores=mc.cores)
 period_est_lomb <- matrix(unlist(period_est_lomb),ncol=topN,byrow=TRUE)
 
-save(period_est,period_est_lomb,file="sdss_sim_period_est.RData")
+save(period_est,period_est_lomb,file="results.RData")
