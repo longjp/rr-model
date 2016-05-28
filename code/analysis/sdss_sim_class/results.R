@@ -17,38 +17,39 @@ source("../params.R")
 unlink("figs",recursive=TRUE)
 dir.create("figs")
 
+
+
+
 ## fraction of times true period in top 5
-N <- nrow(period_est)
+N <- sum(cl=="rr")
 print(paste0("accuracies, top ",topN,":"))
-print(paste("1%:",mean(within_x(period_est,periods[1:N],0.01))))
-print(paste("0.1%:",mean(within_x(period_est,periods[1:N],0.001))))
-print(paste("0.01%:",mean(within_x(period_est,periods[1:N],0.0001))))
+print(paste("1%:",mean(within_x(period_est[1:N,],periods[1:N],0.01))))
+print(paste("0.1%:",mean(within_x(period_est[1:N,],periods[1:N],0.001))))
+print(paste("0.01%:",mean(within_x(period_est[1:N,],periods[1:N],0.0001))))
 print("")
 
-
-N <- nrow(period_est)
 print(paste0("accuracies, top ",topN," for lomb:"))
-print(paste("1%:",mean(within_x(period_est_lomb,periods[1:N],0.01))))
-print(paste("0.1%:",mean(within_x(period_est_lomb,periods[1:N],0.001))))
-print(paste("0.01%:",mean(within_x(period_est_lomb,periods[1:N],0.0001))))
+print(paste("1%:",mean(within_x(period_est_lomb[1:N,],periods[1:N],0.01))))
+print(paste("0.1%:",mean(within_x(period_est_lomb[1:N,],periods[1:N],0.001))))
+print(paste("0.01%:",mean(within_x(period_est_lomb[1:N,],periods[1:N],0.0001))))
 print("")
 
 ## fraction of times period is best
 print("accuracies, top period:")
 period_est <- period_est[,1] ## just use best fit period
-print(paste("1%:",mean(abs((periods[1:N] - period_est)/periods[1:N]) < 0.01)))
-print(paste("0.1%:",mean(abs((periods[1:N] - period_est)/periods[1:N]) < 0.001)))
-print(paste("0.01%:",mean(abs((periods[1:N] - period_est)/periods[1:N]) < 0.0001)))
+print(paste("1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.01)))
+print(paste("0.1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.001)))
+print(paste("0.01%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.0001)))
 
 ## fraction of times period is best
 print("accuracies, top period, lomb:")
 period_est_lomb <- period_est_lomb[,1]  ## just use best fit period
-print(paste("1%:",mean(abs((periods[1:N] - period_est_lomb)/periods[1:N]) < 0.01)))
-print(paste("0.1%:",mean(abs((periods[1:N] - period_est_lomb)/periods[1:N]) < 0.001)))
-print(paste("0.01%:",mean(abs((periods[1:N] - period_est_lomb)/periods[1:N]) < 0.0001)))
+print(paste("1%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.01)))
+print(paste("0.1%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.001)))
+print(paste("0.01%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.0001)))
 
 ## plot all bands with best fit parameters, store in figs
-for(ii in 1:N){
+for(ii in 1:length(tms)){
     tm <- tms[[ii]]
     omega <- 1/period_est[ii]
     coeffs <- ComputeCoeffs(TMtoLC(tm),omega,tem)
@@ -67,7 +68,7 @@ for(ii in 1:N){
 }
 
 ## make all plots together
-for(ii in 1:N){
+for(ii in 1:length(tms)){
     bands <- names(tem$dust)
     bands <- sort(bands)
     omega <- 1/period_est[ii]
