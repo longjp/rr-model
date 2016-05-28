@@ -10,7 +10,7 @@ source("../funcs.R")
 
 
 ## data source
-load("../../data/clean/sdss_sim.RData")
+load("../../data/clean/sdss_sim_class.RData")
 load("results.RData")
 source("../params.R")
 
