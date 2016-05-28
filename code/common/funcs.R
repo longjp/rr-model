@@ -77,6 +77,8 @@ LCtoTM <- function(lc){
         names(tm[[ii]]) <- c("time","mag","sigma")
     }
     names(tm) <- levs
+    nb <- vapply(tm,nrow,c(0))
+    tm <- tm[nb>0]
     return(tm)
 }
 
