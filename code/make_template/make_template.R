@@ -34,9 +34,6 @@ for(ii in 1:length(tms)){
     }
 }
 
-
-
-
 ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
 pdf("band_means.pdf")
@@ -49,7 +46,6 @@ dat <- dat[dat$V1=="SDSS",c(2,3)]
 dust <- dat[,2]
 names(dust) <- dat[,1]
 dust <- dust[order(names(dust))]
-
 
 ## estimate d and alpha for each lc
 rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
@@ -195,9 +191,12 @@ tem$template_funcs <- list()
 for(jj in 1:nrow(tem$templates)){
     tem$template_funcs[[jj]] <- approxfun(temp_time,tem$templates[jj,])
 }
+names(tem$template_funcs) <- bands
+      
 tem$templated_funcs <- list()
 for(jj in 1:nrow(tem$templatesd)){
     tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
 }
+names(tem$templated_funcs) <- bands
 
 save(tem,file="../fit_template/template.RData")
