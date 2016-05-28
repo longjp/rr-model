@@ -33,7 +33,7 @@ for(ii in 1:length(fnames)){
 for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
 
 ## downsampled to total of Nobs observations
-Nobs <- 50
+Nobs <- 10
 for(ii in 1:length(lcs)){
     ix <- sample(1:nrow(lcs[[ii]]),Nobs)
     lcs[[ii]] <- lcs[[ii]][ix,]
