@@ -9,7 +9,7 @@ FitTemplateParallel <- function(ii,tms,omegas,tem,NN,topN){
     lc <- TMtoLC(tms[[ii]])
     rss <- FitTemplate(lc,omegas,tem,NN=NN)
     ps <- 1/omegas[sort_local_min(1:length(rss),rss)]
-    ps <- SeparateBest(ps,0.0002,5)
+    ps <- SeparateBest(ps,0.0002,topN)
     return(ps)
 }
 
@@ -20,6 +20,6 @@ FitLombParallel <- function(ii,tms,omegas,topN){
     out <- pgls(tm,periods=p_grid,BCD_flag=FALSE)
     rss <- out$rss_ls
     ps <- p_grid[sort_local_min(1:length(rss),rss)]
-    ps <- SeparateBest(ps,0.0002,5)
+    ps <- SeparateBest(ps,0.0002,topN)
     return(ps)
 }
