@@ -7,6 +7,7 @@ load("../data/clean/sdss_rrab.RData")
 
 ## get light curves with at least 50 observations / band in each band
 bands <- names(tms[[1]])
+bands <- bands[order(bands)]
 nobs <- matrix(0,nrow=length(tms),ncol=length(bands))
 for(ii in 1:length(bands)){
     nobs[,ii] <- vapply(tms,function(x){nrow(x[[bands[ii]]])},c(0))
@@ -57,6 +58,7 @@ for(ii in 1:nrow(m)){
 }
 ## betas is the mean of the residuals (see note)
 betas <- colMeans(rs)
+names(betas) <- bands
 colnames(rs) <- names(dust)
 rs <- t(t(rs) - betas)
 
