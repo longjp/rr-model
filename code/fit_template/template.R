@@ -57,6 +57,7 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
 }
 
 FitTemplate <- function(lc,omegas,tem,NN=1){
+    tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
@@ -77,6 +78,7 @@ FitTemplate <- function(lc,omegas,tem,NN=1){
 
 ## for a given omega, find coefficients
 ComputeCoeffs <- function(lc,omega,tem,NN=10){
+    tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
@@ -106,18 +108,44 @@ AmpAlphaDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
 }
 
 ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100){
+    tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
     nb <- dat[[2]]
     rss_max <- sum(lm(m~dust)$residuals^2)
-
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
-        coeffs <- AmpAlphaDustUpdate(phis[ii],omega,m,t,dust,nb,tem$template_funcs)
+        coeffs <- AmpAlphaDustUpdate(phis[ii],omega,m,t,dust,nb,
+                                     tem$template_funcs)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
     }
     return(rss)
 }
+
+## check and make tem and lc consistent
+## IF lc has bands not in tem, stop
+## IF lc has fewer bands then tem, get rid
+##    of these bands in tem
+CheckTemLC <- function(tem,lc){
+    if(prod(unique(lc$band) %in% names(tem$dust)) != 1){
+        print("template bands are:")
+        print(names(tem$dust))
+        print("lc is:")
+        print(lc)
+        stop("all lc bands must match template names")
+    }
+    bs <- names(tem$dust)[names(tem$dust) %in% unique(lc$band)]
+    if(length(bs) < length(tem$dust)){
+        tem$betas <- tem$betas[bs]
+        tem$dust <- tem$dust[bs]
+        tem$templates <- tem$templates[bs,]
+        tem$templatesd <- tem$templatesd[bs,]
+        tem$template_funcs <- tem$template_funcs[bs]
+        tem$templated_funcs <- tem$templated_funcs[bs]
+    }
+    return(tem)
+}
+
