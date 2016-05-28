@@ -56,8 +56,8 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
     return(out)
 }
 
-FitTemplate <- function(tm,omegas,tem,NN=1){
-    dat <- AugmentData(tm,tem$dust,tem$betas)
+FitTemplate <- function(lc,omegas,tem,NN=1){
+    dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -76,8 +76,8 @@ FitTemplate <- function(tm,omegas,tem,NN=1){
 }
 
 ## for a given omega, find coefficients
-ComputeCoeffs <- function(tm,omega,tem,NN=10){
-    dat <- AugmentData(tm,tem$dust,tem$betas)
+ComputeCoeffs <- function(lc,omega,tem,NN=10){
+    dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -105,8 +105,8 @@ AmpAlphaDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
     return(out)
 }
 
-ComputeRSSPhase <- function(tm,omega,tem,phis=(1:100)/100){
-    dat <- AugmentData(tm,tem$dust,tem$betas)
+ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100){
+    dat <- AugmentData(lc,tem$dust,tem$betas)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
