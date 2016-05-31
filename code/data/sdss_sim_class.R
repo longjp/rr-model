@@ -14,7 +14,7 @@ nr <- vapply(fnames,function(x){nrow(read.table(paste(folder,x,sep="/")))},c(0))
 fnames <- fnames[nr > 75]
 
 ## order fnames and rrlyrae
-Nnot <- 350 ## number of non--rrlyrae to select
+Nnot <- 1000 ## number of non--rrlyrae to select
 rrlyrae[,1] <- paste("LC_",rrlyrae[,1],".dat",sep="")
 rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
 fnot <- sample(fnames[!(fnames %in% rrlyrae[,1])],Nnot)
@@ -33,7 +33,7 @@ for(ii in 1:length(fnames)){
 for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
 
 ## downsampled to total of Nobs observations
-Nobs <- 10
+Nobs <- 20
 for(ii in 1:length(lcs)){
     ix <- sample(1:nrow(lcs[[ii]]),Nobs)
     lcs[[ii]] <- lcs[[ii]][ix,]
