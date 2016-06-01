@@ -41,7 +41,7 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{bibliography item}[text]
 
-\title{Parsimonious Models for Functional Data: Discovering and Characterizing RR Lyrae from Sparsely Sampled Light Curves}
+\title{Discovering and Characterizing RR Lyrae from Sparsely Sampled Light Curves Using Parsimonious Models}
 \author{James Long}
 %%\institute{UC Berkeley}
 \date{\today}
@@ -131,6 +131,10 @@ Quasar\\
 \item Classify stars.
 \item Do science: period luminosity relations, distance determination.
 \end{itemize}
+
+%% TODO: motivate finding RR Lyrae with missing satellites problem
+%% TODO: connection between period estimation and distance
+
 \end{frame}
 
 
@@ -199,6 +203,11 @@ Total of $26$ parameters, model estimates period well.
 
 \begin{frame}{Output from Model Useful for Classification}
 
+\begin{center}
+\includegraphics[scale=.4]{figs/sdss_color_period.pdf}
+\end{center}
+
+
 %%% TODO: make scatterplot of two features
 
 \end{frame}
@@ -230,9 +239,14 @@ Example of Pan--STARRS lightcurve.
 
 \begin{frame}{RR Lyrae Model}
 
-\begin{equation*}
-m_b(t) = \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)
-\end{equation*}
+\vspace{-.2in}
+
+\begin{align*}
+m_b(t) &= \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)\\
+m_{jb} &= m_b(t_{jb}) + \epsilon_{jb} \text{   where  } \epsilon_{jb} \sim N(0,\sigma_{jb}^2).
+\end{align*}
+
+
 
 \underline{global parameters} common for all RR Lyrae are
 \begin{align*}
@@ -240,6 +254,9 @@ m_b(t) = \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)
 \delta_b &= \text{ attenuation caused by dust in band $b$ }\\
 \gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
 \end{align*}
+
+\vspace{-.2in}
+
 \underline{individual parameters} specific to each RR Lyrae are
 \begin{align*}
 \alpha &= \text{ mean brightness across all bands }\\
