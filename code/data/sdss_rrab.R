@@ -17,7 +17,7 @@ fnames <- fnames[order(fnames)]
 periods <- rrlyrae[,3]
 
 ## load light curves and put in tms format
-lcs <- list()
+lcs <- vector("list",length(fnames))
 for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }

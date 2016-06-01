@@ -26,7 +26,7 @@ periods <- c(rrlyrae[,3],rep(0,Nnot))
 cl <- c(rep("rr",nrow(rrlyrae)),rep("not",Nnot))
 
 ## load light curves
-lcs <- list()
+lcs <- vector("list",length(fnames))
 for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }
