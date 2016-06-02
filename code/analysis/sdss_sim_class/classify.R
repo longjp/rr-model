@@ -72,3 +72,17 @@ par(mar=c(5,5,1,1))
 plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
      xlab="Amplitude",ylab="Model Residual",cex.lab=1.3)
 dev.off()
+
+
+pairs(cbind("amp"=log10(features[,"a"]),
+            "period"=features[,"period"],
+            "dev"=log10(features[,"dev"])),
+      col=cl.plot,pch=cl.plot)
+
+pdf(paste0(fig.dir,"/a_vs_dev_log.pdf"),height=6,width=7)
+par(mar=c(5,5,1,1))
+plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
+     xlab="Amplitude",ylab="Model Residual",cex.lab=1.3,
+     log="xy",xlim=c(.01,5))
+legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
+dev.off()

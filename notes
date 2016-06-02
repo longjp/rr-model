@@ -94,20 +94,7 @@ If we cannot achieve this, we quit.
 
 = questions for lucas
 - how do we determine distances once we estimate periods
-- what to do about degeneracies
-- I have amplitude parameter, cepheids do not, amplitude is a function of period
-  - some evidence amplitude being function of period for rr lyrae
-- will priors change for rr lyrae in different regions of sky
-  - amplitude distribution probably will not change
-  - but dust will
-  - and distance will too
-  - parameters are degenerate, so may not be able to separate 
-
-
-
-
-=== sesar article
-- will DES go deeper?
-- does he estimate periods? will estimating periods help analysis?
-   - he does not estimate periods but it will help analysis. (search for periods in article)
-- what are structure functions?
+   - sesar describes, not sure how to get dereddened magnitudes
+   - do we just estimate a maximum amount of dust
+   - what to do about degeneracies
+      - degenerate with the beta parameter

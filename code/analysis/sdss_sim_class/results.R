@@ -55,14 +55,16 @@ for(ii in 1:length(tms)){
     coeffs <- ComputeCoeffs(TMtoLC(tm),omega,tem)
     pdf(paste0("figs/",ii,".pdf"),height=12,width=8)
     par(mar=c(3,4,2,1),mfcol=c(5,1))
-    for(jj in 1:length(tem$dust)){
+    for(jj in names(tem$dust)){
         pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
             + coeffs[3]*tem$template_funcs[[jj]]((tem$temp_time + coeffs[4]) %% 1))
         xlim <- range(tem$temp_time/omega)
         ylim <- range(range(pred),tm[[jj]]$mag)
         plot(tem$temp_time/omega,pred,type='l',xlab="Phase",ylab="Mag",ylim=rev(ylim),
-         xlim=xlim,main=paste0(names(tem$betas)[jj]," band"))
-        points((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag)
+         xlim=xlim,main=paste0(jj," band"))
+        if(!is.null(tm[[jj]])){
+            points((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag)
+        }
     }
     dev.off()
 }
