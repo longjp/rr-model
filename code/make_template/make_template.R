@@ -58,8 +58,16 @@ names(betas) <- bands
 colnames(rs) <- names(dust)
 rs <- t(t(rs) - betas)
 
-#### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
+## compare lucas betas with empirical, fit well
+rrmag <- read.table("rrmag.dat",header=TRUE)
+rrmag <- rrmag[rrmag$Sys=="SDSS",]
+rrmag <- rrmag[order(rrmag$bnd),]
+lpmed <- log10(median(periods))
+betas_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
+names(betas_n) <- rrmag$bnd
+plot(dust,betas - betas_n)
 
+#### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 ## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:length(tms)){
