@@ -213,20 +213,29 @@ Total of $26$ parameters, model estimates period well.
 \end{frame}
 
 
-\begin{frame}{Dark Energy Survey (DES) and Pan--STARRS Data}
+\begin{frame}{Problem: Sparsely Sampled Light Curves}
 
-\begin{itemize}
-\item some statistics on panstarrs and des lightcurves
-\end{itemize}
 
-Example of Pan--STARRS lightcurve.
+\begin{center}
+\includegraphics[scale=.3]{figs/unfolded_panstarrs.pdf}
+\end{center}
+
+
+\begin{center}
+A Pan--STARRS light curve. Period estimation very difficult for this quality data.
+\end{center}
 
 \end{frame}
 
 
 
 
-
+\begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
+\begin{itemize}
+\item Pan--STARRS
+\item Dark Energy Survey (DES)
+\end{itemize}
+\end{frame}
 
 
 
@@ -237,40 +246,38 @@ Example of Pan--STARRS lightcurve.
 
 \section{Parsimonious Model for RR Lyrae Variables}
 
-\begin{frame}{RR Lyrae Model}
+\begin{frame}{Parsimonious RR Lyrae Model}
 
-\vspace{-.2in}
-
+\underline{global parameters} common for all RR Lyrae:
+{\footnotesize
 \begin{align*}
-m_b(t) &= \alpha + \beta_b + E[B-V]\delta_b + a\gamma_b(\omega t + \phi)\\
-m_{jb} &= m_b(t_{jb}) + \epsilon_{jb} \text{   where  } \epsilon_{jb} \sim N(0,\sigma_{jb}^2).
-\end{align*}
-
-
-
-\underline{global parameters} common for all RR Lyrae are
-\begin{align*}
-\beta_b &=  \text{ magnitude off--set in band $b$ }\\
-\delta_b &= \text{ attenuation caused by dust in band $b$ }\\
+M_b &=  \text{ absolute magnitude band $b$ }\\
+R_b &= \text{ attenuation caused by dust in band $b$ }\\
 \gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
 \end{align*}
+}
 
-\vspace{-.2in}
 
-\underline{individual parameters} specific to each RR Lyrae are
+\begin{equation*}
+m_b(t) = \mu + M_b + E[B-V]R_x + a\gamma_b(\omega t + \phi)
+\end{equation*}
+
+\underline{individual parameters} specific to each RR Lyrae:
+{\footnotesize
 \begin{align*}
-\alpha &= \text{ mean brightness across all bands }\\
+\mu &= \text{ distance modulus }\\
 E[B-V] &= \text{ amount of dust }\\
 a &= \text{ amplitude of variation }\\
 \omega &= \text{ frequency of variation }\\
 \phi &= \text{ phase }
 \end{align*}
+}
 
 \end{frame}
 
 
 
-\begin{frame}{$\gamma_b$ functions}
+\begin{frame}{$\gamma_b$ Functions Estimated from SDSS Stripe 82}
 
 \begin{center}
 \includegraphics[scale=.3]{figs/templates.pdf}
@@ -280,17 +287,23 @@ a &= \text{ amplitude of variation }\\
 
 
 \begin{frame}{Parameter Estimation}
-
-Define
+\begin{itemize}
+\item Likelihood:
+\begin{equation*}
+m_{jb} = m_b(t_{jb}) + \epsilon_{jb} 
+\end{equation*}
+where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+\item Define
 \begin{align*}
-&g(\omega,\alpha,E[B-V],a,\phi) \\
-= &\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \beta_b - \alpha - E[B-V]\delta_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+&g(\omega,\mu,E[B-V],a,\phi) \\
+= &\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - M_b - \mu - E[B-V]R_x - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
 \end{align*}
+\end{itemize}
 
 Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \begin{itemize}
 \item Likelihood is highly multimodal in $\omega$, grid search on frequency.
-\item Model is linear in $\alpha$,$E[B-V]$, and $a$, closed form updates.
+\item Model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates.
 \item Newton--Raphson updates for $\phi$ parameter.
 \end{itemize}
 
