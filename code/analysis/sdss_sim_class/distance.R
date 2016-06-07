@@ -21,70 +21,44 @@ unlink(fig.dir,recursive=TRUE)
 dir.create(fig.dir)
 
 
-rrmag <- read.table("rrmag.dat",header=TRUE)
-rrmag <- rrmag[rrmag$Sys=="SDSS",]
-rrmag <- rrmag[order(rrmag$bnd),]
-
+period_est <- period_est[,1]
 
 Nrr <- sum(cl=="rr")
-coeffs <- matrix(0,nrow=Nrr,ncol=4)
-coeffs_true <- matrix(0,nrow=Nrr,ncol=4)
-coeffs_ave <- matrix(0,nrow=Nrr,ncol=4)
-lpmed <- log10(median(periods[1:Nrr]))
-betas_n_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-names(betas_n_n) <- names(tem$betas)
+coeffs_model <- matrix(0,nrow=Nrr,ncol=4)
+coeffs_lomb <- matrix(0,nrow=Nrr,ncol=4)
 for(ii in 1:Nrr){
-    print(ii)
     tm <- tms[[ii]]
     lc <- TMtoLC(tm)
-    ## using estimated period
-    lpmed <- log10(period_est[ii])
-    betas_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-    names(betas_n) <- names(tem$betas)
-    tem_temp <- tem
-    tem_temp$betas <- betas_n
+    ## distance estimates with rr model
     omega <- 1/period_est[ii]
-    coeffs[ii,] <- ComputeCoeffs(lc,omega,tem_temp)
-    ## using true period
-    lpmed <- log10(periods[ii])
-    betas_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-    names(betas_n) <- names(tem$betas)
-    tem_temp <- tem
-    tem_temp$betas <- betas_n
-    omega <- 1/periods[ii]
-    coeffs_true[ii,] <- ComputeCoeffs(lc,omega,tem_temp)
-    ## using estimated periods and fixed betas_n_n
-    tem_temp <- tem
-    tem_temp$betas <- betas_n_n
-    omega <- 1/periods[ii]
-    coeffs_ave[ii,] <- ComputeCoeffs(lc,omega,tem_temp)
+    coeffs_model[ii,] <- ComputeCoeffs(lc,omega,tem)
+    ## distance estimates using lomb
+    omega <- 1/period_est_lomb[ii]
+    coeffs_lomb[ii,] <- ComputeCoeffs(lc,omega,tem)
 }
-
-
-
 
 
 rrlyrae <- read.table("apj326724t3_mrt.txt",skip=30)
 names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
 rrlyrae$ID <- paste0("LC_",rrlyrae$ID,".dat")
 
-colnames(coeffs) <- c("mu","E[B-V]","a","phi")
-rr <- data.frame(names(tms)[1:Nrr],coeffs)
-names(rr)[1] <- "ID"
+colnames(coeffs_model) <- c("mu_model","E[B-V]_model","a_model","phi_model")
+rr_model <- data.frame(names(tms)[1:Nrr],coeffs_model)
+names(rr_model)[1] <- "ID"
 
-colnames(coeffs_true) <- c("mu_true","E[B-V]_true","a_true","phi_true")
-rr_true <- data.frame(names(tms)[1:Nrr],coeffs_true)
-names(rr_true)[1] <- "ID"
-
-colnames(coeffs_ave) <- c("mu_ave","E[B-V]_ave","a_ave","phi_ave")
-rr_ave <- data.frame(names(tms)[1:Nrr],coeffs_ave)
-names(rr_ave)[1] <- "ID"
-
-out <- merge(merge(merge(rrlyrae,rr),rr_true),rr_ave)
+colnames(coeffs_lomb) <- c("mu_lomb","E[B-V]_lomb","a_lomb","phi_lomb")
+rr_lomb <- data.frame(names(tms)[1:Nrr],coeffs_lomb)
+names(rr_lomb)[1] <- "ID"
 
 
-plot(log10(out$d),out$mu,ave="Specific")
-dev.new()
-plot(log10(out$d),out$mu_true,main="True")
-dev.new()
-plot(log10(out$d),out$mu_ave,main="Ave")
+out <- Reduce(function(x, y) merge(x, y), list(rrlyrae,rr_model,rr_lomb))
+
+pdf("distance_comparison.pdf")
+par(mar=c(5,5,5,1))
+plot(out$d,10^(out$mu_model/5 + 1)/1000,
+     main="Comparison of Distance Estimate to Ground Truth",
+     xlab="Ground Truth Distance in kpc (Sesar 2010)",
+     ylab="Estimate in kpc",
+     cex.lab=1.3)
+abline(a=0,b=1)
+dev.off()
