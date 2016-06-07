@@ -29,6 +29,10 @@ rrmag <- rrmag[order(rrmag$bnd),]
 Nrr <- sum(cl=="rr")
 coeffs <- matrix(0,nrow=Nrr,ncol=4)
 coeffs_true <- matrix(0,nrow=Nrr,ncol=4)
+coeffs_ave <- matrix(0,nrow=Nrr,ncol=4)
+lpmed <- log10(median(periods[1:Nrr]))
+betas_n_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
+names(betas_n_n) <- names(tem$betas)
 for(ii in 1:Nrr){
     print(ii)
     tm <- tms[[ii]]
@@ -49,14 +53,15 @@ for(ii in 1:Nrr){
     tem_temp$betas <- betas_n
     omega <- 1/periods[ii]
     coeffs_true[ii,] <- ComputeCoeffs(lc,omega,tem_temp)
+    ## using estimated periods and fixed betas_n_n
+    tem_temp <- tem
+    tem_temp$betas <- betas_n_n
+    omega <- 1/periods[ii]
+    coeffs_ave[ii,] <- ComputeCoeffs(lc,omega,tem_temp)
 }
 
 
 
-lpmed <- log10(median(periods))
-betas_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-names(betas_n) <- rrmag$bnd
-##plot(dust,betas - betas_n)
 
 
 rrlyrae <- read.table("apj326724t3_mrt.txt",skip=30)
@@ -71,9 +76,15 @@ colnames(coeffs_true) <- c("mu_true","E[B-V]_true","a_true","phi_true")
 rr_true <- data.frame(names(tms)[1:Nrr],coeffs_true)
 names(rr_true)[1] <- "ID"
 
+colnames(coeffs_ave) <- c("mu_ave","E[B-V]_ave","a_ave","phi_ave")
+rr_ave <- data.frame(names(tms)[1:Nrr],coeffs_ave)
+names(rr_ave)[1] <- "ID"
+
+out <- merge(merge(merge(rrlyrae,rr),rr_true),rr_ave)
 
 
-
-plot(log10(out$d),out$mu)
+plot(log10(out$d),out$mu,ave="Specific")
 dev.new()
-plot(log10(out$d),out$mu_true)
+plot(log10(out$d),out$mu_true,main="True")
+dev.new()
+plot(log10(out$d),out$mu_ave,main="Ave")

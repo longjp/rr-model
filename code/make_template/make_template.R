@@ -47,25 +47,20 @@ dust <- dat[,2]
 names(dust) <- dat[,1]
 dust <- dust[order(names(dust))]
 
-## estimate d and alpha for each lc
-rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-for(ii in 1:nrow(m)){
-    rs[ii,] <- lm(m[ii,]~dust)$residuals
-}
-## betas is the mean of the residuals (see note)
-betas <- colMeans(rs)
-names(betas) <- bands
-colnames(rs) <- names(dust)
-rs <- t(t(rs) - betas)
-
-## compare lucas betas with empirical, fit well
+## load and compute beta (M_x) parameters
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
 lpmed <- log10(median(periods))
-betas_n <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-names(betas_n) <- rrmag$bnd
-plot(dust,betas - betas_n)
+betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
+names(betas) <- rrmag$bnd
+
+## estimate d and alpha for each lc
+rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
+m_shift <- t(t(m) - betas)
+for(ii in 1:nrow(m)){
+    rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
+}
 
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
@@ -77,11 +72,9 @@ for(ii in 1:length(tms)){
 }
 
 ## determine amplitude vector by computing svd of amps
-
 amps <- apply(lc_grid,c(1,3),function(x){mean(abs(x))})
 
 ##pairs(cbind(amps,periods))
-
 sv <- svd(amps)
 pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 ##pairs(amps-pred)
