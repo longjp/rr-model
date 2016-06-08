@@ -28,9 +28,10 @@
 \newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
 \newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
 \newcommand{\todo}[1]{{\color{red}TODO: #1}}
-
-\newcommand{\w}{0.8in}
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+\newcommand{\w}{1in}
 \newcommand{\h}{1in}
+
 \usepackage{graphicx}
 \newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 
@@ -63,6 +64,45 @@
 %%%%%%%%
 %%%%%%%% TODO: redo first section with more emphasis on multiband, lomb scargle
 %%%%%%%%
+
+
+\begin{frame}{Texas A\&M Collaboration}
+
+%% astronomers
+%%   \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
+%% \begin{center}
+%% \textbf{Astronomy}
+%% \end{center}
+%% \end{textblock*}
+%%   \begin{textblock*}{3cm}(3.5cm,2cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% Lucas Macri
+%% \end{textblock*}
+%%   \begin{textblock*}{3cm}(7cm,2cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% Wenlong Yuan
+%% \end{textblock*}
+
+
+%% statisticians
+  \begin{textblock*}{3cm}(1.5cm,3.1cm) % {block width} (coords)
+\includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+Lucas Macri
+\end{textblock*}
+
+
+  \begin{textblock*}{3cm}(5cm,3.1cm) % {block width} (coords)
+\includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
+Jennifer Marshall
+\end{textblock*}
+
+  \begin{textblock*}{3cm}(8.5cm,3.1cm) % {block width} (coords)
+\includegraphics[width=\w,height=\h]{figs/long.jpg}\\
+James Long
+\end{textblock*}
+
+
+\end{frame}
 
 
 \section{Time Domain Astronomy and Variable Stars}
@@ -234,9 +274,15 @@ A Pan--STARRS light curve. Period estimation very difficult for this quality dat
 
 
 \begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
+
 \begin{itemize}
-\item Pan--STARRS
 \item Dark Energy Survey (DES)
+\begin{itemize}
+\item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+\item depths to 24 mag in $i$
+\item $\approx$ 100 million stars
+\end{itemize}
+\item Pan--STARRS
 \end{itemize}
 \end{frame}
 
@@ -285,18 +331,22 @@ A Pan--STARRS light curve. Period estimation very difficult for this quality dat
 \begin{frame}{Parsimonious RR Lyrae Model}
 
 
-TODO: Reference other people with physical model. 
-
 \begin{center}
 global parameters fit once for all RR Lyrae\\
 \includegraphics[scale=.3]{figs/model.png}\\
-individual object parameters fit for each RR Lyrae
+individual parameters fit for each RR Lyrae
 \end{center}
 
-\begin{equation*}
-m_{jb} = m_b(t_{jb}) + \epsilon_{jb} 
-\end{equation*}
+\vspace{.2in}
 
+\begin{itemize}
+\item Data $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
+\item Normal measurement error model:
+\begin{equation*}
+m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
+\end{equation*}
+where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{$\gamma_b$ Estimated from SDSS Stripe 82 RR Lyrae}
@@ -307,26 +357,30 @@ m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 
 \end{frame}
 
-
 \begin{frame}{Parameter Estimation}
-\begin{itemize}
-\item Likelihood:
-\begin{equation*}
-m_{jb} = m_b(t_{jb}) + \epsilon_{jb} 
-\end{equation*}
-where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
-\item Define
+%%\begin{itemize}
+%% \item Likelihood:
+%% \begin{equation*}
+%% m_{jb} = m_b(t_{jb}) + \epsilon_{jb} 
+%% \end{equation*}
+%% where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+%% \item Define
+%% \begin{align*}
+%% &RSS(\omega,\mu,E[B-V],a,\phi) \\
+%%  &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+%% \end{align*}
+%% \end{itemize}
 \begin{align*}
 &RSS(\omega,\mu,E[B-V],a,\phi) \\
  &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
 \end{align*}
-\end{itemize}
+
 
 Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \begin{itemize}
 \item Likelihood is highly multimodal in $\omega$, grid search.
 \item Model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates.
-\item Warm start Newton--Raphson updates for $\phi$ parameter.
+\item Warm start Newton--Raphson updates for $\phi$.
 \end{itemize}
 
 \end{frame}
@@ -336,15 +390,38 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 \end{frame}
 
-\section{Preliminary Results}
+\section{Testing Model}
 
-\begin{frame}{Simulation Results for Period Estimation}
+\begin{frame}{Simulation}
+Downsample SDSS variables to 20 observations across all bands:
+
+
+TODO: plot original and downsampled RR Lyrae
+
+\begin{itemize}
+\item Can we estimate periods correctly for RR Lyrae?
+\item Can we separate RR Lyrae from non--RR Lyrae? 
+\item Can we estimate distances accurately?
+\item Can we reproduce halo maps of Sesar 2010?
+\end{itemize}
 
 
 \end{frame}
 
 
+\begin{frame}{Simulation Results for Period Estimation}
+
+TODO: cite new hogg, sesar paper
+\end{frame}
+
+
 \begin{frame}{Simulation Results for Classification}
+
+
+\end{frame}
+
+
+\begin{frame}{Simulation Results for Distance Estimation}
 
 
 \end{frame}
