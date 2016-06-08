@@ -41,14 +41,27 @@ print(paste("1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.01
 print(paste("0.1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.001)))
 print(paste("0.01%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.0001)))
 
-plot(periods[1:N],period_est[1:N])
-
 ## fraction of times period is best
 print("accuracies, top period, lomb:")
 period_est_lomb <- period_est_lomb[,1]  ## just use best fit period
 print(paste("1%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.01)))
 print(paste("0.1%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.001)))
 print(paste("0.01%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.0001)))
+
+
+lim <- range(c(periods[1:N],period_est_lomb[1:N],period_est[1:N]))
+pdf("figs/period_comparison.pdf",height=8,width=18)
+par(mfcol=c(1,2),mar=c(5,5,1,1))
+plot(periods[1:N],period_est_lomb[1:N],xlim=lim,ylim=lim,
+     xlab="True Period",ylab="Sine Period Estimate (Multiband Generalized Lomb Scargle)",
+     cex.lab=1.5)
+abline(a=0,b=1)
+plot(periods[1:N],period_est[1:N],xlim=lim,ylim=lim,
+     xlab="True Period",ylab="RR Lyrae Model Period Estimate",
+     cex.lab=1.5)
+abline(a=0,b=1)
+dev.off()
+
 
 ## plot all bands with best fit parameters, store in figs
 for(ii in 1:length(tms)){

@@ -393,35 +393,80 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \section{Testing Model}
 
 \begin{frame}{Simulation}
-Downsample SDSS variables to 20 observations across all bands:
+
+  \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
+Downsample Stripe 82 variables to 20 observations across all bands:
+\end{textblock*}
+
+  \begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
+\includegraphics[scale=.15]{figs/unfolded_13350.pdf}
+\end{textblock*}
 
 
-TODO: plot original and downsampled RR Lyrae
+  \begin{textblock*}{3cm}(5.5cm,3.5cm) % {block width} (coords)
+\includegraphics[scale=.15]{figs/rightarrow.png}
+\end{textblock*}
 
+  \begin{textblock*}{3cm}(6.75cm,3.1cm) % {block width} (coords)
+\includegraphics[scale=.15]{figs/unfolded_13350down.pdf}
+\end{textblock*}
+
+  \begin{textblock*}{12cm}(1.75cm,6.1cm) % {block width} (coords)
 \begin{itemize}
 \item Can we estimate periods correctly for RR Lyrae?
 \item Can we separate RR Lyrae from non--RR Lyrae? 
 \item Can we estimate distances accurately?
 \item Can we reproduce halo maps of Sesar 2010?
 \end{itemize}
-
+\end{textblock*}
 
 \end{frame}
 
 
 \begin{frame}{Simulation Results for Period Estimation}
 
-TODO: cite new hogg, sesar paper
+
+
+\begin{center}
+Comparison of period estimates for 350 RR Lyrae\\
+\includegraphics[scale=.25]{figs/period_comparison.pdf}
+\end{center}
+
+
+%% \begin{itemize}
+%% \item Sine Model: $6$\% of estimates within $0.01$\% of truth.
+%% \item RR Lyrae Model: $67$\% of estimates within $0.01$\% of truth.
+%% \end{itemize}
+
 \end{frame}
 
 
 \begin{frame}{Simulation Results for Classification}
 
+\begin{center}
+Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
+\includegraphics[scale=.33]{figs/period_vs_EBV.pdf}
+\includegraphics[scale=.33]{figs/a_vs_dev_log.pdf}
+\end{center}
 
+\begin{itemize}
+\item Visually good separation with small number of features.
+\item Use model output as feature input to classifier.
+\item TODO: Sesar 
+\end{itemize}
 \end{frame}
 
 
 \begin{frame}{Simulation Results for Distance Estimation}
+\begin{itemize}
+\item Use model to estimate distance modulus ($\mu$) for RR Lyrae.
+\item Convert $\mu$ to distance (d) in parsecs: $d = 10^{\mu/5 + 1}$
+\end{itemize}
+
+\begin{center}
+\includegraphics[scale=.35]{figs/distance_comparison.pdf}
+\end{center}
+
 
 
 \end{frame}

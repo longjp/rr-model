@@ -64,6 +64,9 @@ lc <- read.table(paste0("AllLCs/LC_",id,".dat"))
 period <- rrlyrae[rrlyrae$V1==id,3]
 make_plot(lc,period,id)
 
+lc <- lc[sample(1:304,20),]
+make_plot(lc,period,paste0(id,"down"))
+
 
 
 lc <- read.table("PS1_sample_LCs/ps1_-3266288406308450226cleaned.txt",

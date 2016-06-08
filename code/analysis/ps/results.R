@@ -45,6 +45,11 @@ print(paste("0.1%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N])
 print(paste("0.01%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]) < 0.0001)))
 
 
+pdf("period_comparison.pdf")
+plot(periods[1:N],period_est[1:N],xlab="Period True",ylab="Period Estimate")
+dev.off()
+
+
 ## plot all bands with best fit parameters, store in figs
 for(ii in 1:length(tms)){
     tm <- tms[[ii]]

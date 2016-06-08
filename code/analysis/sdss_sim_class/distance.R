@@ -54,9 +54,8 @@ names(rr_lomb)[1] <- "ID"
 out <- Reduce(function(x, y) merge(x, y), list(rrlyrae,rr_model,rr_lomb))
 
 pdf("distance_comparison.pdf")
-par(mar=c(5,5,5,1))
+par(mar=c(5,5,1,1))
 plot(out$d,10^(out$mu_model/5 + 1)/1000,
-     main="Comparison of Distance Estimate to Ground Truth",
      xlab="Ground Truth Distance in kpc (Sesar 2010)",
      ylab="Estimate in kpc",
      cex.lab=1.3)
