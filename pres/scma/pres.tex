@@ -263,28 +263,39 @@ Total of $26$ parameters, model estimates period well.
 \includegraphics[scale=.3]{figs/unfolded_panstarrs.pdf}
 \end{center}
 
+\vspace{-.2in}
 
 \begin{center}
-A Pan--STARRS light curve. Period estimation very difficult for this quality data.
+\small{Pan--STARRS light curve. Period estimation difficult for this quality data.}
 \end{center}
 
-\end{frame}
+\vspace{.2in}
 
-
-
-
-\begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
-
-\begin{itemize}
-\item Dark Energy Survey (DES)
+\textbf{Dark Energy Survey (DES)}
 \begin{itemize}
 \item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
 \item depths to 24 mag in $i$
 \item $\approx$ 100 million stars
 \end{itemize}
-\item Pan--STARRS
-\end{itemize}
+
+
 \end{frame}
+
+
+
+
+%% \begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
+
+%% \begin{itemize}
+%% \item Dark Energy Survey (DES)
+%% \begin{itemize}
+%% \item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+%% \item depths to 24 mag in $i$
+%% \item $\approx$ 100 million stars
+%% \end{itemize}
+%% \item Pan--STARRS
+%% \end{itemize}
+%% \end{frame}
 
 
 
@@ -390,6 +401,10 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 \end{frame}
 
+\begin{frame}{Relation to Other Methods in Literature}
+
+\end{frame}
+
 \section{Testing Model}
 
 \begin{frame}{Simulation}
@@ -451,8 +466,8 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 \begin{itemize}
 \item Visually good separation with small number of features.
-\item Use model output as feature input to classifier.
-\item TODO: Sesar 
+\item Potential to use model output as feature input to classifier.
+\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae.
 \end{itemize}
 \end{frame}
 
@@ -472,23 +487,42 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{frame}
 
 
-\section{Future Work and Conclusions}
+\section{Related Work, Future Work and Conclusions}
 
-\begin{frame}{Conclusions}
-\begin{itemize}
-\item building model specifically for particular classes
-\item survey cadence optimization
-\end{itemize}
+\begin{frame}{Related Work}
+
+TODO: cite pejeck and tom. various RR Lyrae model papers. sesar personal communication
+
 \end{frame}
 
 \begin{frame}{Future Work}
 \begin{itemize}
-\item Model refinements: $M_b$ dependence on period
-\item uncertainty quantification
-\item Bayesianize?
-\item application to DES data
+\item Model refinements
+\begin{itemize}
+\item $M_b$ dependence on period
+\item Parameterize $\gamma_b$ to account for shape differences across RRL
+\end{itemize}
+\item Uncertainty quantification
+\begin{itemize}
+\item Propagate uncertainty to 3D halo density estimate
+\item 
+\end{itemize}
+\item Milky Way Halo maps using DES data
 \end{itemize}
 \end{frame}
+
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item Models for specific variable star classes:
+\begin{itemize}
+\item Pros: better parameter estimates, improved classification
+\item Cons: difficult to build, more computation time
+\end{itemize}
+\item 
+\item Survey cadence optimization
+\end{itemize}
+\end{frame}
+
 
 \begin{frame}[allowframebreaks]{Bibliography}
 %  \def\newblock{\hskip .11em plus .33em minus .07em}
