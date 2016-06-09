@@ -105,7 +105,7 @@ James Long
 \end{frame}
 
 
-\section{Time Domain Astronomy and Variable Stars}
+\section{Time Domain Astronomy, Variable Stars, Galactic Halo}
 
 \begin{frame}{Periodic Variable Stars}
 \textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
@@ -164,22 +164,54 @@ Quasar\\
 \end{frame}
 
 
-\begin{frame}{Variable Star Analysis Pipeline}
+\begin{frame}{Example of Variable Star Science}
 \begin{itemize}
-\item Identify Variable Stars.
-\item Estimate parameters for variables: period, amplitude, shape, etc.
-\item Classify stars.
-\item Do science: period luminosity relations, distance determination.
+\item For RR Lyrae variable stars distance is a function of mean brightness in $V$:
+\begin{equation*}
+d = 10^{(V-M_V +5)/5}
+\end{equation*}
+\item Discover structure in the Milky Way halo by finding, estimating distances to RR Lyrae
+
+
+\begin{center}
+\includegraphics[scale=.2]{figs/sesar_map.png}\\
+\footnotesize{Sesar \cite{sesar2010light} using SDSS Stripe 82 Data}
+\end{center}
+
+\item Compare observed structure to cosmological simulations.
+
 \end{itemize}
-
-
-
-
-%% TODO: motivate finding RR Lyrae with missing satellites problem
-%% TODO: connection between period estimation and distance
 
 \end{frame}
 
+
+
+%% \begin{frame}{Mapping the Galactic Halo: Statistical Challenges}
+%% \begin{itemize}
+%% \item Classification: Identify RR Lyrae lightcurves.
+%% \item Parametric Inference: Estimate periods, mean magnitudes, distances.
+%% \item Nonparametric Inference: Construct 3--D density map.
+%% \end{itemize}
+%% \end{frame}
+
+
+\begin{frame}{Mapping Galactic Halo with DES}
+
+\textbf{Dark Energy Survey (DES)}
+\begin{itemize}
+\item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+\item depths to 24 mag in $i$
+\item 5000 square degrees
+\item few million variable stars
+\end{itemize}
+
+\vspace{.3in}
+
+\begin{center}
+DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
+\end{center}
+
+\end{frame}
 
 %% \begin{frame}{Size of Variable Star Data Sets is Growing}
 %% \begin{itemize}
@@ -268,15 +300,6 @@ Total of $26$ parameters, model estimates period well.
 \begin{center}
 \small{Pan--STARRS light curve. Period estimation difficult for this quality data.}
 \end{center}
-
-\vspace{.2in}
-
-\textbf{Dark Energy Survey (DES)}
-\begin{itemize}
-\item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
-\item depths to 24 mag in $i$
-\item $\approx$ 100 million stars
-\end{itemize}
 
 
 \end{frame}
@@ -383,7 +406,7 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 %% \end{itemize}
 \begin{align*}
 &RSS(\omega,\mu,E[B-V],a,\phi) \\
- &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
+ &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{jb}}\right)^2
 \end{align*}
 
 
@@ -397,15 +420,11 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \end{frame}
 
 
-\begin{frame}{Visualization of Warm Start for $\phi$}
+%% \begin{frame}{Visualization of Warm Start for $\phi$}
 
-\end{frame}
+%% \end{frame}
 
-\begin{frame}{Relation to Other Methods in Literature}
-
-\end{frame}
-
-\section{Testing Model}
+\section{Simulations}
 
 \begin{frame}{Simulation}
 
@@ -467,7 +486,7 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \begin{itemize}
 \item Visually good separation with small number of features.
 \item Potential to use model output as feature input to classifier.
-\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae.
+%\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
 \end{itemize}
 \end{frame}
 
@@ -487,41 +506,69 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{frame}
 
 
-\section{Related Work, Future Work and Conclusions}
+\section{Related and Ongoing Work}
 
 \begin{frame}{Related Work}
 
-TODO: cite pejeck and tom. various RR Lyrae model papers. sesar personal communication
+\textbf{Period Estimation Algorithms / Variable Star Models:}
+\begin{itemize}
+\item Sinusoid Based Methods
+\begin{itemize}
+\item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
+\item Generalized LS (GLS) \cite{zechmeister2009generalised}
+\item Multiband Extensions \cite{vanderplas2015periodograms,long2014estimating}.
+\item AoV \cite{schwarzenberg1996fast}
+\end{itemize}
+\item ``Non--parametric'' methods
+\begin{itemize}
+\item Phase Dispersion Minimization \cite{stellingwerf1978period}
+\item Supersmoother \cite{sesar2010light}
+\end{itemize}
+\item Template Based Methods
+\begin{itemize}
+\item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
+\item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
+\end{itemize}
+\end{itemize}
+
+\vspace{.1in}
+
+\textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
+\begin{itemize}
+\item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
+\end{itemize}
+
 
 \end{frame}
 
-\begin{frame}{Future Work}
+\begin{frame}{Ongoing Work}
 \begin{itemize}
-\item Model refinements
+\item Model refinements:
 \begin{itemize}
-\item $M_b$ dependence on period
+\item $M_b$ dependence on period, metallicity.
+\item Bands other than $g,i,u,r,z$
 \item Parameterize $\gamma_b$ to account for shape differences across RRL
 \end{itemize}
-\item Uncertainty quantification
-\begin{itemize}
 \item Propagate uncertainty to 3D halo density estimate
-\item 
+\begin{itemize}
+\item Treat as Inference Problem: Bayesian posterior or frequentist confidence bands. Hierarchical model?
+\item Treat as Prediction Problem: Evaluate distance / density estimates using Stripe 82 data or follow--up observations.
 \end{itemize}
 \item Milky Way Halo maps using DES data
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Conclusions}
-\begin{itemize}
-\item Models for specific variable star classes:
-\begin{itemize}
-\item Pros: better parameter estimates, improved classification
-\item Cons: difficult to build, more computation time
-\end{itemize}
-\item 
-\item Survey cadence optimization
-\end{itemize}
-\end{frame}
+%% \begin{frame}{Conclusions}
+%% \begin{itemize}
+%% \item Models for specific variable star classes:
+%% \begin{itemize}
+%% \item Pros: better parameter estimates, improved classification
+%% \item Cons: difficult to build, more computation time
+%% \end{itemize}
+%% \item 
+%% \item Survey cadence selection
+%% \end{itemize}
+%% \end{frame}
 
 
 \begin{frame}[allowframebreaks]{Bibliography}
