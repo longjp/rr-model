@@ -55,6 +55,9 @@ If we cannot achieve this, we quit.
 
 
 == to do
+
+
+
 - consider effect of removing dust completely
 
 
@@ -64,12 +67,11 @@ If we cannot achieve this, we quit.
 
 
 = outline for talk
-- intro to varianble stars
-- cosmological motivation
-- existing methods for period estimation / classification
-- semi--physical model for RR Lyrae in DES
-- period estimation tests
-- model as classifier
+- having dust correction change with period does not dramatically improve
+  ability of model to fit data
+- g and u band residuals are strongly correlated, adding an additional mean term 
+  here will improve fits. although then we have three mean terms so could just fit 5 means
+- ancova (analysis of covariance) models may be useful for fitting all band mean parameters together
 
 
 
