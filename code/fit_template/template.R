@@ -126,8 +126,8 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100){
 }
 
 ## check and make tem and lc consistent
-## IF lc has bands not in tem, stop
-## IF lc has fewer bands then tem, get rid
+## if lc has bands not in tem, stop
+## if lc has fewer bands then tem, get rid
 ##    of these bands in tem
 CheckTemLC <- function(tem,lc){
     if(prod(unique(lc$band) %in% names(tem$dust)) != 1){
@@ -149,3 +149,7 @@ CheckTemLC <- function(tem,lc){
     return(tem)
 }
 
+
+TBMEtoLC <- function(time,band,mag,error){
+    return(data.frame(time,band,mag,error))
+}
