@@ -167,5 +167,22 @@ and
 \V{\beta} = \frac{1}{n}\sum \V{r}_i
 \end{equation*}
 $\V{\beta}$ is orthogonal to $\V{\delta}$ and $\V{1}$ because the $\V{r}_i$ are orthogonal to $\V{\delta}$ and $\V{1}$ because these are the columns of the design matrix and $\V{r}_i$ are the residuals.
+
+\section{Solving for Period Dependent Terms}
+
+The absolute magnitude in band $b$ is a quadratic function of period. The proposed model is
+\begin{equation*}
+\bar{m}_{ib} = \mu_i + E[B-V]_iR_b + \beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2  + \epsilon_{ib}
+\end{equation*}
+where $\epsilon_{ib} \sim N(0,\sigma^2)$ where $i$ indexes star and $b$ indexes band (usually $b=u,g,i,r,z$). $\mu_i$ is the distance modulus, $E[B-V]_i$ is the amount of dust for star $i$, $R_b$ is the extinction in band $b$, and $\beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2  + \epsilon_{ib}$ is the absolute magnitude in band $b$ of a star with log period $p_i$. The parameters $\beta_{0b},\beta_{1b},\beta_{2b}$ must be fit for all $b$.
+
+This is a two factor (one factor band, one factor light curve) ANCOVA model (C is for covariance, $R_b$ and $p_i$ are continuous covariates) with an interaction between extinction and light curve ($\mu_i + E[B-V]_iR_b$) and between band and log period ($\beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2$).
+
+The model needs to be made identifiable. Two questions:
+\begin{enumerate}
+\item Need to parameterize this model so it is identifiable. How can we preserve meaning of $\mu$ as distance modulus?
+\item How do we implement this model in \texttt{R}?
+\end{enumerate}
+
 \end{document}
 
