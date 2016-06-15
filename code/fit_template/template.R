@@ -1,5 +1,37 @@
 ## functions for fitting rr lyrae light curve
 
+## fits RR Lyrae template
+##
+## arguments
+##           lc : light curve, data frame with columns time, band, mag, error
+##       omegas : vector of frequencies
+##          tem : input templates
+##           NN : number of newton steps a each frequency
+##   use.errors : should photometric errors be used, generally not advised
+##
+##
+## value
+##          rss : the residual sum of squares at each frequency in omegas     
+FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
+    tem <- CheckTemLC(tem,lc)
+    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    nb <- dat[[2]]
+    coeffs <- c(0,0,0,runif(1))
+    rss_max <- sum(lm(m~dust)$residuals^2)
+    rss <- rep(0,length(omegas))
+    for(ii in 1:length(omegas)){
+        for(jj in 1:NN){
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+        }
+        gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
+        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
+    }
+    return(rss)
+}
+
 AugmentData <- function(tm,dust,betas,use.errors=FALSE){
     tm <- tm[order(tm$band),]
     nb <- table(tm$band)
@@ -56,30 +88,11 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
     return(out)
 }
 
-FitTemplate <- function(lc,omegas,tem,NN=1){
-    tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas)
-    m <- dat[[1]]$mag
-    dust <- dat[[1]]$dust
-    t <- dat[[1]]$time
-    nb <- dat[[2]]
-    coeffs <- c(0,0,0,runif(1))
-    rss_max <- sum(lm(m~dust)$residuals^2)
-    rss <- rep(0,length(omegas))
-    for(ii in 1:length(omegas)){
-        for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
-        }
-        gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
-        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
-    }
-    return(rss)
-}
 
 ## for a given omega, find coefficients
-ComputeCoeffs <- function(lc,omega,tem,NN=10){
+ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
     tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas)
+    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -107,9 +120,9 @@ AmpAlphaDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
     return(out)
 }
 
-ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100){
+ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
     tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas)
+    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -148,7 +161,6 @@ CheckTemLC <- function(tem,lc){
     }
     return(tem)
 }
-
 
 TBMEtoLC <- function(time,band,mag,error){
     return(data.frame(time,band,mag,error))

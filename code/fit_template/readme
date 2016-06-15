@@ -1,0 +1,14 @@
+## by James Long
+## date June 15, 2016
+
+template.py
+ - python wrapper demonstrating use of FitTemplate function
+
+template.R 
+ - fits RR Lyrae template to light curve
+ - function FitTemplate returns the residual sum of squares for
+   frequencies in omegas vector
+
+template.RData
+ - light curve shape information use by template functions
+   
