@@ -20,4 +20,4 @@ period_est <- mclapply(1:N,FitTemplateParallel,
                        mc.cores=mc.cores)
 period_est <- matrix(unlist(period_est),ncol=topN,byrow=TRUE)
 
-save(period_est,period_est_lomb,file="results.RData")
+save(period_est,file="results.RData")

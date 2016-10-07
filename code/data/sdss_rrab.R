@@ -1,4 +1,4 @@
-## select RR ab for template creation, template creation selects well sampled
+## select RR ab for template creation, template creation selects well` sampled
 rm(list=ls())
 source('../common/funcs.R')
 
