@@ -9,7 +9,7 @@ source("../../common/funcs.R")
 source("../funcs.R")
 
 ## data source
-load("../../data/clean/sdss_rrab.RData")
+load("../../data/clean/sdss_class.RData")
 
 ## parameters for simulation
 source("../params.R")
