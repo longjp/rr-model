@@ -12,7 +12,7 @@ source("../funcs.R")
 
 
 ## data source
-load("../../data/clean/sdss_rrab.RData")
+load("../../data/clean/sdss_class.RData")
 load("results.RData")
 source("../params.R")
 
@@ -50,6 +50,10 @@ for(ii in 1:N){
 features <- cbind(coeffs,period_est,tot.dev)
 colnames(features) <- c("alpha","d","a","phi","period","dev")
 
+
+cols <- 1:2
+names(cols) <- c("rr","not")
+pairs(features,col=cols[cl])
 
 dat <- data.frame(cl,features)
 rpart.fit <- rpart(cl~.,data=dat)

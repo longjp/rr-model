@@ -98,10 +98,13 @@ ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
     t <- dat[[1]]$time
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
-    while(coeffs[3]==0){
+    J <- 0
+    ## prevent infinite loops with J
+    while(coeffs[3]==0 & J < 10){
         for(jj in 1:NN){
             coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
         }
+        J <- J + 1
     }
     return(coeffs)
 }
