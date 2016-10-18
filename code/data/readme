@@ -5,12 +5,14 @@
 == funcs.R functions used for processing raw data
 == All other files process a particular raw data set 
 
-======= raw/ 
-== stripe82candidateVar_v1.1.dat
-  - http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
-== AllLCs
-  - http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
-== apj326724t2_mrt.txt
-  - http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt
 
-hello
+======= to get started, download and unzip the files below in the raw/ folder
+1) stripe82candidateVar_v1.1.dat
+  - file available here:
+    http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
+2) AllLCs
+  - directory available here:
+    http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
+3) apj326724t2_mrt.txt
+  - file available here:
+    http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt
