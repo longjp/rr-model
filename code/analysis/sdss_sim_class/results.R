@@ -17,9 +17,6 @@ source("../params.R")
 unlink("figs",recursive=TRUE)
 dir.create("figs")
 
-
-
-
 ## fraction of times true period in top 5
 N <- sum(cl=="rr")
 print(paste0("accuracies, top ",topN,":"))

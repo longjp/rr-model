@@ -63,8 +63,10 @@ dev.off()
 
 rf.fit <- randomForest(cl~.,data=dat)
 
+## predict everything with random forest
+dat$predict <- predict(rf.fit)
 
-rf.fit
+
 
 cl.plot <- as.numeric(as.factor(cl))
 pdf(paste0(fig.dir,"/scatterplot_features.pdf"),height=6,width=7)
@@ -124,27 +126,34 @@ rrlyrae$ID <- paste0("LC_",rrlyrae$ID,".dat")
 
 
 ###### get coefficients AND classifications for ALL light curves here
-rr_model <- data.frame(names(tms),features)
+rr_model <- data.frame(names(tms),dat)
 names(rr_model)[1] <- "ID"
-
-## 
-out <- merge(rrlyrae,rr_model)
-
+out <- merge(rrlyrae,rr_model,all=TRUE)
+out <- out[!is.na(out$cl),] ## only use observations which we have classes for
 
 
-pdf("distance_comparison.pdf")
-par(mar=c(5,5,1,1))
-plot(out$d,10^(out$mu_model/5 + 1)/1000,
+## compute distance based on model (out$mu)
+
+## pdf("distance_comparison.pdf")
+## par(mar=c(5,5,1,1))
+
+to_use <- out$predict=='rr'
+plot(out$d[to_use],10^(out$mu[to_use]/5 + 1)/1000,col=(1*(out$cl[to_use]=='not')+1),
      xlab="Ground Truth Distance in kpc (Sesar 2010)",
      ylab="Estimate in kpc",
      cex.lab=1.3)
 abline(a=0,b=1)
-dev.off()
+
+not_rr <- to_use & out$cl!='rr'
+points(rep(min(out$d[to_use],na.rm=TRUE),sum(not_rr)),10^(out$mu[not_rr]/5 + 1)/1000,
+       col='red',pch=19)
+##dev.off()
 
 
+#### make side by side comparison maps of Sesar
 
-
-#### make side by side comparison maps of Sesar and me
+## why do we have rr, dec, d for some objects (5) that are not actually rr lyrae
+## what happens to rrlyrae c and d? is my classifier wrong if it labels these as rrlyrae?`
 
 out$d
 plot(-out$d*sin(2*pi*out$ra/360),out$d*cos(2*pi*out$ra/360))
