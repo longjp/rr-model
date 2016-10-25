@@ -83,43 +83,29 @@
 %%%%%%%%
 
 
-\begin{frame}{Texas A\&M Collaboration}
+%% \begin{frame}{Texas A\&M Collaboration}
 
-%% astronomers
-%%   \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
-%% \begin{center}
-%% \textbf{Astronomy}
-%% \end{center}
-%% \end{textblock*}
-%%   \begin{textblock*}{3cm}(3.5cm,2cm) % {block width} (coords)
+
+
+%% %% statisticians
+%%   \begin{textblock*}{3cm}(1.5cm,3.1cm) % {block width} (coords)
 %% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
 %% Lucas Macri
 %% \end{textblock*}
-%%   \begin{textblock*}{3cm}(7cm,2cm) % {block width} (coords)
-%% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
-%% Wenlong Yuan
+
+
+%%   \begin{textblock*}{3cm}(5cm,3.1cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
+%% Jennifer Marshall
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(8.5cm,3.1cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
+%% James Long
 %% \end{textblock*}
 
 
-%% statisticians
-  \begin{textblock*}{3cm}(1.5cm,3.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
-Lucas Macri
-\end{textblock*}
-
-
-  \begin{textblock*}{3cm}(5cm,3.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
-Jennifer Marshall
-\end{textblock*}
-
-  \begin{textblock*}{3cm}(8.5cm,3.1cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/long.jpg}\\
-James Long
-\end{textblock*}
-
-
-\end{frame}
+%% \end{frame}
 
 
 %% \begin{frame}{Why Important?}
@@ -201,13 +187,13 @@ Quasar\\
 \end{frame}
 
 
-\begin{frame}{Example of Variable Star Science}
+\begin{frame}{Variable Star Science: Mapping Milky Way Halo}
 \begin{itemize}
-\item For RR Lyrae variable stars distance is a function of mean brightness in $V$:
+\item for RR Lyrae variable stars distance is a function of mean brightness in $V$:
 \begin{equation*}
 d = 10^{(V-M_V +5)/5}
 \end{equation*}
-\item Discover structure in the Milky Way halo by \underline{identifying}, \underline{stimating distances} to RR Lyrae
+\item discover structure in the Milky Way halo by \underline{identifying}, \underline{estimating distances} to RR Lyrae
 
 
 \begin{center}
@@ -215,7 +201,7 @@ d = 10^{(V-M_V +5)/5}
 \footnotesize{Sesar \cite{sesar2010light} using SDSS Stripe 82 Data}
 \end{center}
 
-\item Compare observed structure to cosmological simulations.
+\item compare observed structure to cosmological simulations
 
 \end{itemize}
 
@@ -242,11 +228,18 @@ d = 10^{(V-M_V +5)/5}
 \item few million variable stars
 \end{itemize}
 
-\vspace{.3in}
+\vspace{.2in}
 
 \begin{center}
-DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
-\end{center}
+  \includegraphics[scale=0.3]{figs/des2.png}
+  \end{center}
+
+
+\begin{itemize}
+\item DES is deeper and wider than SDSS, but more sparsely sampled
+\item identifying and estimating distances to RRL more challenging
+\end{itemize}
+
 
 \end{frame}
 
@@ -363,13 +356,18 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 
 \begin{frame}{Finding the RR Lyrae}
 
+\vspace{-.1in}
+  
   \begin{center}
     \includegraphics[scale=0.5]{figs/rr_color.png}
     \end{center}
 
+\vspace{-.1in}
+  
   \begin{itemize}
   \item compute colors, periods, etc (features) for stars
-  \item make cuts to select regions of feature space containing mostly RR Lyrae
+  \item make cuts to select regions containing mostly RR Lyrae
+  \item \textbf{downside:} difficult to make cuts when class information is distributed across many features
   \end{itemize}
   
 \att{``Exploring the Variable Sky with the Sloan Digital Sky Survey'' Sesar et al 2007 \url{http://iopscience.iop.org/article/10.1086/521819}\\}
@@ -387,7 +385,7 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 \begin{itemize}
 \item \textbf{training data:} lightcurves of known class
   \begin{itemize}
-  \item eg SDSS Stripe 82 light curves (known RRL, not RRL)
+  \item eg SDSS Stripe 82 light curves
   \end{itemize}
 \item \textbf{unlabeled data:} lightcurves of unknown class
   \begin{itemize}
@@ -425,7 +423,7 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
     \item $z_i \in \{1,\ldots,K\}$ is class of observation $i$
     \item $x_i \in \mathbb{R}^p$ is feature vector of observation $i$
     \end{itemize}
-  \item \textbf{dimension:} number of features ($=$ 2 here)
+  \item \textbf{dimension:} number of features ($p=2$ here)
   \item here $K=2$
   \item usually more than two features, difficult to ``see'' class separation
   \end{itemize}
@@ -550,7 +548,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 \vspace{-.2in}
 
 \begin{center}
-  Bandwidth too large. Estimator is \underline{biased}.
+  Bandwidth too large. Estimator has too much \underline{bias}.
 \end{center}
 
   
@@ -568,7 +566,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 \vspace{-.2in}
 
 \begin{center}
-  Same bandwidth, new data generated. Estimator looks the same, but \underline{biased}.
+  Same bandwidth, new data generated. Estimator looks the same (low variance), but \underline{biased}.
 \end{center}
 
   
@@ -587,17 +585,17 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
       \includegraphics[scale=0.2]{figs/density1_largen.pdf}\\
       $a) bw=0.03, n = 1000 \, \, \, \, \,  \, \, \, \, b) bw=0.03, n=10000$
     \end{center}
-  \item bandwidth lacks a clear interpretation
+  \item bandwidth is parameter, but lacks a clear interpretation
   \item bandwidth itself is not interesting
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Variance and Bias}
   \begin{itemize}
-  \item \textbf{variance:} how much do my parameter estimates $\widehat{\theta}$ change if I ``perturb'' the data?
-  \item \textbf{bias:} how far, on average, is my estimate from the true value
+  \item \textbf{variance:} amount of change in estimate $\widehat{\theta}$  if data is ``perturbed''?
+  \item \textbf{bias:} how far, on average, estimate is from the true value
   \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
-  \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to statistical procedures with good performance
+  \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to produce statistical procedures with good performance
   \item \textbf{cross validation:} one method for conducting this negotiation
   \end{itemize}
 
@@ -786,60 +784,32 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 \section{Parameter Estimation for Sparsely Sampled Variable Stars}
 
-%% \begin{frame}{Parsimonious RR Lyrae Model}
 
-%% \underline{global parameters} common for all RR Lyrae:
-%% {\footnotesize
-%% \begin{align*}
-%% M_b &=  \text{ absolute magnitude band $b$ }\\
-%% R_b &= \text{ attenuation caused by dust in band $b$ }\\
-%% \gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
-%% \end{align*}
-%% }
+\begin{frame}{Modeling and Feature Extraction}
 
-%% \vspace{.2in}
-
-%% \begin{equation*}
-%% m_b(t) = \mu + M_b + E[B-V]R_b + a\gamma_b(\omega t + \phi)
-%% \end{equation*}
-
-%% \vspace{.2in}
-
-%% \underline{individual parameters} specific to each RR Lyrae:
-%% {\footnotesize
-%% \begin{align*}
-%% \mu &= \text{ distance modulus }\\
-%% E[B-V] &= \text{ amount of dust }\\
-%% a &= \text{ amplitude of variation }\\
-%% \omega &= \text{ frequency of variation }\\
-%% \phi &= \text{ phase }
-%% \end{align*}
-%% }
-
-%% \end{frame}
-
-
-\begin{frame}{Period Estimation Methods}
-
+  \vspace{-.1in}
+  
+  \begin{itemize}
+  \item the most important part of classification is the features chosen (not the classification method employed)
+  \item need accurate estimates of period, amplitude, colors
+  \item generic period finding algorithms:
+    \begin{itemize}
+    \item lomb--scargle
+    \item multiband periodograms (Vanderplas and Ivezic)
+    \end{itemize}
+  \begin{center}
+    \includegraphics[scale=0.35]{figs/vanderplas_periodogram.png}
+  \end{center}
+  \vspace{-.15in}
+\item could not attain resonable period estimation accuracy on DES quality light curves
+  \end{itemize}
+  
+  \att{``PERIODOGRAMS FOR MULTIBAND ASTRONOMICAL TIME SERIES'' Vanderplas et al. \url{http://iopscience.iop.org/article/10.1088/0004-637X/812/1/18}\\}
 \end{frame}
 
 
-\begin{frame}{More on Period Estimation Methods}
 
-\end{frame}
-
-
-\begin{frame}{Do Not Work for Sparsely Sampled Light Curves}
-
-\end{frame}
-
-
-\begin{frame}{Template Based Methods}
-
-\end{frame}
-
-
-\begin{frame}{RR Lyrae Model}
+\begin{frame}{Custom Made RR Lyrae Model}
 
 
 \begin{center}
@@ -983,7 +953,7 @@ Comparison of period estimates for 350 RR Lyrae\\
     \end{center}
 \end{frame}
 
-\begin{frame}{CART Tree}
+\begin{frame}{Simple Tree Had Nearly As Low Error Rate}
   \begin{center}
     \includegraphics[scale=0.4]{figs/rpart_pruned.pdf}
     \end{center}
