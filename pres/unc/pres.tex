@@ -839,7 +839,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 \end{frame}
 
 
-\begin{frame}{Parsimonious RR Lyrae Model}
+\begin{frame}{RR Lyrae Model}
 
 
 \begin{center}
@@ -894,6 +894,12 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \item Warm start Newton--Raphson updates for $\phi$.
 \end{itemize}
 
+\vspace{.2in}
+
+\begin{center}
+  \textbf{Model Output:} $(\widehat{\omega},\widehat{\mu},\widehat{E[B-V]},\widehat{a},\widehat{\phi},RSS/n)$
+\end{center}
+
 \end{frame}
 
 \section{Simulation Results}
@@ -947,25 +953,42 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 
-\begin{frame}{Simulation Results for Classification}
+
+\begin{frame}{Feature Scatter Plots}
+  \begin{center}
+    \includegraphics[scale=0.45]{figs/RRfeatures.pdf}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}{Feature Scatter Plots}
 
 \begin{center}
-Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
+%Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \includegraphics[scale=.33]{figs/period_vs_EBV.pdf}
 \includegraphics[scale=.33]{figs/a_vs_dev_log.pdf}
 \end{center}
 
-\begin{itemize}
-\item Visually good separation with small number of features.
-\item Potential to use model output as feature input to classifier.
-%\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
-\end{itemize}
+%% \begin{itemize}
+%% \item Visually good separation with small number of features.
+%% \item Potential to use model output as feature input to classifier.
+%% %\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
+%% \end{itemize}
 \end{frame}
 
 
 \begin{frame}{CART Tree}
-
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/rpart_fulltree.pdf}
+    \end{center}
 \end{frame}
+
+\begin{frame}{CART Tree}
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/rpart_pruned.pdf}
+    \end{center}
+\end{frame}
+
 
 \begin{frame}{Simulation Results for Distance Estimation}
 \begin{itemize}
@@ -984,38 +1007,38 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 \section{Related and Ongoing Work}
 
-\begin{frame}{Related Work}
+%% \begin{frame}{Related Work}
 
-\textbf{Period Estimation Algorithms / Variable Star Models:}
-\begin{itemize}
-\item Sinusoid Based Methods
-\begin{itemize}
-\item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
-\item Generalized LS (GLS) \cite{zechmeister2009generalised}
-\item Multiband Extensions \cite{vanderplas2015periodograms,long2014estimating}.
-\item AoV \cite{schwarzenberg1996fast}
-\end{itemize}
-\item ``Non--parametric'' methods
-\begin{itemize}
-\item Phase Dispersion Minimization \cite{stellingwerf1978period}
-\item Supersmoother \cite{sesar2010light}
-\end{itemize}
-\item Template Based Methods
-\begin{itemize}
-\item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
-\item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
-\end{itemize}
-\end{itemize}
+%% \textbf{Period Estimation Algorithms / Variable Star Models:}
+%% \begin{itemize}
+%% \item Sinusoid Based Methods
+%% \begin{itemize}
+%% \item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
+%% \item Generalized LS (GLS) \cite{zechmeister2009generalised}
+%% \item Multiband Extensions \cite{vanderplas2015periodograms,long2014estimating}.
+%% \item AoV \cite{schwarzenberg1996fast}
+%% \end{itemize}
+%% \item ``Non--parametric'' methods
+%% \begin{itemize}
+%% \item Phase Dispersion Minimization \cite{stellingwerf1978period}
+%% \item Supersmoother \cite{sesar2010light}
+%% \end{itemize}
+%% \item Template Based Methods
+%% \begin{itemize}
+%% \item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
+%% \item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
+%% \end{itemize}
+%% \end{itemize}
 
-\vspace{.1in}
+%% \vspace{.1in}
 
-\textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
-\begin{itemize}
-\item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
-\end{itemize}
+%% \textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
+%% \begin{itemize}
+%% \item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
+%% \end{itemize}
 
 
-\end{frame}
+%%\end{frame}
 
 \begin{frame}{Ongoing Work}
 \begin{itemize}
