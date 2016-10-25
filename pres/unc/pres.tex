@@ -59,7 +59,7 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{bibliography item}[text]
 
-\title{Statistical Tools for Time Domain Astronomy}
+\title{Statistical Tools for Time Domain Astronomy: Classifiers, Cross Validation, Templates}
 \author{James Long}
 \institute{Texas A\&M University}
 \date{\today}
@@ -131,20 +131,20 @@
 \section{Motivating Problem: Mapping the Galactic Halo}
 
 \begin{frame}{Periodic Variable Stars}
-\textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
+\textbf{periodic variables:} stars that repeat brightness variation over a fixed period
 \begin{center}
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
 \end{center}
 \begin{itemize}
-\item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
-\item Data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$.
-\item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$.
+\item star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$
+\item data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$
+\item observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Folded Light Curve of Periodic Variable}
-\textbf{Folded light curve:} Brightness versus time modulo period.
+\textbf{folded light curve:} Brightness versus time modulo period.
 \begin{center}
 \includegraphics[scale=.3]{figs/folded_13350.pdf}
 \end{center}
@@ -153,9 +153,9 @@
 
 \begin{frame}{SDSS--III Stripe 82 \cite{ivezic2007sloan}}
 \begin{itemize}
-\item Collected $\approx 60,000$ variables in Stripe 82 Region
-\item Variables belong to different \textbf{classes}
-\item Some periodic, some not
+\item collected $\approx 60,000$ variables in Stripe 82 Region
+\item variables belong to different \textbf{classes}
+\item some periodic, some not
 \end{itemize}
 
 
@@ -237,7 +237,7 @@ d = 10^{(V-M_V +5)/5}
 
 \begin{itemize}
 \item DES is deeper and wider than SDSS, but more sparsely sampled
-\item identifying and estimating distances to RRL more challenging
+\item identifying and estimating distances to RRL is more challenging
 \end{itemize}
 
 
@@ -367,7 +367,7 @@ d = 10^{(V-M_V +5)/5}
   \begin{itemize}
   \item compute colors, periods, etc (features) for stars
   \item make cuts to select regions containing mostly RR Lyrae
-  \item \textbf{downside:} difficult to make cuts when class information is distributed across many features
+  \item \textbf{downside:} difficult to make cuts when class information is distributed across many features or non--linear boundaries
   \end{itemize}
   
 \att{``Exploring the Variable Sky with the Sloan Digital Sky Survey'' Sesar et al 2007 \url{http://iopscience.iop.org/article/10.1086/521819}\\}
@@ -397,7 +397,7 @@ d = 10^{(V-M_V +5)/5}
 
 \textbf{Steps in Classification:}
 \begin{enumerate}
-\item \textbf{feature extraction:} derive quantities from light curves useful for separating classes, eg period, amplitude, derivatives, etc.
+\item \textbf{feature extraction:} derive quantities from light curves useful for separating classes, eg period, amplitude, colors, etc.
 \item \textbf{classifier construction:} using training data, construct function
 \begin{equation*}
 \widehat{\mathcal{C}}(features) \rightarrow class
@@ -424,7 +424,6 @@ d = 10^{(V-M_V +5)/5}
     \item $x_i \in \mathbb{R}^p$ is feature vector of observation $i$
     \end{itemize}
   \item \textbf{dimension:} number of features ($p=2$ here)
-  \item here $K=2$
   \item usually more than two features, difficult to ``see'' class separation
   \end{itemize}
 \end{column}
@@ -441,13 +440,15 @@ d = 10^{(V-M_V +5)/5}
   \item for particular $x$ in feature space, select whichever class is more probable
   \end{itemize}
 
+  \vspace{.1in}
+  
     \textbf{Notation:}
   \begin{align*}
     p_k &= \text{probability an observation belongs to class } k\\
     f_k(x) &= \text{probability density of features for observations of class } k
   \end{align*}
 
-\vspace{.2in}
+\vspace{.1in}
   
   By Bayes theorem, the probability an observation with features $x$ belongs to class $k$ is
   \begin{equation*}
@@ -458,13 +459,13 @@ d = 10^{(V-M_V +5)/5}
 
 
 
-\begin{frame}{Kernel Density Estimator for Estimating $f_k$}
+\begin{frame}{Kernel Density Estimator for $f_k$}
   Estimate $p_k$ and $f_k$ from the training data by
   \begin{itemize}
   \item $\widehat{p}_k = \frac{\sum_{i=1}^n \ind_{z_i=k}}{n}$
   \item 
   \begin{equation*}
-    \widehat{f}_k(x) = \frac{1}{\sum_{i=1}^n \ind_{z_i=k}}\sum_{i=1}^{n_k} K_h(||x-x_i||)\ind_{z_i=k}
+    \widehat{f}_k(x) = \frac{1}{\sum_{i=1}^n \ind_{z_i=k}}\sum_{i=1}^{n} K_h(||x-x_i||)\ind_{z_i=k}
   \end{equation*}
 where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
   \end{itemize}
@@ -592,7 +593,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 \begin{frame}{Variance and Bias}
   \begin{itemize}
-  \item \textbf{variance:} amount of change in estimate $\widehat{\theta}$  if data is ``perturbed''
+  \item \textbf{variance:} amount of change in estimate if data is ``perturbed''
   \item \textbf{bias:} how far, on average, estimate is from the true value
   \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
   \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to produce statistical procedures with good performance
@@ -603,30 +604,27 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 
 
-\begin{frame}{Back to Classification Example}
+\begin{frame}{Classification Example: Bandwidth too Large}
 
   \begin{center}
-    \includegraphics[scale=0.4]{figs/kde2d3.pdf}\\
-    Bandwidth is too large.
+    \includegraphics[scale=0.4]{figs/kde2d3.pdf}
   \end{center}
   
 \end{frame}
 
 
-\begin{frame}{Back to Classification Example}
+\begin{frame}{Classification Example: Bandwidth too Small}
 
   \begin{center}
-    \includegraphics[scale=0.4]{figs/kde2d1.pdf}\\
-    Bandwidth is too small.
+    \includegraphics[scale=0.4]{figs/kde2d1.pdf}
   \end{center}
   
 \end{frame}
 
-\begin{frame}{Back to Classification Example}
+\begin{frame}{Classification Example: Bandwidth about Right}
 
   \begin{center}
-    \includegraphics[scale=0.4]{figs/kde2d2.pdf}\\
-    Bandwidth about right.
+    \includegraphics[scale=0.4]{figs/kde2d2.pdf}
   \end{center}
   
 \end{frame}
@@ -751,11 +749,11 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 
 
-\begin{frame}{Where is Bias -- Variance Tradeoff}
+\begin{frame}{Where is Bias -- Variance Tradeoff?}
 
   \begin{itemize}
-  \item trees with many terminal nodes have high variance, low bias
-  \item trees with few terminal nodes have low variance, high bias
+  \item trees with many nodes have high variance, low bias
+  \item trees with few nodes have low variance, high bias
   \item ``prune'' the tree to optimize tradeoff
   \end{itemize}
 
@@ -828,13 +826,13 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
   \item generic period finding algorithms:
     \begin{itemize}
     \item lomb--scargle
-    \item multiband periodograms (Vanderplas and Ivezic)
+    \item multiband periodograms
     \end{itemize}
   \begin{center}
     \includegraphics[scale=0.35]{figs/vanderplas_periodogram.png}
   \end{center}
   \vspace{-.15in}
-\item could not attain reasonable period estimation accuracy on DES quality light curves
+\item could not attain reasonable period estimation accuracy on DES quality light curves with these methods
   \end{itemize}
   
   \att{``PERIODOGRAMS FOR MULTIBAND ASTRONOMICAL TIME SERIES'' Vanderplas et al. \url{http://iopscience.iop.org/article/10.1088/0004-637X/812/1/18}\\}
@@ -842,7 +840,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 
 
-\begin{frame}{Custom Made RR Lyrae Model}
+\begin{frame}{Custom Built RR Lyrae Model}
 
 
 \begin{center}
@@ -854,12 +852,12 @@ individual parameters fit for each RR Lyrae
 \vspace{.2in}
 
 \begin{itemize}
-\item Data $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
-\item Normal measurement error model:
+\item data $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
+\item normal measurement error model:
 \begin{equation*}
 m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 \end{equation*}
-where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$
 \end{itemize}
 \end{frame}
 
@@ -892,9 +890,9 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 
 Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \begin{itemize}
-\item Likelihood is highly multimodal in $\omega$, grid search.
-\item Model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates.
-\item Warm start Newton--Raphson updates for $\phi$.
+\item likelihood is highly multimodal in $\omega$, grid search
+\item model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates
+\item warm start Newton--Raphson updates for $\phi$
 \end{itemize}
 
 \vspace{.2in}
@@ -907,31 +905,35 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 \section{Simulation Results}
 
-\begin{frame}{Simulation}
+\begin{frame}{Simulation SDSS Stripe 82 to DES Quality LCs}
 
-  \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
-Downsample Stripe 82 variables to 20 observations across all bands:
+  \begin{textblock*}{12cm}(.5cm,1.5cm) % {block width} (coords)
+    Downsample
+    \begin{itemize}
+    \item 350 RR Lyrae
+    \item 1000 non--rrlyrae
+    \end{itemize}
+    from Stripe 82 to 20 observations across all bands:
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(1cm,4cm) % {block width} (coords)
 \includegraphics[scale=.15]{figs/unfolded_13350.pdf}
 \end{textblock*}
 
 
-  \begin{textblock*}{3cm}(5.5cm,3.5cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(5.5cm,4.2cm) % {block width} (coords)
 \includegraphics[scale=.15]{figs/rightarrow.png}
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(6.75cm,3.1cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(6.75cm,4cm) % {block width} (coords)
 \includegraphics[scale=.15]{figs/unfolded_13350down.pdf}
 \end{textblock*}
 
-  \begin{textblock*}{12cm}(1.75cm,6.1cm) % {block width} (coords)
+  \begin{textblock*}{12cm}(1.75cm,6.8cm) % {block width} (coords)
 \begin{itemize}
 \item Can we estimate periods correctly for RR Lyrae?
 \item Can we separate RR Lyrae from non--RR Lyrae? 
 \item Can we estimate distances accurately?
-\item Can we reproduce halo maps of Sesar 2010?
 \end{itemize}
 \end{textblock*}
 
