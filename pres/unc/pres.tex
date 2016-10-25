@@ -585,8 +585,8 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
       \includegraphics[scale=0.2]{figs/density1_largen.pdf}\\
       $a) bw=0.03, n = 1000 \, \, \, \, \,  \, \, \, \, b) bw=0.03, n=10000$
     \end{center}
-  \item bandwidth is parameter, but lacks a clear interpretation
-  \item bandwidth itself is not interesting
+  %% \item bandwidth is parameter, but lacks a clear interpretation
+  %% \item bandwidth itself is not interesting
   \end{itemize}
 \end{frame}
 
@@ -636,20 +636,47 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 
 
-\begin{frame}{Choosing the Bandwidth with Cross Validation}
+\begin{frame}{Cross Validation for Bandwidth Selection}
+  \begin{itemize}
+  \item construct grid of possible bandwidths
+  \item split the data into 10 groups
+  \item repeat 10 times, alternating held out group
+    \begin{itemize}
+    \item using 9 groups, fit the densities with each bandwidth
+    \item predict classes for held out  group and compute error
+    \end{itemize}
+  \item results in 10 error ``curves'' (error as function of bandwidth)
+  \item choose bandwidth which minimizes mean of these curves
+  \end{itemize}
 
+\vspace{.2in}
+  
+  \begin{center}
+    \textbf{This is known as 10--fold cross validation.}
+  \end{center}
 \end{frame}
 
 
 
-\begin{frame}{Data Splitting Strategy}
+\begin{frame}{Error as a Function of Bandwidth}
 
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/kde_cv.pdf}
+  \end{center}
+  
 \end{frame}
 
 
 
-\begin{frame}{Results on this Data}
+\begin{frame}{Results on Validation Data: Confusion Matrix}
 
+Apply classifier with selected bandwidth to validation set.
+  
+\begin{center}
+\input{figs/confusion_kde.tex}
+\end{center}
+
+  
 \end{frame}
 
 
