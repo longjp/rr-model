@@ -25,6 +25,7 @@
 \newcommand{\Var}{\text{Var }}
 \newcommand{\Cov}{\text{Cov }}
 \newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
 \newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
 \newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
 \newcommand{\todo}[1]{{\color{red}TODO: #1}}
@@ -103,6 +104,26 @@ James Long
 
 
 \end{frame}
+
+
+\begin{frame}{Why Important?}
+
+  Abstract: Ongoing and upcoming time domain surveys will produce
+unprecedented amounts of data. Turning these data into scientific
+knowledge requires application and development of sophisticated
+statistical methodology. I will discuss some new statistical tools for
+analyzing time domain data, including period estimators for sparsely
+sampled periodic variable stars and machine learning algorithms for
+source classification. I will highlight the concept of the
+bias--variance tradeoff in both of these problems and discuss methods
+such as cross validation for optimizing this tradeoff. I will conclude
+with an application of these methods to finding structure in the Milky
+Way Halo using Dark Energy Survey data.
+
+
+
+  \end{frame}
+
 
 
 \section{Motivating Problem: Mapping the Galactic Halo}
@@ -324,13 +345,48 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 
 \section{Classification and the Bias Variance Tradeoff}
 
+\begin{frame}{Finding the RR Lyrae}
+
+\end{frame}
+
+
+
+\begin{frame}{Finding the RR Lyrae: Sesar 2010}
+
+\end{frame}
+
+\begin{frame}{Finding the RR Lyrae: Sesar 2010}
+
+\end{frame}
+
+
+\begin{frame}{Variance and Bias}
+  \begin{itemize}
+  \item \textbf{variance:} how much do my parameter estimates $\widehat{\theta}$ change if I ``perturb'' the data?
+  \item \textbf{bias:}
+  \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
+  \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to statistical procedures with good performance
+  \item \textbf{cross validation:} one method for conducting this negotiation
+  \end{itemize}
+
+{\small Histogram binwidths.}
+\end{frame}
+
+
+
 
 \begin{frame}{Overview of Statistical Classification}
 
 \textbf{Key Terms:}
 \begin{itemize}
 \item \textbf{training data:} lightcurves of known class
+  \begin{itemize}
+  \item eg SDSS Stripe 82 light curves (known RRL, not RRL)
+  \end{itemize}
 \item \textbf{unlabeled data:} lightcurves of unknown class
+  \begin{itemize}
+  \item eg DES variable sources
+  \end{itemize}
 \end{itemize}
 
 \vspace{.2in}
@@ -345,6 +401,198 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 \item \textbf{apply classifier:} for unlabeled data, compute features and predict class using $\widehat{\mathcal{C}}$
 \end{enumerate}
 \end{frame}
+
+\begin{frame}{Classification Problem with Two Features}
+\begin{columns}[T] % align columns
+
+\begin{column}{.5\textwidth}
+%% \begin{center}
+%% Training Data
+%% \end{center}
+\includegraphics[height=2.3in,width=2.3in]{figs/sim_features.pdf}
+\end{column}
+\begin{column}{.5\textwidth}
+  \begin{itemize}
+  \item \textbf{dimension:} number of features
+  \item with two features possible to make simple cuts
+  \item harder with more than two features
+  \item how do we assess error rate?
+  \end{itemize}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Kernel Density Estimator}
+  \begin{align*}
+    p_k &= \text{probability an observation belongs to class } k\\
+    f_k(x) &= \text{probability density of features for observations of class } k
+  \end{align*}
+
+\vspace{.2in}
+  
+  By Bayes theorem, the probability an observation with features $x$ belongs to class $k$ is
+  \begin{equation*}
+    p(k|x) = \frac{p_k f_k(x)}{\sum_{k=1}^K p_k f_k(x)}
+  \end{equation*}
+
+\textbf{Problem:} Do not know $p_k$ or $f_k$.  
+\end{frame}
+
+
+
+\begin{frame}{Kernel Density Estimator for Estimating $f_k$}
+
+  \begin{equation*}
+    \widehat{f}_k(x) = \frac{1}{\sum_{i=1}^n \ind_{z_i=k}}\sum_{i=1}^{n_k} K_h(x-x_i)\ind_{z_i=k}
+  \end{equation*}
+
+  \begin{itemize}
+  \item $K_h(\cdot) = h^{-1}K(\cdot h^{-1})$
+  \item $K$ is the kernel (often gaussian)
+  \item $h$ is the bandwidth (tuning parameter)
+  \end{itemize}
+
+  \vspace{.3in}
+  
+  \begin{center}
+    \textbf{The bandwidth plays the roll of binsize for histograms.}
+  \end{center}
+
+  \todo{write this in arbitrary dimension}
+  
+\end{frame}
+
+
+
+\begin{frame}{The Bandwidth in 1 Dimension}
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/density2_1.pdf}
+    \end{center}
+
+\vspace{-.2in}
+  
+      \begin{center}
+  The bandwidth looks appropriate.
+      \end{center}
+\end{frame}
+
+
+
+
+\begin{frame}{The Bandwidth in 1 Dimension}
+
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/density1_1.pdf}
+    \end{center}
+
+\vspace{-.2in}
+
+\begin{center}
+    The bandwidth is too small, causing a large amount of \underline{variance} in estimator.
+    \end{center}
+  
+\end{frame}
+
+
+
+\begin{frame}{The Bandwidth in 1 Dimension}
+
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/density1_2.pdf}
+    \end{center}
+
+\vspace{-.2in}
+
+\begin{center}
+  Same bandwidth, new data generated. The estimate has changed significantly ie high \underline{variance}.
+\end{center}
+  
+\end{frame}
+
+
+
+\begin{frame}{The Bandwidth in 1 Dimension}
+
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/density3_1.pdf}
+    \end{center}
+
+\vspace{-.2in}
+
+\begin{center}
+  Bandwidth too large. Estimator is \underline{biased}.
+\end{center}
+
+  
+\end{frame}
+
+
+
+\begin{frame}{The Bandwidth in 1 Dimension}
+
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/density3_2.pdf}
+    \end{center}
+
+\vspace{-.2in}
+
+\begin{center}
+  Same bandwidth, new data generated. Estimator looks the same, but \underline{biased}.
+\end{center}
+
+  
+  
+\end{frame}
+
+
+
+
+\begin{frame}{Notes}
+  \begin{itemize}
+  \item ``sweet spot'' for bandwidth which balances variance--bias
+  \item the best bandwidth depends on the sample size
+    \begin{center}
+      \includegraphics[scale=0.2]{figs/density1_1.pdf}
+      \includegraphics[scale=0.2]{figs/density1_largen.pdf}\\
+      $a) bw=0.03, n = 1000 \, \, \, \, \,  \, \, \, \, b) bw=0.03, n=10000$
+    \end{center}
+  \item bandwidth lacks a clear interpretation
+  \item bandwidth itself is not interesting
+  \end{itemize}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Back to Classification Example}
+
+    \textbf{Message:} Too much variance. If I regenerated the data, the estiamte would completely change.
+\end{frame}
+
+
+\begin{frame}{Hueristic: Very Large Bandwidth}
+
+
+  \textbf{Message:} Too much bias. The estimator is incapable of capturing important aspects in the density.
+\end{frame}
+
+
+\begin{frame}{Choosing the Bandwidth with Cross Valiation}
+
+\end{frame}
+
+
+
+
 
 \begin{frame}{Classifier Construction using CART}
 \begin{columns}[T] % align columns
@@ -397,6 +645,25 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 \input{figs/confusion_sim.tex}
 \end{center}
 
+\end{frame}
+
+
+\begin{frame}{Notes}
+  \begin{itemize}
+  \item the kernel density estimator is a smooth version of a histogram
+    \begin{itemize}
+    \item bandwidth of kde $\leftrightarrow$ bin width of histogram
+    \end{itemize}
+  \item classifiers have strengths and weaknesses
+    \begin{itemize}
+    \item kde works well in low dimension with a lot of data
+    \item CART works in moderate dimensions with nonlinear decision boundaries
+    \end{itemize}
+  \item many other types of classifiers: support vector machines, random forests, neural networks
+    \begin{itemize}
+    \item some of the more advanced methods automatically balance bias--variance tradeoff
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 
@@ -656,6 +923,17 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \item Milky Way Halo maps using DES data
 \end{itemize}
 \end{frame}
+
+
+
+
+
+
+
+\begin{frame}{Talking to Statisticians}
+
+\end{frame}
+
 
 %% \begin{frame}{Conclusions}
 %% \begin{itemize}
