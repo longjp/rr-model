@@ -36,6 +36,22 @@
 \usepackage{graphicx}
 \newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 
+
+
+\usepackage[absolute,overlay]{textpos}
+
+\newcommand{\att}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny Source: #1}
+      \end{textblock*}}
+
+
+\newcommand{\foot}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny #1}
+      \end{textblock*}}
+
+
+
+
 \newtheorem{assumptions}{Assumptions}
 
 \setbeamertemplate{headline}[default]
@@ -106,23 +122,23 @@ James Long
 \end{frame}
 
 
-\begin{frame}{Why Important?}
+%% \begin{frame}{Why Important?}
 
-  Abstract: Ongoing and upcoming time domain surveys will produce
-unprecedented amounts of data. Turning these data into scientific
-knowledge requires application and development of sophisticated
-statistical methodology. I will discuss some new statistical tools for
-analyzing time domain data, including period estimators for sparsely
-sampled periodic variable stars and machine learning algorithms for
-source classification. I will highlight the concept of the
-bias--variance tradeoff in both of these problems and discuss methods
-such as cross validation for optimizing this tradeoff. I will conclude
-with an application of these methods to finding structure in the Milky
-Way Halo using Dark Energy Survey data.
+%%   Abstract: Ongoing and upcoming time domain surveys will produce
+%% unprecedented amounts of data. Turning these data into scientific
+%% knowledge requires application and development of sophisticated
+%% statistical methodology. I will discuss some new statistical tools for
+%% analyzing time domain data, including period estimators for sparsely
+%% sampled periodic variable stars and machine learning algorithms for
+%% source classification. I will highlight the concept of the
+%% bias--variance tradeoff in both of these problems and discuss methods
+%% such as cross validation for optimizing this tradeoff. I will conclude
+%% with an application of these methods to finding structure in the Milky
+%% Way Halo using Dark Energy Survey data.
 
 
 
-  \end{frame}
+%%   \end{frame}
 
 
 
@@ -347,30 +363,20 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 
 \begin{frame}{Finding the RR Lyrae}
 
-\end{frame}
+  \begin{center}
+    \includegraphics[scale=0.5]{figs/rr_color.png}
+    \end{center}
 
-
-
-\begin{frame}{Finding the RR Lyrae: Sesar 2010}
-
-\end{frame}
-
-\begin{frame}{Finding the RR Lyrae: Sesar 2010}
-
-\end{frame}
-
-
-\begin{frame}{Variance and Bias}
   \begin{itemize}
-  \item \textbf{variance:} how much do my parameter estimates $\widehat{\theta}$ change if I ``perturb'' the data?
-  \item \textbf{bias:}
-  \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
-  \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to statistical procedures with good performance
-  \item \textbf{cross validation:} one method for conducting this negotiation
+  \item compute colors, periods, etc (features) for stars
+  \item make cuts to select regions of feature space containing mostly RR Lyrae
   \end{itemize}
-
-{\small Histogram binwidths.}
+  
+\att{``Exploring the Variable Sky with the Sloan Digital Sky Survey'' Sesar et al 2007 \url{http://iopscience.iop.org/article/10.1086/521819}\\}
+  
 \end{frame}
+
+
 
 
 
@@ -409,14 +415,19 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 %% \begin{center}
 %% Training Data
 %% \end{center}
-\includegraphics[height=2.3in,width=2.3in]{figs/sim_features.pdf}
+\includegraphics[height=2.3in,width=2.3in]{figs/training.pdf}
 \end{column}
 \begin{column}{.5\textwidth}
   \begin{itemize}
-  \item \textbf{dimension:} number of features
-  \item with two features possible to make simple cuts
-  \item harder with more than two features
-  \item how do we assess error rate?
+  \item \textbf{data:} $\{(x_i,z_i)\}_{i=1}^n$
+    \begin{itemize}
+    \item $n = $ number of observations
+    \item $z_i \in \{1,\ldots,K\}$ is class of observation $i$
+    \item $x_i \in \mathbb{R}^p$ is feature vector of observation $i$
+    \end{itemize}
+  \item \textbf{dimension:} number of features ($=$ 2 here)
+  \item here $K=2$
+  \item usually more than two features, difficult to ``see'' class separation
   \end{itemize}
 \end{column}
 
@@ -426,6 +437,13 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 
 
 \begin{frame}{Kernel Density Estimator}
+  \textbf{Idea:}
+  \begin{itemize}
+  \item estimate density for each class using kernel density estimator (smoothed histogram)
+  \item for particular $x$ in feature space, select whichever class is more probable
+  \end{itemize}
+
+    \textbf{Notation:}
   \begin{align*}
     p_k &= \text{probability an observation belongs to class } k\\
     f_k(x) &= \text{probability density of features for observations of class } k
@@ -438,19 +456,25 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
     p(k|x) = \frac{p_k f_k(x)}{\sum_{k=1}^K p_k f_k(x)}
   \end{equation*}
 
-\textbf{Problem:} Do not know $p_k$ or $f_k$.  
 \end{frame}
 
 
 
 \begin{frame}{Kernel Density Estimator for Estimating $f_k$}
-
-  \begin{equation*}
-    \widehat{f}_k(x) = \frac{1}{\sum_{i=1}^n \ind_{z_i=k}}\sum_{i=1}^{n_k} K_h(x-x_i)\ind_{z_i=k}
-  \end{equation*}
-
+  Estimate $p_k$ and $f_k$ from the training data by
   \begin{itemize}
-  \item $K_h(\cdot) = h^{-1}K(\cdot h^{-1})$
+  \item $\widehat{p}_k = \frac{\sum_{i=1}^n \ind_{z_i=k}}{n}$
+  \item 
+  \begin{equation*}
+    \widehat{f}_k(x) = \frac{1}{\sum_{i=1}^n \ind_{z_i=k}}\sum_{i=1}^{n_k} K_h(||x-x_i||)\ind_{z_i=k}
+  \end{equation*}
+where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
+  \end{itemize}
+
+\vspace{.2in}
+  
+  \textbf{Note:}
+  \begin{itemize}
   \item $K$ is the kernel (often gaussian)
   \item $h$ is the bandwidth (tuning parameter)
   \end{itemize}
@@ -461,7 +485,6 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
     \textbf{The bandwidth plays the roll of binsize for histograms.}
   \end{center}
 
-  \todo{write this in arbitrary dimension}
   
 \end{frame}
 
@@ -569,43 +592,83 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Variance and Bias}
+  \begin{itemize}
+  \item \textbf{variance:} how much do my parameter estimates $\widehat{\theta}$ change if I ``perturb'' the data?
+  \item \textbf{bias:} how far, on average, is my estimate from the true value
+  \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
+  \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to statistical procedures with good performance
+  \item \textbf{cross validation:} one method for conducting this negotiation
+  \end{itemize}
 
+\end{frame}
 
 
 
 \begin{frame}{Back to Classification Example}
 
-    \textbf{Message:} Too much variance. If I regenerated the data, the estiamte would completely change.
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/kde2d3.pdf}\\
+    Bandwidth is too large.
+  \end{center}
+  
 \end{frame}
 
 
-\begin{frame}{Hueristic: Very Large Bandwidth}
+\begin{frame}{Back to Classification Example}
 
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/kde2d1.pdf}\\
+    Bandwidth is too small.
+  \end{center}
+  
+\end{frame}
 
-  \textbf{Message:} Too much bias. The estimator is incapable of capturing important aspects in the density.
+\begin{frame}{Back to Classification Example}
+
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/kde2d2.pdf}\\
+    Bandwidth about right.
+  \end{center}
+  
 \end{frame}
 
 
-\begin{frame}{Choosing the Bandwidth with Cross Valiation}
+
+
+
+
+\begin{frame}{Choosing the Bandwidth with Cross Validation}
+
+\end{frame}
+
+
+
+\begin{frame}{Data Splitting Strategy}
+
+\end{frame}
+
+
+
+\begin{frame}{Results on this Data}
 
 \end{frame}
 
 
 
 
-
-\begin{frame}{Classifier Construction using CART}
+\begin{frame}{Another Classifier: CART}
 \begin{columns}[T] % align columns
 
 \begin{column}{.5\textwidth}
 %% \begin{center}
 %% Training Data
 %% \end{center}
-\includegraphics[height=2.3in,width=2.3in]{figs/sim_features.pdf}
+\includegraphics[height=2.3in,width=2.3in]{figs/training.pdf}
 \end{column}
 \begin{column}{.5\textwidth}
 \begin{itemize}
-\item CART developed by Breiman et al in 1980's \cite{breiman1984classification}
+\item CART developed by Breiman et al in 1980's 
 \item recursively partitions feature space
 \item partition represented by tree
 \end{itemize}
@@ -613,23 +676,66 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 
 
 \end{columns}
+
+\att{``Classification and Regression Trees'' Breiman et al. \url{https://www.amazon.com/Classification-Regression-Wadsworth-Statistics-Probability/dp/0412048418}\\}
 \end{frame}
 
 \begin{frame}{Building CART Tree . . .}
 \includegraphics[height=2.3in,width=4.5in]{figs/tree_2.pdf}
 \end{frame}
 
-\begin{frame}{Building CART Tree . . .}
-\includegraphics[height=2.3in,width=4.5in]{figs/tree_3.pdf}
-\end{frame}
+%% \begin{frame}{Building CART Tree . . .}
+%% \includegraphics[height=2.3in,width=4.5in]{figs/tree_3.pdf}
+%% \end{frame}
 
 \begin{frame}{Building CART Tree . . .}
 \includegraphics[height=2.3in,width=4.5in]{figs/tree_4.pdf}
 \end{frame}
 
-\begin{frame}{Resulting Classifier}
+\begin{frame}{Building CART Tree . . .}
 \includegraphics[height=2.3in,width=4.5in]{figs/tree_5.pdf}
 \end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_6.pdf}
+\end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_7.pdf}
+\end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_8.pdf}
+\end{frame}
+
+
+%% \begin{frame}{Building CART Tree . . .}
+%% \includegraphics[height=2.3in,width=4.5in]{figs/tree_10.pdf}
+%% \end{frame}
+
+
+\begin{frame}{When to stop adding nodes?}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_11.pdf}
+\end{frame}
+
+
+
+
+\begin{frame}{Where is Bias -- Variance Tradeoff}
+
+  \begin{itemize}
+  \item trees with many terminal nodes have high variance, low bias
+  \item trees with few terminal nodes have low variance, high bias
+  \item we ``prune'' the tree to optimize tradeoff
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}{Pruning the Tree with Cross Validation}
+
+\end{frame}
+
+
 
 \begin{frame}{Apply Classifier to Test Data}
 
@@ -857,6 +963,10 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{frame}
 
 
+\begin{frame}{CART Tree}
+
+\end{frame}
+
 \begin{frame}{Simulation Results for Distance Estimation}
 \begin{itemize}
 \item Use model to estimate distance modulus ($\mu$) for RR Lyrae.
@@ -928,12 +1038,13 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 
 
+\begin{frame}
 
-
-\begin{frame}{Talking to Statisticians}
+  \begin{center}
+    {\huge Thank you. Questions?}
+    \end{center}
 
 \end{frame}
-
 
 %% \begin{frame}{Conclusions}
 %% \begin{itemize}
