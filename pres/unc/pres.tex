@@ -592,7 +592,7 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 \begin{frame}{Variance and Bias}
   \begin{itemize}
-  \item \textbf{variance:} amount of change in estimate $\widehat{\theta}$  if data is ``perturbed''?
+  \item \textbf{variance:} amount of change in estimate $\widehat{\theta}$  if data is ``perturbed''
   \item \textbf{bias:} how far, on average, estimate is from the true value
   \item \textbf{tuning parameters:} parameters in a statistical method that are not of fundamental interest, but change output
   \item \textbf{variance--bias tradeoff:} tuning parameters ``negotiate'' a tradeoff between bias and variance to produce statistical procedures with good performance
@@ -670,12 +670,17 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
 
 \begin{frame}{Results on Validation Data: Confusion Matrix}
 
-Apply classifier with selected bandwidth to validation set.
+\begin{itemize}
+\item kept 100 observations ``in reserve'', a \underline{validation set}.
+\item these observations were not used to estimate bandwidth
+\item apply bandwidth chosen by cross validation to this data
+\end{itemize}
   
 \begin{center}
 \input{figs/confusion_kde.tex}
 \end{center}
 
+3\% error rate, honest estimate because none of this data was used to make classifier.
   
 \end{frame}
 
@@ -751,32 +756,33 @@ Apply classifier with selected bandwidth to validation set.
   \begin{itemize}
   \item trees with many terminal nodes have high variance, low bias
   \item trees with few terminal nodes have low variance, high bias
-  \item we ``prune'' the tree to optimize tradeoff
+  \item ``prune'' the tree to optimize tradeoff
   \end{itemize}
+
+  \begin{center}
+    \includegraphics[scale=0.3]{figs/cart_cv.pdf}
+    \end{center}
+
   
 \end{frame}
 
-\begin{frame}{Pruning the Tree with Cross Validation}
-
-\end{frame}
 
 
+%% \begin{frame}{Apply Classifier to Test Data}
 
-\begin{frame}{Apply Classifier to Test Data}
+%% \textbf{Test Data:} Data used to evaluate classifier accuracy. Test data is not used to construct classifier.
 
-\textbf{Test Data:} Data used to evaluate classifier accuracy. Test data is not used to construct classifier.
+%% \vspace{.1in}
 
-\vspace{.1in}
+%% \textbf{Confusion Matrix:} Rows are true class of test data. Columns are predicted class of test data. Entries are counts.
 
-\textbf{Confusion Matrix:} Rows are true class of test data. Columns are predicted class of test data. Entries are counts.
+%% \vspace{.2in}
 
-\vspace{.2in}
+%% \begin{center}
+%% \input{figs/confusion_sim.tex}
+%% \end{center}
 
-\begin{center}
-\input{figs/confusion_sim.tex}
-\end{center}
-
-\end{frame}
+%% \end{frame}
 
 
 \begin{frame}{Notes}
@@ -981,8 +987,11 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 \begin{frame}{Simple Tree Had Nearly As Low Error Rate}
+
+  \vspace{-.5in}
+
   \begin{center}
-    \includegraphics[scale=0.4]{figs/rpart_pruned.pdf}
+    \includegraphics[scale=0.6]{figs/rpart_pruned.pdf}
     \end{center}
 \end{frame}
 
