@@ -1,5 +1,38 @@
+## specific files to ignore
 apj326724t2_mrt.txt
 *.zip
 apj326724t3_mrt.txt
 */sand/*
 */PS1_sample_LCs/*
+
+
+
+
+## JPL: copied global .gitignore here b/c shared repo
+# ignore compiled files, log files, ect.
+*.pyc
+*.pdf
+*.dvi
+*.log
+*.aux
+*~
+*.Rhistory
+*.RData
+*.dat
+*.so
+*.eps
+*.png
+*.bbl
+*.blg
+*.out
+auto/*
+*.toc
+*.nav
+*.bak
+*.snm
+*.lof
+*.lot
+*/auto/*
+
+# ignore the database itself - may want to change this at some point
+*.db
