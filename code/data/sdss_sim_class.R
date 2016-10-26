@@ -33,10 +33,13 @@ for(ii in 1:length(fnames)){
 for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
 
 ## downsampled to total of Nobs observations
+
 Nobs <- 20
 for(ii in 1:length(lcs)){
-    ix <- sample(1:nrow(lcs[[ii]]),Nobs)
-    lcs[[ii]] <- lcs[[ii]][ix,]
+    lc <- lcs[[ii]]
+    lc <- lc[lc[,2]!="u",]
+    ix <- sample(1:nrow(lc),Nobs)
+    lcs[[ii]] <- lc[ix,]
 }
 tms <- lapply(lcs,LCtoTM)
 names(tms) <- fnames
