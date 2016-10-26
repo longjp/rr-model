@@ -5,6 +5,7 @@ library('parallel')
 library('multiband')
 library('rpart')
 library('randomForest')
+library(rpart.plot)
 load("../../fit_template/template.RData")
 source("../../fit_template/template.R")
 source("../../common/funcs.R")
@@ -20,6 +21,8 @@ fig.dir <- "figs_classify"
 unlink(fig.dir,recursive=TRUE)
 dir.create(fig.dir)
 
+
+## shouldn't tot.dev be mean.dev?
 
 period_est <- period_est[,1] ## just use best fit period
 
@@ -50,16 +53,65 @@ features <- cbind(coeffs,period_est,tot.dev)
 colnames(features) <- c("mu","E[B-V]","a","phi","period","dev")
 
 
-pairs(features)
+cols <- c("#00000030",'red')
+names(cols) <- c("not","rr")
+pchs <- c(1,2)
+names(pchs) <- c("not","rr")
+pdf("RRfeatures.pdf")
+pairs(features,col=cols[cl],pch=pchs[cl])
+dev.off()
 
 
-dat <- data.frame(cl,features)
-rpart.fit <- rpart(cl~.,data=dat)
-pdf(paste0(fig.dir,"/cart_tree.pdf"),height=6,width=7)
+dat <- data.frame(cl,features[,-1])
+rpart.fit <- rpart(cl~.,data=dat,control=rpart.control(xval=10,minsplit=1,cp=.001))
+rpart.fit$cptable
+mincp <- rpart.fit$cptable[which.min(rpart.fit$cptable[,"xerror"]),"CP"]
+
+
+pdf("real_data_cp.pdf",width=10,height=8)
+par(mar=c(5,5,5,1))
+plotcp(rpart.fit,cex.lab=1.5)
+dev.off()
+
+
+pdf("rpart_fulltree.pdf")
+par(mar=c(0,1,0,1))
+prp(rpart.fit,extra=2,compress=FALSE,varlen=0)
+dev.off()
+
+pdf("rpart_pruned.pdf")
+rpart.fit.pruned <- prune(rpart.fit, cp= mincp)
+prp(rpart.fit.pruned,extra=2,compress=FALSE,varlen=0)
+dev.off()
+
+pdf("rpart_pruned_more.pdf")
+rpart.fit.pruned <- prune(rpart.fit, cp= 0.023)
+prp(rpart.fit.pruned,extra=2,compress=FALSE,varlen=0)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+out <- table(predict(rpart.fit.pruned,type="class"),cl)
+
+
+
+sum(diag(out))/sum(out)
+
+##pdf(paste0(fig.dir,"/cart_tree.pdf"),height=6,width=7)
+
+
 par(xpd = TRUE)
 plot(rpart.fit,uniform=TRUE)
 text(rpart.fit, use.n = TRUE)
-dev.off()
+##dev.off()
 
 rf.fit <- randomForest(cl~.,data=dat)
 
