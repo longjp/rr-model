@@ -66,14 +66,3 @@ make_plot(lc,period,id)
 
 lc <- lc[sample(1:304,20),]
 make_plot(lc,period,paste0(id,"down"))
-
-
-
-lc <- read.table("PS1_sample_LCs/ps1_-3266288406308450226cleaned.txt",
-                 header=TRUE)
-lc <- lc[,c(3,2,4,1)]
-names(lc) <- c("time","band","mag","sigma")
-tm <- LCtoTM(lc)
-out <- pgls(tm,period_min=0.2,period_max=1,BCD_flag=FALSE)
-period <- out$period_seq_all[which.min(out$rss_ls)]
-make_plot(lc,period,"panstarrs")
