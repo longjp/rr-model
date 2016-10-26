@@ -144,7 +144,7 @@
 
 
 \begin{frame}{Folded Light Curve of Periodic Variable}
-\textbf{folded light curve:} Brightness versus time modulo period.
+\textbf{folded light curve:} brightness versus time modulo period
 \begin{center}
 \includegraphics[scale=.3]{figs/folded_13350.pdf}
 \end{center}
@@ -755,11 +755,12 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
   \item trees with many nodes have high variance, low bias
   \item trees with few nodes have low variance, high bias
   \item ``prune'' the tree to optimize tradeoff
+  \begin{center}
+    \includegraphics[scale=0.28]{figs/cart_cv.pdf}
+    \end{center}
+  \item may want to choose simpler tree with slightly higher error rate
   \end{itemize}
 
-  \begin{center}
-    \includegraphics[scale=0.3]{figs/cart_cv.pdf}
-    \end{center}
 
   
 \end{frame}
@@ -799,6 +800,8 @@ where $K_h(\cdot) = h^{-p}K(\cdot h^{-1})$.
     \item some of the more advanced methods automatically balance bias--variance tradeoff
     \end{itemize}
   \end{itemize}
+
+  \foot{Good Reference: ``The Elements of Statistical Learning'' Hastie et al. Available: \url{http://statweb.stanford.edu/~tibs/ElemStatLearn/}\\}
 \end{frame}
 
 
@@ -982,18 +985,34 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 
-\begin{frame}{CART Tree}
+\begin{frame}{CART Tree Unpruned}
   \begin{center}
-    \includegraphics[scale=0.4]{figs/rpart_fulltree.pdf}
+    \includegraphics[scale=0.5]{figs/rpart_fulltree.pdf}
     \end{center}
 \end{frame}
 
-\begin{frame}{Simple Tree Had Nearly As Low Error Rate}
 
-  \vspace{-.5in}
+\begin{frame}{Error as Function of Tree Size}
+  \begin{center}
+    \includegraphics[scale=0.4]{figs/real_data_cp.pdf}
+    \end{center}
+
+\end{frame}
+
+\begin{frame}{Lowest Error Rate Tree}
 
   \begin{center}
-    \includegraphics[scale=0.6]{figs/rpart_pruned.pdf}
+    \includegraphics[scale=0.4]{figs/rpart_pruned.pdf}
+    \end{center}
+\end{frame}
+
+
+
+\begin{frame}{Simpler Tree}
+  \vspace{-.5in}
+  
+  \begin{center}
+    \includegraphics[scale=0.6]{figs/rpart_pruned_more.pdf}
     \end{center}
 \end{frame}
 
