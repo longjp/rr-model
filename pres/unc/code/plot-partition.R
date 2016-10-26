@@ -63,7 +63,7 @@ partition.tree <- function (tree, label = "yval", add = FALSE, ordvars, ...){
     rx <- range(m[[var[1L]]])
     rx <- rx + c(-0.025, 0.025) * diff(rx)
     rz <- range(m[[var[2L]]])
-    rz <- c(0,1)
+    ##rz <- c(0,1)
     rz <- rz + c(-0.025, 0.025) * diff(rz)
     xrange <- c(rx, rz)[c(1, 3, 2, 4)]
     xcoord <- NULL

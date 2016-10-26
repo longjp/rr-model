@@ -174,7 +174,7 @@ for(ii in 2:n.best){
 
 ##
 library(rpart)
-fit.tree <- rpart(class~.,data=dat,control=rpart.control(cp=.00001))
+fit.tree <- rpart(class~.,data=dat,control=rpart.control(cp=.00001,minsplit=1))
 pdf("../figs/cart_cv.pdf",width=10,height=8)
 par(mar=c(5,5,5,1))
 plotcp(fit.tree,cex.lab=1.3,cex.main=2)
