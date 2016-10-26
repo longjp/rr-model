@@ -31,12 +31,8 @@ dat <- generate_data(n)
 test <- generate_data(100)
 
 
-############# EXPERIMENT BEGINS HERE
-
-head(dat)
+## plot training data
 lims <- c(range(dat$x1),range(dat$x2))
-
-
 pdf(paste0("../figs/training.pdf"))
 par(mar=c(5,5,1,1))
 plot(0,0,xlim=c(-.5,1.5),ylim=c(-.5,1.5),col=0,xlab="Feature x1",ylab="Feature x2",cex.lab=1.3)
@@ -46,6 +42,10 @@ dev.off()
 
 
 
+
+########### 1) Kernel density estimator classifier
+
+## look at different levels of smoothing
 hs <- c(0.04,.4,1.8)
 for(ii in 1:length(hs)){
     pdf(paste0("../figs/kde2d",ii,".pdf"))
@@ -66,10 +66,12 @@ for(ii in 1:length(hs)){
 
 
 
-#### run cross validation on training
+### run cross validation on training
 
 
-
+## computing density at new points is a pain, right now
+## using strategy discussed here
+## http://stackoverflow.com/questions/16201906/how-can-i-get-the-value-of-a-kernel-density-estimate-at-specific-points
 compute_density <- function(x_old,y_old,x_new,y_new,h){
     dens <- kde2d(x_old,y_old,h=h,n=50)
     gr <- data.frame(with(dens, expand.grid(dens$x,dens$y)), as.vector(dens$z))
@@ -80,29 +82,28 @@ compute_density <- function(x_old,y_old,x_new,y_new,h){
     return(pred)
 }
 
-
-
 hs <- 0.0001*2^(0:20)
 cv_group <- (1:nrow(dat))%%10 + 1
 cv_error <- matrix(0,ncol=length(hs),nrow=10)
-
 
 for(ii in 1:10){
     print(ii)
     for(jj in 1:length(hs)){
         x <- dat$x1[cv_group!=ii & dat$class==1]
         y <- dat$x2[cv_group!=ii & dat$class==1]
-        preds1 <- compute_density(x,y,dat$x1[cv_group==ii],dat$x2[cv_group==ii],h=hs[jj])
+        preds1 <- compute_density(x,y,dat$x1[cv_group==ii],
+                                  dat$x2[cv_group==ii],h=hs[jj])
         x <- dat$x1[cv_group!=ii & dat$class==2]
         y <- dat$x2[cv_group!=ii & dat$class==2]
-        preds2 <- compute_density(x,y,dat$x1[cv_group==ii],dat$x2[cv_group==ii],h=hs[jj])
+        preds2 <- compute_density(x,y,dat$x1[cv_group==ii],
+                                  dat$x2[cv_group==ii],h=hs[jj])
         cl.pred <- 1 + (preds2 > preds1)
         cv_error[ii,jj] <- mean(cl.pred != dat$class[cv_group==ii])
     }
 }
 
 
-## plot error as a function of bandwidth
+## plot CV error as a function of bandwidth
 pdf("../figs/kde_cv.pdf",width=10,height=6)
 par(mar=c(5,5,1,1))
 plot(.5,0,col=0,xlim=range(hs),ylim=c(0,max(cv_error)),
@@ -135,9 +136,7 @@ sink()
 
 
 
-########### NOW BUILD TREE
-
-
+########### 2) CART classifier
 dat$class <- c("black","red")[dat$class]
 dat$class <- as.factor(dat$class)
 

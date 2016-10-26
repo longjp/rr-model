@@ -24,10 +24,14 @@ sj <- bw.SJ(x)
 bws <- c(sj/10,sj,5*sj)
 sj <- bw.SJ(x)
 
+
+## make density estimate with 3 bandwidths (under,correct, over smoothing)
+## 2x each (to see sampling variability, undersmoothing has high var, over
+## smoothing has very low var)
 for(jj in 1:2){
     x <- rnormal_mix()
     for(ii in 1:length(bws)){
-        pdf(paste0("density_figs/density",ii,"_",jj,".pdf"))
+        pdf(paste0("../figs/density",ii,"_",jj,".pdf"))
         par(mar=c(5,5,1,1))
         plot(density(x,bw=bws[ii]),main="",col='red',lty=2,
              xlab=paste0("x (bandwidth=",round(bws[ii],2),")"),
@@ -40,7 +44,7 @@ for(jj in 1:2){
 
 ### smallest bandwidth, but with larger sample size
 x <- rnormal_mix(n=10000)
-pdf(paste0("density_figs/density",1,"_largen.pdf"))
+pdf(paste0("../figs/density",1,"_largen.pdf"))
 par(mar=c(5,5,1,1))
 plot(density(x,bw=bws[1]),main="",col='red',lty=2,
      xlab=paste0("x (bandwidth=",round(bws[1],2),")"),
@@ -48,9 +52,3 @@ plot(density(x,bw=bws[1]),main="",col='red',lty=2,
 curve(normal_mix,add=TRUE,lwd=2)
 points(x,rep(0,length(x)),col="#00000030")
 dev.off()
-
-
-file.copy(from=list.files('density_figs',full.names=TRUE),
-          to=paste0('../figs/',list.files('density_figs')),
-          overwrite=TRUE)
-
