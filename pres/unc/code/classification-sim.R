@@ -5,7 +5,6 @@ library(tables)
 library(MASS)
 source("plot-partition.R")
 
-
 generate_data <- function(n){
     nc1 <- rbinom(1,n,.5)
     nc2 <- n - nc1
@@ -35,7 +34,8 @@ test <- generate_data(100)
 lims <- c(range(dat$x1),range(dat$x2))
 pdf(paste0("../figs/training.pdf"))
 par(mar=c(5,5,1,1))
-plot(0,0,xlim=c(-.5,1.5),ylim=c(-.5,1.5),col=0,xlab="Feature x1",ylab="Feature x2",cex.lab=1.3)
+plot(0,0,xlim=c(-.5,1.5),ylim=c(-.5,1.5),col=0,
+     xlab="Feature x1",ylab="Feature x2",cex.lab=1.3)
 points(dat$x1,dat$x2,col=as.character(dat$class),pch=as.numeric(dat$class))
 legend("topleft",c("Class 1","Class 2"),col=1:2,pch=1:2,cex=1.5)
 dev.off()
@@ -50,12 +50,15 @@ hs <- c(0.04,.4,1.8)
 for(ii in 1:length(hs)){
     pdf(paste0("../figs/kde2d",ii,".pdf"))
     par(mar=c(5,5,1,1))
-    plot(0,0,xlim=c(-.5,1.5),ylim=c(-.5,1.5),col=0,xlab="Feature x1",ylab="Feature x2",cex.lab=1.3)
+    plot(0,0,xlim=c(-.5,1.5),ylim=c(-.5,1.5),col=0,
+         xlab="Feature x1",ylab="Feature x2",cex.lab=1.3)
     points(dat$x1,dat$x2,col=as.character(dat$class),pch=as.numeric(dat$class))
     for(jj in 1:2){
         to_use <- dat$class==jj
-        fit.kde <- kde2d(dat$x1[to_use],dat$x2[to_use],n=50,h=hs[ii],lims=c(-.5,1.5,-.5,1.5))
-        contour(fit.kde,levels  =  seq(from=.2,to=.8,by=.3),add=TRUE,col=jj,cex=2)
+        fit.kde <- kde2d(dat$x1[to_use],dat$x2[to_use],
+                         n=50,h=hs[ii],lims=c(-.5,1.5,-.5,1.5))
+        contour(fit.kde,levels  =  seq(from=.2,to=.8,by=.3),
+                add=TRUE,col=jj,cex=2)
     }
     legend("topleft",c("Class 1","Class 2"),col=1:2,pch=1:2,cex=1.5)
     dev.off()
@@ -119,8 +122,12 @@ dev.off()
 
 
 ## make predictions
-pred1 <- compute_density(dat$x1[dat$class==1],dat$x2[dat$class==1],test$x1,test$x2,h=bw_best)
-pred2 <- compute_density(dat$x1[dat$class==2],dat$x2[dat$class==2],test$x1,test$x2,h=bw_best)
+pred1 <- compute_density(dat$x1[dat$class==1],
+                         dat$x2[dat$class==1],
+                         test$x1,test$x2,h=bw_best)
+pred2 <- compute_density(dat$x1[dat$class==2],
+                         dat$x2[dat$class==2],
+                         test$x1,test$x2,h=bw_best)
 pred <- (pred2 > pred1) + 1
 table(pred,test$cl)
 
@@ -146,11 +153,11 @@ fit.tree <- tree(class~.,data=dat)
 
 pdf("../figs/sim_features.pdf",width=6,height=6)
 par(mar=c(4.5,4.5,1,1))
-plot(dat$x1,dat$x2,col=as.character(dat$class),xlab="Feature x",ylab="Feature y",cex.lab=1.5,
+plot(dat$x1,dat$x2,col=as.character(dat$class),
+     xlab="Feature x",ylab="Feature y",cex.lab=1.5,
      pch=as.numeric(dat$class))
 dev.off()
 
-source('plot-partition.R')
 
 
 
@@ -161,7 +168,8 @@ for(ii in 2:n.best){
     fit <- prune.tree(fit.tree,best=ii)
     pdf(paste("../figs/tree_",ii,".pdf",sep=""),width=12,height=6)
     par(mfcol=c(1,2),mar=c(4.5,4.5,1,1))
-    plot(dat$x1,dat$x2,col=as.character(dat$class),xlab="Feature x1",ylab="Feature x2",cex.lab=1.5,
+    plot(dat$x1,dat$x2,col=as.character(dat$class),
+         xlab="Feature x1",ylab="Feature x2",cex.lab=1.5,
          pch=as.numeric(dat$class))
     partition.tree(fit,cex=1.5,add=TRUE,ordvars=c("x1","x2"),font=2)
     plot(fit,cex.lab=2,type="uniform")
@@ -171,7 +179,7 @@ for(ii in 2:n.best){
 
 
 
-##
+## output full tree
 library(rpart)
 fit.tree <- rpart(class~.,data=dat,control=rpart.control(cp=.00001,minsplit=1))
 pdf("../figs/cart_cv.pdf",width=10,height=8)
