@@ -38,7 +38,7 @@ for(ii in 1:Nrr){
 }
 
 
-rrlyrae <- read.table("apj326724t3_mrt.txt",skip=30)
+rrlyrae <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
 names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
 rrlyrae$ID <- paste0("LC_",rrlyrae$ID,".dat")
 
