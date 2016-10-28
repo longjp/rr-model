@@ -3,19 +3,38 @@ library(MASS)
 library(rgl)
 options(width=120)
 
+## TODO: fix XYtoEquat, some issue with arctan
+
+## cartesian_mw has cartesian coordinates
+## of RR Lyrae in cartesian coordinates with mw center at origin
+XYtoEquat <- function(x,y){
+    d <- sqrt(x^2 + y^2)
+    ra <- (atan2(y,-x)/(2*pi))*360
+    return(cbind(d=d,ra=ra,dec=0))
+}
+
+EquatToXY <- function(d,ra){
+    x <- -d*sin(2*pi*ra/360)
+    y <- d*cos(2*pi*ra/360)
+    return(cbind(x,y))
+}
+
+
+
+
 rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
-names(rr)[1:6] <- c("ID","RA","Decl","ar","dh","dg")
-
-plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360))
-
-fit.kde <- kde2d(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360),n=50)
+rr <- rr[,1:6]
+names(rr) <- c("ID","RA","Decl","ar","dh","dg")
+rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
 
 
-fit.kde$z[20:30,20:30] <- max(fit.kde$z)
+plot(rr$x,rr$y)
+fit.kde <- kde2d(rr$x,rr$y,n=50)
 
-plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360),
-     xlab="x",ylab="y",cex.lab=1.3)
-contour(fit.kde,add=TRUE,col="#00000020",cex=2)
+
+
+plot(rr$x,rr$y,xlab="x",ylab="y",cex.lab=1.3)
+contour(fit.kde,add=TRUE,col="#00000080",cex=2)
 
 
 
@@ -74,23 +93,19 @@ abline(a=0,b=1)
 
 
 
-
-
-## cartesian_mw has cartesian coordinates
-## of RR Lyrae in cartesian coordinates with mw center at origin
-ToPolar <- function(x,y){
-    d <- sqrt(x^2 + y^2)
-    ra <- (atan2(-x,y)/(2*pi))*360
-    return(cbind(d=d,ra=ra,dec=0))
-}
-
-
-
+test <- XYtoEquat(rr$x,rr$y)[,1:2]
+head(test)
+plot(test[,2],rr$RA)
 
 ## make sure this is working right
 x <- fit.kde$x
 y <- fit.kde$y
 grid.xy <- cbind(rep(x,length(x)),rep(y,each=length(y)))
+plot(grid.xy,col="#00000030")
+points(rr$x,rr$y,col='red',pch=19)
+
+
+
 grid.equat <- ToPolar(grid.xy[,1],grid.xy[,2])
 
 
