@@ -1,6 +1,7 @@
 rm(list=ls())
 library(MASS)
 library(rgl)
+library(RColorBrewer)
 options(width=120)
 
 ## TODO: fix XYtoEquat, some issue with arctan
@@ -9,7 +10,7 @@ options(width=120)
 ## of RR Lyrae in cartesian coordinates with mw center at origin
 XYtoEquat <- function(x,y){
     d <- sqrt(x^2 + y^2)
-    ra <- (atan2(y,-x)/(2*pi))*360
+    ra <- ((atan2(-x,y) + 2*pi) %% (2*pi))*(360/(2*pi))
     return(cbind(d=d,ra=ra,dec=0))
 }
 
@@ -20,21 +21,90 @@ EquatToXY <- function(d,ra){
 }
 
 
+d <- c(0,120,120,120)
+ra <- c(0,20,0,4)*360/24
+pts <- EquatToXY(d,ra)
+xlim <- range(pts[,1])
+ylim <- range(pts[,2])
+
+
+## ra <- 3*pi/4
+## x <- sin(ra)
+## y <- cos(ra)
+## ra
+## x
+## y
+## atan2(x,y)
+## XYtoEquat(x,y)
+
+
+## rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
+## rr <- rr[,1:6]
+## names(rr) <- c("ID","RA","Decl","ar","dh","dg")
+## rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
+
+
+## plot(rr$x,rr$y)
+## fit.kde <- kde2d(rr$x,rr$y,n=50)
+
+
+
+## x <- fit.kde$x
+## y <- fit.kde$y
+## grid.xy <- cbind(rep(x,length(x)),rep(y,each=length(y)))
+## plot(grid.xy,col="#00000030")
+## points(rr$x,rr$y,col='red',pch=19)
+
+
+
+## grid.equat <- EquatToXY(grid.xy[,1],grid.xy[,2])
+
+
+## test <- XYtoEquat(rr$x,rr$y)[,1:2]
+## head(test)
+## plot(test[,1],rr$dh)
+## abline(a=0,b=1)
+
+## head(grid.equat)
+
+## grid.equat.ind <- (grid.equat[,"ra"] < 360*(4/24))# | (grid.equat[,"ra"] > 360*(20/24)) 
+
+## par(mfcol=c(1,2))
+## plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360))
+## plot(grid.xy,col=grid.equat.ind)
+
+
+
+
+
+
+
+
+
+
+
+rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
+rr_class <- rr_class[,1:2]
+names(rr_class) <- c("ID","class")
+
 
 
 rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
 rr <- rr[,1:6]
 names(rr) <- c("ID","RA","Decl","ar","dh","dg")
 rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
-
-
-plot(rr$x,rr$y)
-fit.kde <- kde2d(rr$x,rr$y,n=50)
+rr <- merge(rr,rr_class)
+rr <- rr[rr$class=="ab",]
 
 
 
-plot(rr$x,rr$y,xlab="x",ylab="y",cex.lab=1.3)
-contour(fit.kde,add=TRUE,col="#00000080",cex=2)
+plot(rr$x,rr$y,xlim=xlim,ylim=ylim)
+fit.kde <- kde2d(rr$x,rr$y,n=50,lims=c(xlim,ylim))
+
+
+
+plot(rr$x,rr$y,xlab="x",ylab="y",cex.lab=1.3,xlim=xlim,ylim=ylim)
+contour(fit.kde,add=TRUE,col="#00000080",cex=2,lims=c(xlim,ylim))
 
 
 
@@ -89,38 +159,108 @@ plot(rr$dg,sqrt(rowSums(cartesian_mw^2)))
 abline(a=0,b=1)
 
 
+MakeGrid <- function(x,y)
+    return(cbind(rep(x,length(x)),rep(y,each=length(y))))
+}
 
 
-
-
-test <- XYtoEquat(rr$x,rr$y)[,1:2]
-head(test)
-plot(test[,2],rr$RA)
 
 ## make sure this is working right
 x <- fit.kde$x
 y <- fit.kde$y
-grid.xy <- cbind(rep(x,length(x)),rep(y,each=length(y)))
-plot(grid.xy,col="#00000030")
+grid.xy <- MakeGrid(x,y)
+plot(grid.xy,col="#00000030",xlim=xlim,ylim=ylim)
 points(rr$x,rr$y,col='red',pch=19)
 
 
 
-grid.equat <- ToPolar(grid.xy[,1],grid.xy[,2])
+grid.equat <- XYtoEquat(grid.xy[,1],grid.xy[,2])
+
+
+
 
 
 head(grid.equat)
-grid.equat.ind <- (grid.equat[,"ra"] < 360*(4/24))# | (grid.equat[,"ra"] > 360*(20/24)) 
+grid.equat.ind <- (((grid.equat[,"ra"] < 360*(4/24)) | (grid.equat[,"ra"] > 360*(20/24)))
+    & (grid.equat[,"d"] < 120))
 
 par(mfcol=c(1,2))
-plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360))
-plot(grid.xy,col=grid.equat.ind)
+plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360),xlim=xlim,ylim=ylim)
+plot(grid.xy,col=grid.equat.ind,xlim=xlim,ylim=ylim)
+
+### but no clear definition for how far we can observe
+### so still confused by this halo model calculations
 
 
 grid.galac <- cbind(grid.equat[,1],EquatorialToGalactic(grid.equat[,2],grid.equat[,3]))
 grid.galac_cart <- SphericalToCartesian(grid.galac[,1],grid.galac[,2],grid.galac[,3])
 grid.galac_cart_mw <- CartesianSunToMW(grid.galac_cart)
 dens <- 1/sqrt(rowSums(grid.galac_cart_mw^2))^3
-matrix(dens
+
+MakeMatrix <- function(gr){
+    return(matrix(gr,nrow=sqrt(length(gr))))
+}
+
+
+fit.kde <- kde2d(rr$x,rr$y,n=50,lims=c(xlim,ylim))
+dens.mat <- MakeMatrix(dens)
+grid.equat.ind.mat <- MakeMatrix(grid.equat.ind)
+dens.mat[!grid.equat.ind.mat] <- 0
+fit.kde$z[!grid.equat.ind.mat] <- 0
+dens.mat <- dens.mat  / sum(dens.mat)
+fit.kde$z <- fit.kde$z  / sum(fit.kde$z)
+
+
+
+z.cont <- log10(fit.kde$z / dens.mat)
+z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
+
+
+
+DrawRALine <- function(d){
+    ras <- 0:360
+    return(EquatToXY(rep(d,length(ras)),ras))
+}
+
+
+
+##BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral
+
+ncol <- 7
+cols <- brewer.pal(ncol,"RdYlBu")
+ds <- lapply(25*(1:5),function(x){DrawRALine(x)})
+filled.contour(x,y,z.cont,col=cols,nlevels=ncol-3,
+               plot.axes = { axis(1);
+                   axis(2);
+                   points(rr$x,rr$y,col="#00000020");
+                   for(ii in ds){points(ii,type='l')}})
+
+
+plot(rr$x,rr$y)
+points(d25,type='l')
+
+
+head(rr)
+
+
+
+### adjust for fact that as distance increases, volume is increasing
+### use function better than filled.contour for making contour
+### sesar uses subset of these
+       ## only rrab stars
+
+
+
+
+
+## contour(fit.kde,levels=quantile(dens.mat,c(.5,.8,.9)),
+##         plot.axes = { axis(1); axis(2); points(x,y,col="#00000020") })
+
+
+
+
+## contour(x, y, dens.mat, col = "pink", method = "edge",
+##         vfont = c("sans serif", "plain"),levels=quantile(dens.mat,c(.5,.8,.9)))
+
 
 ## normalize 1/R3 density across area, subtract from observed, plot
