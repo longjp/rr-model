@@ -28,61 +28,6 @@ xlim <- range(pts[,1])
 ylim <- range(pts[,2])
 
 
-## ra <- 3*pi/4
-## x <- sin(ra)
-## y <- cos(ra)
-## ra
-## x
-## y
-## atan2(x,y)
-## XYtoEquat(x,y)
-
-
-## rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
-## rr <- rr[,1:6]
-## names(rr) <- c("ID","RA","Decl","ar","dh","dg")
-## rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
-
-
-## plot(rr$x,rr$y)
-## fit.kde <- kde2d(rr$x,rr$y,n=50)
-
-
-
-## x <- fit.kde$x
-## y <- fit.kde$y
-## grid.xy <- cbind(rep(x,length(x)),rep(y,each=length(y)))
-## plot(grid.xy,col="#00000030")
-## points(rr$x,rr$y,col='red',pch=19)
-
-
-
-## grid.equat <- EquatToXY(grid.xy[,1],grid.xy[,2])
-
-
-## test <- XYtoEquat(rr$x,rr$y)[,1:2]
-## head(test)
-## plot(test[,1],rr$dh)
-## abline(a=0,b=1)
-
-## head(grid.equat)
-
-## grid.equat.ind <- (grid.equat[,"ra"] < 360*(4/24))# | (grid.equat[,"ra"] > 360*(20/24)) 
-
-## par(mfcol=c(1,2))
-## plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360))
-## plot(grid.xy,col=grid.equat.ind)
-
-
-
-
-
-
-
-
-
-
-
 rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
 rr_class <- rr_class[,1:2]
 names(rr_class) <- c("ID","class")
@@ -99,7 +44,7 @@ rr <- rr[rr$class=="ab",]
 
 
 plot(rr$x,rr$y,xlim=xlim,ylim=ylim)
-fit.kde <- kde2d(rr$x,rr$y,n=50,lims=c(xlim,ylim))
+fit.kde <- kde2d(rr$x,rr$y,n=200,lims=c(xlim,ylim),h=2)
 
 
 
@@ -181,8 +126,8 @@ grid.equat <- XYtoEquat(grid.xy[,1],grid.xy[,2])
 
 
 head(grid.equat)
-grid.equat.ind <- (((grid.equat[,"ra"] < 360*(4/24)) | (grid.equat[,"ra"] > 360*(20/24)))
-    & (grid.equat[,"d"] < 120))
+grid.equat.ind <- (((grid.equat[,"ra"] <= 360*(4/24)) | (grid.equat[,"ra"] >= 360*(20/24)))
+    & (grid.equat[,"d"] <= 120))
 
 par(mfcol=c(1,2))
 plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360),xlim=xlim,ylim=ylim)
@@ -197,18 +142,39 @@ grid.galac_cart <- SphericalToCartesian(grid.galac[,1],grid.galac[,2],grid.galac
 grid.galac_cart_mw <- CartesianSunToMW(grid.galac_cart)
 dens <- 1/sqrt(rowSums(grid.galac_cart_mw^2))^3
 
+OblateModel <- function(x){
+    nh <- 2.77
+    qh <- 0.64
+    return((1/sqrt(sum(x[1:2]^2 + (x[3]/qh)^2)))^nh)
+}
+
+dens.oblate <- apply(grid.galac_cart_mw,1,OblateModel)
+
+
+
+
 MakeMatrix <- function(gr){
     return(matrix(gr,nrow=sqrt(length(gr))))
 }
 
 
-fit.kde <- kde2d(rr$x,rr$y,n=50,lims=c(xlim,ylim))
+dens.oblate.mat <- MakeMatrix(dens.oblate)
+filled.contour(x,y,dens.oblate.mat,main="oblate")
 dens.mat <- MakeMatrix(dens)
+dev.new()
+filled.contour(x,y,dens.mat,main="1/R3")
+
+
+dens.mat <- dens.oblate.mat
+
+## cdh scales density estimate by volume represented by point
+cdh <- outer(fit.kde$x,fit.kde$y,FUN=function(x,y){return(sqrt(x^2 + y^2))})
+##dens.mat <- MakeMatrix(dens)
 grid.equat.ind.mat <- MakeMatrix(grid.equat.ind)
 dens.mat[!grid.equat.ind.mat] <- 0
 fit.kde$z[!grid.equat.ind.mat] <- 0
 dens.mat <- dens.mat  / sum(dens.mat)
-fit.kde$z <- fit.kde$z  / sum(fit.kde$z)
+fit.kde$z <- (fit.kde$z*cdh)  / sum(fit.kde$z*cdh)
 
 
 
@@ -217,23 +183,37 @@ z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
 
 
 
-DrawRALine <- function(d){
+DrawDCircle <- function(d){
     ras <- 0:360
     return(EquatToXY(rep(d,length(ras)),ras))
 }
 
 
+a <- c(270,300,330,0,30,60,90)
+x.from <- rep(0,length(a))
+x.to <- 200*cos(2*pi*(a+90)/(360))
+y.from <- rep(0,length(a))
+y.to <- 200*sin(2*pi*(a+90)/(360))
+
+
+##DrawRALine <- function(ra){
+    
+
+
 
 ##BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral
 
-ncol <- 7
+
+ncol <- 10
 cols <- brewer.pal(ncol,"RdYlBu")
-ds <- lapply(25*(1:5),function(x){DrawRALine(x)})
-filled.contour(x,y,z.cont,col=cols,nlevels=ncol-3,
+ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
+filled.contour(x,y,z.cont,xlim=xlim,ylim=ylim,col=cols,nlevels=length(cols)-3,
                plot.axes = { axis(1);
                    axis(2);
                    points(rr$x,rr$y,col="#00000020");
-                   for(ii in ds){points(ii,type='l')}})
+                   for(ii in ds){points(ii,type='l')};
+                   segments(x.from,y.from,x.to,y.to)})
+
 
 
 plot(rr$x,rr$y)
@@ -243,24 +223,8 @@ points(d25,type='l')
 head(rr)
 
 
-
-### adjust for fact that as distance increases, volume is increasing
-### use function better than filled.contour for making contour
-### sesar uses subset of these
-       ## only rrab stars
+############# implement oblate halo model
+############# kNN density estimator (effectively a variable bandwidth density estimator)
 
 
-
-
-
-## contour(fit.kde,levels=quantile(dens.mat,c(.5,.8,.9)),
-##         plot.axes = { axis(1); axis(2); points(x,y,col="#00000020") })
-
-
-
-
-## contour(x, y, dens.mat, col = "pink", method = "edge",
-##         vfont = c("sans serif", "plain"),levels=quantile(dens.mat,c(.5,.8,.9)))
-
-
-## normalize 1/R3 density across area, subtract from observed, plot
+############# experiment with nice contour plotting software
