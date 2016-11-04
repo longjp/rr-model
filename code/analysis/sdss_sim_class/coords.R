@@ -5,26 +5,6 @@ library(RColorBrewer)
 source('kNN.R')
 options(width=120)
 
-## cartesian_mw has cartesian coordinates
-## of RR Lyrae in cartesian coordinates with mw center at origin
-XYtoEquat <- function(x,y){
-    d <- sqrt(x^2 + y^2)
-    ra <- ((atan2(-x,y) + 2*pi) %% (2*pi))*(360/(2*pi))
-    return(cbind(d=d,ra=ra,dec=0))
-}
-
-EquatToXY <- function(d,ra){
-    x <- -d*sin(2*pi*ra/360)
-    y <- d*cos(2*pi*ra/360)
-    return(cbind(x,y))
-}
-
-
-d <- c(0,120,120,120)
-ra <- c(0,20,0,4)*360/24
-pts <- EquatToXY(d,ra)
-xlim <- range(pts[,1])
-ylim <- range(pts[,2])
 
 
 rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
@@ -36,51 +16,38 @@ names(rr_class) <- c("ID","class")
 rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
 rr <- rr[,1:6]
 names(rr) <- c("ID","RA","Decl","ar","dh","dg")
-rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
 rr <- merge(rr,rr_class)
 rr <- rr[rr$class=="ab",]
 
+head(rr)
+rr <- rr[,c("RA","Decl","dh")]
+
+
+
+
+#### what is input to function
+##  rrlyrae: ra, dec, d
+##  potting limits
+
+
+d <- c(0,120,120,120)
+ra <- c(0,20,0,4)*360/24
+pts <- EquatToXY(d,ra)
+xlim <- range(pts[,1])
+ylim <- range(pts[,2])
+
+
+
+rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
 
 
 plot(rr$x,rr$y,xlim=xlim,ylim=ylim)
 ##fit.dens <- kde2d(rr$x,rr$y,n=200,lims=c(xlim,ylim),h=2)
-fit.dens <- NearestNeighborDensity2d(cbind(rr$x,rr$y),x1r=xlim,x2r=ylim,n=200,k=5)
+fit.dens <- NearestNeighborDensity2d(cbind(rr$x,rr$y),
+                                     x1r=xlim,
+                                     x2r=ylim,
+                                     n=400,k=8)
 
-
-
-plot(rr$x,rr$y,xlab="x",ylab="y",cex.lab=1.3,xlim=xlim,ylim=ylim)
-contour(fit.dens,add=TRUE,col="#00000080",cex=2,lims=c(xlim,ylim))
-
-
-
-EquatorialToGalactic <- function(alpha,delta){
-    alpha <- 2*pi*(alpha/360)
-    delta <- 2*pi*(delta/360)
-    alpha.ngp <- 2*pi*(192.85 / 360)
-    delta.ngp <- 2*pi*((27 + 8/60) / 360)
-    alpha.0 <- 2*pi*(282.85 / 360)
-    l.0 <- 2*pi*(32.93 / 360)
-    b <- (asin(sin(delta)*sin(delta.ngp) -
-               cos(delta)*cos(delta.ngp)*sin(alpha-alpha.0)))
-    l <- acos(cos(alpha-alpha.0)*cos(delta)/cos(b)) + l.0
-    return(cbind(b=(360*b)/(2*pi),l=(360*l)/(2*pi)))
-}
-
-
-SphericalToCartesian <- function(r,b,l){
-    phi <- 2*pi*l/360
-    theta <- pi/2 - 2*pi*b/360 ## b \in [-90,90] for astronomers, want b \in [0,\pi]
-    x <- r*sin(theta)*cos(phi)
-    y <- r*sin(theta)*sin(phi)
-    z <- r*cos(theta)
-    return(cbind(x=x,y=y,z=z))
-}
-
-CartesianSunToMW <- function(cartesian){
-    SUNtoMWC <- 8 ## distance from sun to milky way center
-    cartesian_mw <- t(t(cartesian) - c(SUNtoMWC,0,0))
-    return(cartesian_mw)
-}
 
 
 ## convert to cartesian galactocentric coordinates
@@ -91,93 +58,35 @@ rr <- cbind(rr,bls)
 
 
 
-
-## examine results
-plot(bls,xlab="b",ylab='l',main="Stripe 82 in Galactic Coordinates")
-plot3d(cartesian)
-par(mfcol=c(1,3))
-plot(rr$dh,sqrt(rowSums(cartesian^2)))
-abline(a=0,b=1)
-plot(rr$dg,sqrt(rowSums(cartesian^2)))
-abline(a=0,b=1)
-plot(rr$dg,sqrt(rowSums(cartesian_mw^2)))
-abline(a=0,b=1)
-
-
-
 ## make sure this is working right
 x <- fit.dens$x
 y <- fit.dens$y
-grid.xy <- MakeGrid(x,y)
-plot(grid.xy,col="#00000030",xlim=xlim,ylim=ylim)
-points(rr$x,rr$y,col='red',pch=19)
+dens.mat <- HaloOnCartesian(x,y)
 
 
-
-grid.equat <- XYtoEquat(grid.xy[,1],grid.xy[,2])
-
-
-
-
-
-head(grid.equat)
-grid.equat.ind <- (((grid.equat[,"ra"] <= 360*(4/24)) | (grid.equat[,"ra"] >= 360*(20/24)))
-    & (grid.equat[,"d"] <= 120))
-
-par(mfcol=c(1,2))
-plot(-rr$dh*sin(2*pi*rr$RA/360),rr$dh*cos(2*pi*rr$RA/360),xlim=xlim,ylim=ylim)
-plot(grid.xy,col=grid.equat.ind,xlim=xlim,ylim=ylim)
-
-### but no clear definition for how far we can observe
-### so still confused by this halo model calculations
-
-
-grid.galac <- cbind(grid.equat[,1],EquatorialToGalactic(grid.equat[,2],grid.equat[,3]))
-grid.galac_cart <- SphericalToCartesian(grid.galac[,1],grid.galac[,2],grid.galac[,3])
-grid.galac_cart_mw <- CartesianSunToMW(grid.galac_cart)
-dens <- 1/sqrt(rowSums(grid.galac_cart_mw^2))^3
-
-OblateModel <- function(x){
-    nh <- 2.77
-    qh <- 0.64
-    return((1/sqrt(sum(x[1:2]^2 + (x[3]/qh)^2)))^nh)
-}
-
-dens.oblate <- apply(grid.galac_cart_mw,1,OblateModel)
-
-dev.new()
-filled.contour(x,y,log10(dens.oblate.mat),main="oblate")
-
-dens.oblate.mat <- MakeMatrix(dens.oblate)
-
-dens.mat <- MakeMatrix(dens)
-dev.new()
-filled.contour(x,y,dens.mat,main="1/R3")
-
-
-dens.mat <- dens.oblate.mat
 
 ## cdh scales density estimate by volume represented by point
-cdh <- outer(fit.dens$x,fit.dens$y,FUN=function(x,y){return(sqrt(x^2 + y^2))})
-##dens.mat <- MakeMatrix(dens)
-grid.equat.ind.mat <- MakeMatrix(grid.equat.ind)
-dens.mat[!grid.equat.ind.mat] <- 0
-fit.dens$z[!grid.equat.ind.mat] <- 0
-dens.mat <- dens.mat  / sum(dens.mat)
+grid.xy <- MakeGrid(x,y)
+grid.equat <- XYtoEquat(grid.xy[,1],grid.xy[,2])
+grid.ind <- (((grid.equat[,"ra"] <= 360*(4/24)) |
+                    (grid.equat[,"ra"] >= 360*(20/24)))
+    & (grid.equat[,"d"] <= 120))
+
+
+
+cdh <- outer(fit.dens$x,fit.dens$y,
+             FUN=function(x,y){return(sqrt(x^2 + y^2))})
+grid.ind.mat <- MakeMatrix(grid.ind)
+dens.mat[!grid.ind.mat] <- 0
+fit.dens$z[!grid.ind.mat] <- 0
+dens.mat <- (dens.mat*cdh)  / sum(dens.mat*cdh)
 fit.dens$z <- (fit.dens$z*cdh)  / sum(fit.dens$z*cdh)
 
 
+## does cdh affect halo model too?
 
 z.cont <- fit.dens$z - .8*dens.mat
-z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
-
-
-
-DrawDCircle <- function(d){
-    ras <- 0:360
-    return(EquatToXY(rep(d,length(ras)),ras))
-}
-
+z.cont <- apply(z.cont,c(1,2),function(x){max(x,0)})
 
 a <- c(270,300,330,0,30,60,90)
 x.from <- rep(0,length(a))
@@ -185,23 +94,37 @@ x.to <- 200*cos(2*pi*(a+90)/(360))
 y.from <- rep(0,length(a))
 y.to <- 200*sin(2*pi*(a+90)/(360))
 
-
-    
-
-
-
 ##BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral
 
+## z.cont <- log10(z.cont)
+## z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
 
-ncol <- 10
-cols <- brewer.pal(ncol,"RdYlBu")
+
+
+
+
+
+
+level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
+ncol <- length(level) + 1
+cols <- rev(brewer.pal(ncol,"RdBu"))
+
+
+z.cont <- as.vector(z.cont)
+
+
+
+cols <- rev(brewer.pal(10,name="RdBu"))
+decLocations <- quantile(z.cont[grid.ind],
+                         probs = seq(0.5,0.99,length.out=9),type=4)
+dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
+
+
+plot(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20,xaxs='i',yaxs='i')
 ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
-filled.contour(x,y,log10(z.cont),xlim=xlim,ylim=ylim,col=cols,nlevels=length(cols)-3,
-               plot.axes = {
-                   axis(1)
-                   points(rr$x,rr$y,col="#00000020");
-                   for(ii in ds){points(ii,type='l')};
-                   segments(x.from,y.from,x.to,y.to)})
+points(rr$x,rr$y,pch=20)
+for(ii in ds){points(ii,type='l')}
+segments(x.from,y.from,x.to,y.to)
 
 
 #### TODO:
@@ -210,15 +133,4 @@ filled.contour(x,y,log10(z.cont),xlim=xlim,ylim=ylim,col=cols,nlevels=length(col
 ## 3. make plot with downsampled data
 
 
-plot(rr$x,rr$y)
-points(d25,type='l')
 
-
-head(rr)
-
-
-############# implement oblate halo model
-############# kNN density estimator (effectively a variable bandwidth density estimator)
-
-
-############# experiment with nice contour plotting software
