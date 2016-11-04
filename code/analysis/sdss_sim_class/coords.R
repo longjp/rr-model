@@ -2,9 +2,8 @@ rm(list=ls())
 library(MASS)
 library(rgl)
 library(RColorBrewer)
+source('kNN.R')
 options(width=120)
-
-## TODO: fix XYtoEquat, some issue with arctan
 
 ## cartesian_mw has cartesian coordinates
 ## of RR Lyrae in cartesian coordinates with mw center at origin
@@ -44,12 +43,13 @@ rr <- rr[rr$class=="ab",]
 
 
 plot(rr$x,rr$y,xlim=xlim,ylim=ylim)
-fit.kde <- kde2d(rr$x,rr$y,n=200,lims=c(xlim,ylim),h=2)
+##fit.dens <- kde2d(rr$x,rr$y,n=200,lims=c(xlim,ylim),h=2)
+fit.dens <- NearestNeighborDensity2d(cbind(rr$x,rr$y),x1r=xlim,x2r=ylim,n=200,k=5)
 
 
 
 plot(rr$x,rr$y,xlab="x",ylab="y",cex.lab=1.3,xlim=xlim,ylim=ylim)
-contour(fit.kde,add=TRUE,col="#00000080",cex=2,lims=c(xlim,ylim))
+contour(fit.dens,add=TRUE,col="#00000080",cex=2,lims=c(xlim,ylim))
 
 
 
@@ -104,15 +104,10 @@ plot(rr$dg,sqrt(rowSums(cartesian_mw^2)))
 abline(a=0,b=1)
 
 
-MakeGrid <- function(x,y)
-    return(cbind(rep(x,length(x)),rep(y,each=length(y))))
-}
-
-
 
 ## make sure this is working right
-x <- fit.kde$x
-y <- fit.kde$y
+x <- fit.dens$x
+y <- fit.dens$y
 grid.xy <- MakeGrid(x,y)
 plot(grid.xy,col="#00000030",xlim=xlim,ylim=ylim)
 points(rr$x,rr$y,col='red',pch=19)
@@ -150,16 +145,11 @@ OblateModel <- function(x){
 
 dens.oblate <- apply(grid.galac_cart_mw,1,OblateModel)
 
-
-
-
-MakeMatrix <- function(gr){
-    return(matrix(gr,nrow=sqrt(length(gr))))
-}
-
+dev.new()
+filled.contour(x,y,log10(dens.oblate.mat),main="oblate")
 
 dens.oblate.mat <- MakeMatrix(dens.oblate)
-filled.contour(x,y,dens.oblate.mat,main="oblate")
+
 dens.mat <- MakeMatrix(dens)
 dev.new()
 filled.contour(x,y,dens.mat,main="1/R3")
@@ -168,17 +158,17 @@ filled.contour(x,y,dens.mat,main="1/R3")
 dens.mat <- dens.oblate.mat
 
 ## cdh scales density estimate by volume represented by point
-cdh <- outer(fit.kde$x,fit.kde$y,FUN=function(x,y){return(sqrt(x^2 + y^2))})
+cdh <- outer(fit.dens$x,fit.dens$y,FUN=function(x,y){return(sqrt(x^2 + y^2))})
 ##dens.mat <- MakeMatrix(dens)
 grid.equat.ind.mat <- MakeMatrix(grid.equat.ind)
 dens.mat[!grid.equat.ind.mat] <- 0
-fit.kde$z[!grid.equat.ind.mat] <- 0
+fit.dens$z[!grid.equat.ind.mat] <- 0
 dens.mat <- dens.mat  / sum(dens.mat)
-fit.kde$z <- (fit.kde$z*cdh)  / sum(fit.kde$z*cdh)
+fit.dens$z <- (fit.dens$z*cdh)  / sum(fit.dens$z*cdh)
 
 
 
-z.cont <- log10(fit.kde$z / dens.mat)
+z.cont <- fit.dens$z - .8*dens.mat
 z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
 
 
@@ -196,7 +186,6 @@ y.from <- rep(0,length(a))
 y.to <- 200*sin(2*pi*(a+90)/(360))
 
 
-##DrawRALine <- function(ra){
     
 
 
@@ -207,13 +196,18 @@ y.to <- 200*sin(2*pi*(a+90)/(360))
 ncol <- 10
 cols <- brewer.pal(ncol,"RdYlBu")
 ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
-filled.contour(x,y,z.cont,xlim=xlim,ylim=ylim,col=cols,nlevels=length(cols)-3,
-               plot.axes = { axis(1);
-                   axis(2);
+filled.contour(x,y,log10(z.cont),xlim=xlim,ylim=ylim,col=cols,nlevels=length(cols)-3,
+               plot.axes = {
+                   axis(1)
                    points(rr$x,rr$y,col="#00000020");
                    for(ii in ds){points(ii,type='l')};
                    segments(x.from,y.from,x.to,y.to)})
 
+
+#### TODO:
+## 1. fix edge effects of density estimator
+## 2. clean up code, functionalize
+## 3. make plot with downsampled data
 
 
 plot(rr$x,rr$y)
