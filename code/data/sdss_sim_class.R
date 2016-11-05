@@ -1,4 +1,4 @@
-## downsample sdss stripe 82 rr lyrae ab to 50 total observations
+## downsample sdss stripe 82 rr lyrae ab to Nobs total observations
 rm(list=ls())
 source('../common/funcs.R')
 
@@ -15,7 +15,7 @@ fnames <- fnames[nr > 75]
 
 ## order fnames and rrlyrae
 Nnot <- 1000 ## number of non--rrlyrae to select
-rrlyrae[,1] <- paste("LC_",rrlyrae[,1],".dat",sep="")
+rrlyrae[,1] <- paste0("LC_",rrlyrae[,1],".dat")
 rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
 fnot <- sample(fnames[!(fnames %in% rrlyrae[,1])],Nnot)
 fnames <- fnames[fnames %in% rrlyrae[,1]]
@@ -24,6 +24,13 @@ rrlyrae <- rrlyrae[rrlyrae[,1] %in% fnames,]
 fnames <- c(fnames,fnot)
 periods <- c(rrlyrae[,3],rep(0,Nnot))
 cl <- c(rep("rr",nrow(rrlyrae)),rep("not",Nnot))
+
+## find ra, dec for all fnames light curves
+cat <- read.table("raw/stripe82candidateVar_v1.1.dat",header=TRUE)
+ids <- gsub(".dat","",gsub("LC_","",fnames))
+mean(ids %in% cat$ID) ## should = 1 (ie all ids in catalog)
+ra <- cat$ra[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
+dec <- cat$dec[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
 
 ## load light curves
 lcs <- vector("list",length(fnames))
@@ -45,4 +52,4 @@ tms <- lapply(lcs,LCtoTM)
 names(tms) <- fnames
 
 ## output lightcurves and periods
-save(tms,periods,cl,file="clean/sdss_sim_class.RData")
+save(tms,periods,cl,ra,dec,file="clean/sdss_sim_class.RData")
