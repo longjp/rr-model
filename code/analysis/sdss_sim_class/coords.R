@@ -6,6 +6,7 @@ source('kNN.R')
 options(width=120)
 
 
+## need to run this 3x: full data, lomb scargle, and rr lyrae model
 
 rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
 rr_class <- rr_class[,1:2]
@@ -23,8 +24,6 @@ head(rr)
 rr <- rr[,c("RA","Decl","dh")]
 
 
-
-
 #### what is input to function
 ##  rrlyrae: ra, dec, d
 ##  potting limits
@@ -35,7 +34,6 @@ ra <- c(0,20,0,4)*360/24
 pts <- EquatToXY(d,ra)
 xlim <- range(pts[,1])
 ylim <- range(pts[,2])
-
 
 
 rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
@@ -88,44 +86,10 @@ fit.dens$z <- (fit.dens$z*cdh)  / sum(fit.dens$z*cdh)
 z.cont <- fit.dens$z - .8*dens.mat
 z.cont <- apply(z.cont,c(1,2),function(x){max(x,0)})
 
-a <- c(270,300,330,0,30,60,90)
-x.from <- rep(0,length(a))
-x.to <- 200*cos(2*pi*(a+90)/(360))
-y.from <- rep(0,length(a))
-y.to <- 200*sin(2*pi*(a+90)/(360))
 
 ##BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral
 
-## z.cont <- log10(z.cont)
-## z.cont[is.na(z.cont)] <- min(z.cont,na.rm=TRUE)
-
-
-
-
-
-
-
-level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
-ncol <- length(level) + 1
-cols <- rev(brewer.pal(ncol,"RdBu"))
-
-
-z.cont <- as.vector(z.cont)
-
-
-
-cols <- rev(brewer.pal(10,name="RdBu"))
-decLocations <- quantile(z.cont[grid.ind],
-                         probs = seq(0.5,0.99,length.out=9),type=4)
-dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
-
-
-plot(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20,xaxs='i',yaxs='i')
-ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
-points(rr$x,rr$y,pch=20)
-for(ii in ds){points(ii,type='l')}
-segments(x.from,y.from,x.to,y.to)
-
+MakeContour(z.cont,grid.xy,grid.ind,rr)
 
 #### TODO:
 ## 1. fix edge effects of density estimator

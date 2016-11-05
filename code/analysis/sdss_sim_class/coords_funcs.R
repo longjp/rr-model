@@ -80,6 +80,30 @@ HaloOnCartesian <- function(x,y){
 
 
 
+MakeContour <- function(z.cont,grid.xy,grid.ind,rr){
+    a <- c(270,300,330,0,30,60,90)
+    x.from <- rep(0,length(a))
+    x.to <- 200*cos(2*pi*(a+90)/(360))
+    y.from <- rep(0,length(a))
+    y.to <- 200*sin(2*pi*(a+90)/(360))
+    level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
+    ncol <- length(level) + 1
+    cols <- rev(brewer.pal(ncol,"RdBu"))
+    z.cont <- as.vector(z.cont)
+    cols <- rev(brewer.pal(10,name="RdBu"))
+    decLocations <- quantile(z.cont[grid.ind],
+                             probs = seq(0.5,0.99,length.out=9),type=4)
+    dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
+    plot(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20,xaxs='i',yaxs='i')
+    ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
+    points(rr$x,rr$y,pch=20)
+    for(ii in ds){points(ii,type='l')}
+    segments(x.from,y.from,x.to,y.to)
+}
+
+
+
+
 NearestNeighborDensity2d <- function(x,x1r,x2r,n=100,k=sqrt(nrow(x))){
     ## construct grid for evaluating density
     x1 <- seq(x1r[1],x1r[2],length.out=n)
