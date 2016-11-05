@@ -3,9 +3,7 @@ rm(list=ls())
 ## load necessary libraries
 library('parallel')
 library('multiband')
-library('rpart')
 library('randomForest')
-library(rpart.plot)
 load("../../fit_template/template.RData")
 source("../../fit_template/template.R")
 source("../../common/funcs.R")
@@ -22,11 +20,9 @@ unlink(fig.dir,recursive=TRUE)
 dir.create(fig.dir)
 
 
-## shouldn't tot.dev be mean.dev?
-
 period_est <- period_est[,1] ## just use best fit period
 
-tot.dev <- rep(0,N)
+rss.n <- rep(0,N)
 for(ii in 1:N){
     tm <- tms[[ii]]
     omega <- 1/period_est[ii]
@@ -38,7 +34,7 @@ for(ii in 1:N){
             + coeffs[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coeffs[4]) %% 1))
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
     }
-    tot.dev[ii] <- sum(dev)
+    rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
 }
 
 coeffs <- matrix(0,ncol=4,nrow=N)
@@ -49,8 +45,8 @@ for(ii in 1:N){
 }
 
 
-features <- cbind(coeffs,period_est,tot.dev)
-colnames(features) <- c("mu","E[B-V]","a","phi","period","dev")
+features <- cbind(coeffs,period_est,rss.n)
+colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n")
 
 
 cols <- c("#00000030",'red')
@@ -62,67 +58,11 @@ pairs(features,col=cols[cl],pch=pchs[cl])
 dev.off()
 
 
-dat <- data.frame(cl,features[,-1])
-rpart.fit <- rpart(cl~.,data=dat,control=rpart.control(xval=10,minsplit=1,cp=.001))
-rpart.fit$cptable
-mincp <- rpart.fit$cptable[which.min(rpart.fit$cptable[,"xerror"]),"CP"]
-
-
-pdf("real_data_cp.pdf",width=10,height=8)
-par(mar=c(5,5,5,1))
-plotcp(rpart.fit,cex.lab=1.5)
-dev.off()
-
-
-pdf("rpart_fulltree.pdf")
-par(mar=c(0,1,0,1))
-prp(rpart.fit,extra=2,compress=FALSE,varlen=0)
-dev.off()
-
-pdf("rpart_pruned.pdf")
-rpart.fit.pruned <- prune(rpart.fit, cp= mincp)
-prp(rpart.fit.pruned,extra=2,compress=FALSE,varlen=0)
-dev.off()
-
-pdf("rpart_pruned_more.pdf")
-rpart.fit.pruned <- prune(rpart.fit, cp= 0.023)
-prp(rpart.fit.pruned,extra=2,compress=FALSE,varlen=0)
-dev.off()
-
-
-
-
-
-
-
-
-
-
-
-out <- table(predict(rpart.fit.pruned,type="class"),cl)
-
-
-
-sum(diag(out))/sum(out)
-
-##pdf(paste0(fig.dir,"/cart_tree.pdf"),height=6,width=7)
-
-
-par(xpd = TRUE)
-plot(rpart.fit,uniform=TRUE)
-text(rpart.fit, use.n = TRUE)
-##dev.off()
-
-rf.fit <- randomForest(cl~.,data=dat)
-
-## predict everything with random forest
-dat$predict <- predict(rf.fit)
-
 
 
 cl.plot <- as.numeric(as.factor(cl))
 pdf(paste0(fig.dir,"/scatterplot_features.pdf"),height=6,width=7)
-pairs(features,col=cl.plot,lab=c("Mean","E[B-V]","Amp.","Phase","Period","Model Res."),
+pairs(features,col=cl.plot,lab=c("Mean","E[B-V]","Amp.","Phase","Period","RSSn"),
       pch=cl.plot)
 dev.off()
 
@@ -133,18 +73,15 @@ plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
 dev.off()
 
 
-
-
-
 pairs(cbind("amp"=log10(features[,"a"]),
             "period"=features[,"period"],
-            "dev"=log10(features[,"dev"])),
+            "dev"=log10(features[,"rss.n"])),
       col=cl.plot,pch=cl.plot)
 
 pdf(paste0(fig.dir,"/a_vs_dev_log.pdf"),height=6,width=7)
 par(mar=c(5,5,1,1))
 plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
-     xlab="Amplitude",ylab="Model Residual",cex.lab=1.3,
+     xlab="Amplitude",ylab="RSS/n",cex.lab=1.3,
      log="xy",xlim=c(.01,5))
 legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
@@ -159,18 +96,28 @@ dev.off()
 
 
 
+########## USE RANDOM FOREST TO FIND RR LYRAE, OUTPUT CLASSIFICATIONS
+########## AND DISTANCE ESTIMATES (for input into coords.R)
+
+
+dat <- data.frame(cl,features[,-1])
+rf.fit <- randomForest(cl~.,data=dat)
+dat$predict <- predict(rf.fit)
+dat$mu <- features[,"mu"]
+to_use <- dat$predict=="rr"
+rf_rr <- data.frame(ra=ra[to_use],dec=dec[to_use],d=10^(dat$mu[to_use]/5 + 1)/1000)
+save(rf_rr,file="rf_rr.RData")
 
 
 
 
-
-
-######### now compute distances
+#### TODO: need to write from here down
+########## PLOT DISTANCES FOR LIGHTCURVES
+dat <- data.frame(cl,features)
 
 fig.dir <- "figs_distance"
 unlink(fig.dir,recursive=TRUE)
 dir.create(fig.dir)
-
 
 rrlyrae <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
 names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
@@ -184,11 +131,6 @@ out <- merge(rrlyrae,rr_model,all=TRUE)
 out <- out[!is.na(out$cl),] ## only use observations which we have classes for
 
 
-## compute distance based on model (out$mu)
-
-## pdf("distance_comparison.pdf")
-## par(mar=c(5,5,1,1))
-
 to_use <- out$predict=='rr'
 plot(out$d[to_use],10^(out$mu[to_use]/5 + 1)/1000,col=(1*(out$cl[to_use]=='not')+1),
      xlab="Ground Truth Distance in kpc (Sesar 2010)",
@@ -200,18 +142,3 @@ not_rr <- to_use & out$cl!='rr'
 points(rep(min(out$d[to_use],na.rm=TRUE),sum(not_rr)),10^(out$mu[not_rr]/5 + 1)/1000,
        col='red',pch=19)
 ##dev.off()
-
-
-#### make side by side comparison maps of Sesar
-
-## why do we have rr, dec, d for some objects (5) that are not actually rr lyrae
-## what happens to rrlyrae c and d? is my classifier wrong if it labels these as rrlyrae?`
-
-out$d
-plot(-out$d*sin(2*pi*out$ra/360),out$d*cos(2*pi*out$ra/360))
-
-
-## go from l (longitude) ,b (latitude) (,d (distance)
-## "Cartesian galactocentric coordinate system"
-
-## def of stripe 82: RA ~ 20h to R.A. ∼ 4h (so 8 hours or 360/3 = 120 degrees)
