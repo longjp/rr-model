@@ -2,26 +2,29 @@ rm(list=ls())
 library(MASS)
 library(rgl)
 library(RColorBrewer)
-source('kNN.R')
+source('coords_funcs.R')
 options(width=120)
 
 
 ## need to run this 3x: full data, lomb scargle, and rr lyrae model
 
-rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
-rr_class <- rr_class[,1:2]
-names(rr_class) <- c("ID","class")
+
+###### FOR MAKING "TRUE" MAP
+## rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
+## rr_class <- rr_class[,1:2]
+## names(rr_class) <- c("ID","class")
+## rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
+## rr <- rr[,1:6]
+## names(rr) <- c("ID","ra","dec","ar","d","dg")
+## rr <- merge(rr,rr_class)
+## rr <- rr[rr$class=="ab",]
+## head(rr)
+## rr <- rr[,c("ra","dec","d")]
 
 
+load("rf_rr.RData")
+rr <- rf_rr
 
-rr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
-rr <- rr[,1:6]
-names(rr) <- c("ID","RA","Decl","ar","dh","dg")
-rr <- merge(rr,rr_class)
-rr <- rr[rr$class=="ab",]
-
-head(rr)
-rr <- rr[,c("RA","Decl","dh")]
 
 
 #### what is input to function
@@ -29,14 +32,14 @@ rr <- rr[,c("RA","Decl","dh")]
 ##  potting limits
 
 
-d <- c(0,120,120,120)
+ds <- c(0,120,120,120)
 ra <- c(0,20,0,4)*360/24
-pts <- EquatToXY(d,ra)
+pts <- EquatToXY(ds,ra)
 xlim <- range(pts[,1])
 ylim <- range(pts[,2])
 
 
-rr <- cbind(rr,EquatToXY(rr$dh,rr$RA))
+rr <- cbind(rr,EquatToXY(rr$d,rr$ra))
 
 
 plot(rr$x,rr$y,xlim=xlim,ylim=ylim)
@@ -49,8 +52,8 @@ fit.dens <- NearestNeighborDensity2d(cbind(rr$x,rr$y),
 
 
 ## convert to cartesian galactocentric coordinates
-bls <- EquatorialToGalactic(rr$RA,rr$Decl)
-cartesian <- SphericalToCartesian(rr$dh,bls[,1],bls[,2])
+bls <- EquatorialToGalactic(rr$ra,rr$dec)
+cartesian <- SphericalToCartesian(rr$d,bls[,1],bls[,2])
 cartesian_mw <- CartesianSunToMW(cartesian)
 rr <- cbind(rr,bls)
 
