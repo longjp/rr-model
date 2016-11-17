@@ -37,6 +37,8 @@ for(ii in 1:N){
     rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
 }
 
+## convert rss into p--value
+
 coeffs <- matrix(0,ncol=4,nrow=N)
 for(ii in 1:N){
     tm <- tms[[ii]]
@@ -48,6 +50,15 @@ for(ii in 1:N){
 features <- cbind(coeffs,period_est,rss.n)
 colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n")
 
+
+d1 <- density(features[cl=="rr",6],bw="SJ")
+d2 <- density(features[cl=="not",6],bw="SJ")
+xlim <- range(c(d1$x,d2$x))
+ylim <- range(c(d1$y,d2$y))
+plot(0,0,xlim=xlim,ylim=ylim,xlab="RSS",ylab="Density")
+points(d1$x,d1$y,col="black",type='l')
+points(d2$x,d2$y,col="red",type='l')
+legend("topright",c("rr","not rr"),lty=1,col=1:2)
 
 cols <- c("#00000030",'red')
 names(cols) <- c("not","rr")
