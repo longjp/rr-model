@@ -1,10 +1,10 @@
 ## downsample sdss stripe 82 rr lyrae ab to Nobs total observations
 rm(list=ls())
+set.seed(1234)
 source('../common/funcs.R')
 
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
-rrlyrae <- rrlyrae[sample(1:nrow(rrlyrae),30),]
 
 folder <- "raw/AllLCs/"
 fnames <- list.files(folder)
@@ -15,7 +15,7 @@ nr <- vapply(fnames,function(x){nrow(read.table(paste(folder,x,sep="/")))},c(0))
 fnames <- fnames[nr > 75]
 
 ## order fnames and rrlyrae
-Nnot <- 100 ## number of non--rrlyrae to select
+Nnot <- 1000 ## number of non--rrlyrae to select
 rrlyrae[,1] <- paste0("LC_",rrlyrae[,1],".dat")
 rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
 fnot <- sample(fnames[!(fnames %in% rrlyrae[,1])],Nnot)
