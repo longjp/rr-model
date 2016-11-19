@@ -81,33 +81,50 @@ HaloOnCartesian <- function(x,y){
 
 
 MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
-    a <- c(270,300,330,0,30,60,90)
-    x.from <- rep(0,length(a))
-    x.to <- 125*cos(2*pi*(a+90)/(360))
-    y.from <- rep(0,length(a))
-    y.to <- 125*sin(2*pi*(a+90)/(360))
-    level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
-    ncol <- length(level) + 1
-    cols <- rev(brewer.pal(ncol,"RdBu"))
-    z.cont <- as.vector(z.cont)
-    cols <- rev(brewer.pal(10,name="RdBu"))
-    decLocations <- quantile(z.cont[grid.ind],
-                             probs = seq(0.5,0.99,length.out=9),type=4)
-    dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
     xlim <- range(grid.xy[grid.ind,1])
     ylim <- range(grid.xy[grid.ind,2])
-    plot(0,0,col=0,xaxs='i',yaxs='i',xlab="kpc",ylab="",axes=FALSE,cex.lab=4,
+    xlim <- c(-120,120)
+    ylim <- c(0,130)
+    plot(0,0,col=0,xaxs='i',yaxs='i',
+         xlab="kpc",ylab="",axes=FALSE,cex.lab=4,
          xlim=xlim,ylim=ylim)
     if(plot_contour){
+        level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
+        ncol <- length(level) + 1
+        cols <- rev(brewer.pal(ncol,"RdBu"))
+        z.cont <- as.vector(z.cont)
+        cols <- rev(brewer.pal(10,name="RdBu"))
+        decLocations <- quantile(z.cont[grid.ind],
+                                 probs = seq(0.5,0.99,length.out=9),type=4)
+        dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
         points(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20)
     }
-    ds <- lapply(25*(1:5),function(x){DrawDCircle(x)})
+    ## locations of RRL
     points(rr$x,rr$y,pch=20)
-    for(ii in ds){points(ii,type='l')}
-    segments(x.from,y.from,x.to,y.to)
+    ## y=0 line, ie x-axis
     segments(-125,0,125,0,lwd=3)
+    ## concentric circles for distance 
+    ds <- lapply(25*(1:4),function(x){DrawDCircle(x)})
+    for(ii in ds){points(ii,type='l')}
+    ## distances on x-axis
     at <- c(-125,-100,-75,-50,-25,0,25,50,75,100,125)
     axis(1,at=at,labels=abs(at),cex.axis=4)
+    ## RA lines
+    a <- c(270,300,330,0,30,60,90)
+    x.from <- rep(0,length(a))
+    x.to <- 122*cos(2*pi*(a+90)/(360))
+    y.from <- rep(0,length(a))
+    y.to <- 122*sin(2*pi*(a+90)/(360))
+    segments(x.from,y.from,x.to,y.to)
+    ## plot RA labels
+    dist <- 126
+    locs <- 30*(1:5)
+    te <- locs-90
+    te[te < 0] <- 360+te[te<0]
+    for(ii in 1:length(locs))
+        text(dist*cos(locs[ii]*2*pi/360),
+             dist*sin(locs[ii]*2*pi/360),
+             bquote(.(te[ii])~degree),cex=3)
 }
 
 

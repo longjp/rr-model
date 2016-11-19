@@ -1,7 +1,7 @@
 rm(list=ls())
 library(MASS)
 library(RColorBrewer)
-source('coords_funcs.R')
+source('map_funcs.R')
 options(width=120)
 
 ########## TO STORE TRUE, RR MODEL, AND LOMB DATA
@@ -35,6 +35,9 @@ PrepPlot <- function(rr){
     xlim <- range(pts[,1])
     ylim <- range(pts[,2])
 
+    xlim <- c(-125,125)
+    ylim <- c(0,125)
+    
     rr <- cbind(rr,EquatToXY(rr$d,rr$ra))
     ##fit.dens <- kde2d(rr$x,rr$y,n=200,lims=c(xlim,ylim),h=2)
     fit.dens <- NearestNeighborDensity2d(cbind(rr$x,rr$y),
@@ -57,8 +60,9 @@ PrepPlot <- function(rr){
     grid.xy <- MakeGrid(x,y)
     grid.equat <- XYtoEquat(grid.xy[,1],grid.xy[,2])
     grid.ind <- (((grid.equat[,"ra"] <= 360*(4/24)) |
-                  (grid.equat[,"ra"] >= 360*(20/24)))
-        & (grid.equat[,"d"] <= 120))
+                  (grid.equat[,"ra"] >= 360*(20/24 + 32/(24*60))))
+        & (grid.equat[,"d"] <= 120)
+        & (grid.equat[,"d"] >= 5))
     cdh <- outer(fit.dens$x,fit.dens$y,
                  FUN=function(x,y){return(sqrt(x^2 + y^2))})
     grid.ind.mat <- MakeMatrix(grid.ind)
@@ -72,6 +76,8 @@ PrepPlot <- function(rr){
     return(list(z.cont=z.cont,grid.xy=grid.xy,grid.ind=grid.ind,rr=rr))
 
 }
+
+
 
 ## plot with "truth"
 out <- PrepPlot(rr[[1]])
@@ -92,12 +98,13 @@ MakeContour(out$z.cont,out$grid.xy,out$grid.ind,out$rr,plot_contour=FALSE)
 dev.off()
 
 
+source('map_funcs.R')
+MakeContour(out$z.cont,out$grid.xy,out$grid.ind,out$rr)
 
-## does cdh affect halo model too?
-##BrBG PiYG PRGn PuOr RdBu RdGy RdYlBu RdYlGn Spectral
 
 #### TODO:
-## 1. fix edge effects of density estimator
-
+## 1. get rid of RR past 120 kpc and less than 5 kpc
+## 2. does cdh affect halo model too?
+## 3. fix edge effects of density estimator
 
 
