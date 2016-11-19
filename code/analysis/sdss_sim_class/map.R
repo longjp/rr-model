@@ -25,9 +25,6 @@ load("rf_rr.RData")
 rr[[2]] <- rf_rr
 
 #### FOR MAKING LOMB BASED MAP
-##  todo
-
-
 PrepPlot <- function(rr){
     ds <- c(0,120,120,120)
     ra <- c(0,20,0,4)*360/24
@@ -78,6 +75,10 @@ PrepPlot <- function(rr){
 }
 
 
+## get rid of all RR outside 5-120 kpc
+for(ii in 1:length(rr))
+    rr[[ii]] <- rr[[ii]][(rr[[ii]][,3] < 120) & (rr[[ii]][,3] > 5),]
+
 
 ## plot with "truth"
 out <- PrepPlot(rr[[1]])
@@ -98,13 +99,10 @@ MakeContour(out$z.cont,out$grid.xy,out$grid.ind,out$rr,plot_contour=FALSE)
 dev.off()
 
 
-source('map_funcs.R')
-MakeContour(out$z.cont,out$grid.xy,out$grid.ind,out$rr)
-
-
 #### TODO:
-## 1. get rid of RR past 120 kpc and less than 5 kpc
 ## 2. does cdh affect halo model too?
 ## 3. fix edge effects of density estimator
 
 
+plot(1:10,1:10,axes=FALSE)
+axis(1,1:10,1:10,line=-4)

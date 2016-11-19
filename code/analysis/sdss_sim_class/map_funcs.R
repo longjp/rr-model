@@ -86,7 +86,7 @@ MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
     xlim <- c(-120,120)
     ylim <- c(0,130)
     plot(0,0,col=0,xaxs='i',yaxs='i',
-         xlab="kpc",ylab="",axes=FALSE,cex.lab=4,
+         xlab="",ylab="",axes=FALSE,cex.lab=4,
          xlim=xlim,ylim=ylim)
     if(plot_contour){
         level <- quantile(log10(z.cont),c(.7,.8,.9,.95,.99))
@@ -106,9 +106,10 @@ MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
     ## concentric circles for distance 
     ds <- lapply(25*(1:4),function(x){DrawDCircle(x)})
     for(ii in ds){points(ii,type='l')}
-    ## distances on x-axis
-    at <- c(-125,-100,-75,-50,-25,0,25,50,75,100,125)
-    axis(1,at=at,labels=abs(at),cex.axis=4)
+    ## text on x-axis
+    at <- c(-100,-75,-50,-25,0,25,50,75,100)
+    mtext(text=abs(at),side=1,line=1.7,at=at,cex=4)
+    mtext(text="kpc",side=1,line=3.7,at=0,cex=4)
     ## RA lines
     a <- c(270,300,330,0,30,60,90)
     x.from <- rep(0,length(a))
