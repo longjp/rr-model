@@ -122,7 +122,6 @@ save(rf_rr,file="rf_rr.RData")
 
 
 
-#### TODO: need to write from here down
 ########## PLOT DISTANCES FOR LIGHTCURVES
 dat <- data.frame(cl,features)
 
