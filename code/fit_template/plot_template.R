@@ -17,7 +17,7 @@ xlim <- range(t)
 pdf("templates.pdf",width=12,height=6)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=ylim,xlim=xlim,xaxs='i',xlab="Phase",ylab="Normalized Magnitude",
-     cex.lab=1.3)
+     cex.lab=2)
 for(ii in 1:nrow(templates)){
     points(t,templates[ii,],type='l',lwd=3,
            col=band_mark[rownames(templates)[ii]],
@@ -25,7 +25,7 @@ for(ii in 1:nrow(templates)){
 }
 to_use <- names(band_mark) %in% rownames(templates)
 legend("bottomleft",names(band_mark)[to_use],
-       col=band_mark[to_use],lty=band_mark[to_use],lwd=3,cex=1.3)
+       col=band_mark[to_use],lty=band_mark[to_use],lwd=3,cex=2)
 dev.off()
 
 
