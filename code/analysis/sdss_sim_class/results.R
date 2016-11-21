@@ -47,15 +47,35 @@ print(paste("0.01%:",mean(abs((periods[1:N] - period_est_lomb[1:N])/periods[1:N]
 
 
 lim <- range(c(periods[1:N],period_est_lomb[1:N],period_est[1:N]))
-pdf("figs/period_comparison.pdf",height=8,width=18)
-par(mfcol=c(1,2),mar=c(5,5,1,1))
+pdf("period_est_sine.pdf",height=6,width=6)
+par(mar=c(5,5,1,1))
 plot(periods[1:N],period_est_lomb[1:N],xlim=lim,ylim=lim,
-     xlab="True Period",ylab="Sine Period Estimate (Multiband Generalized Lomb Scargle)",
+     xlab="True Period",ylab="Sine Period Estimate",
      cex.lab=1.5)
 abline(a=0,b=1)
+dev.off()
+
+pdf("period_est_template.pdf",height=6,width=6)
+par(mar=c(5,5,1,1))
 plot(periods[1:N],period_est[1:N],xlim=lim,ylim=lim,
      xlab="True Period",ylab="RR Lyrae Model Period Estimate",
      cex.lab=1.5)
+abline(a=0,b=1)
+dev.off()
+
+
+
+lim <- range(c(periods[1:N],period_est_lomb[1:N],period_est[1:N]))
+pdf("period_est_comparison.pdf",height=6,width=12)
+par(mar=c(5,5,1,1),mfcol=c(1,2))
+plot(periods[1:N],period_est_lomb[1:N],xlim=lim,ylim=lim,
+     xlab="True Period",ylab="Sine Period Estimate",
+     cex.lab=2)
+abline(a=0,b=1)
+par(mar=c(5,5,1,1))
+plot(periods[1:N],period_est[1:N],xlim=lim,ylim=lim,
+     xlab="True Period",ylab="RRL Model Period Estimate",
+     cex.lab=2)
 abline(a=0,b=1)
 dev.off()
 

@@ -38,7 +38,6 @@ for(ii in 1:N){
 }
 
 ## convert rss into p--value
-
 coeffs <- matrix(0,ncol=4,nrow=N)
 for(ii in 1:N){
     tm <- tms[[ii]]
@@ -69,6 +68,17 @@ pairs(features,col=cols[cl],pch=pchs[cl])
 dev.off()
 
 
+cols <- c(1,2)
+rands <- sample(nrow(features))
+names(cols) <- c("not","rr")
+par(mar=c(5,5,1,1))
+
+colnames(features)
+pdf("features_template_downsampled.pdf",width=8,height=8)
+par(mar=c(5,5,1,1))
+plot(features[rands,5],features[rands,6],col=cols[cl[rands]],pch=pchs[cl[rands]],
+     xlab="Period Estimate",ylab="RSS/n",cex.lab=1.3)
+dev.off()
 
 
 cl.plot <- as.numeric(as.factor(cl))
