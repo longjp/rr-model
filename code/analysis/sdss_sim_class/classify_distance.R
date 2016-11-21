@@ -23,41 +23,34 @@ dir.create(fig.dir)
 period_est <- period_est[,1] ## just use best fit period
 
 rss.n <- rep(0,N)
+coeffs <- matrix(0,ncol=4,nrow=N)
 for(ii in 1:N){
     tm <- tms[[ii]]
     omega <- 1/period_est[ii]
     lc <- TMtoLC(tm)
-    coeffs <- ComputeCoeffs(lc,omega,tem)
+    coes <- ComputeCoeffs(lc,omega,tem)
+    coeffs[ii,] <- coes
     dev <- rep(0,length(tm))
     for(jj in 1:length(tm)){
-        pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
-            + coeffs[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coeffs[4]) %% 1))
+        pred <- (coes[1] + tem$betas[jj] + coes[2]*tem$dust[jj]
+            + coes[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coes[4]) %% 1))
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
     }
     rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
 }
 
-## convert rss into p--value
-coeffs <- matrix(0,ncol=4,nrow=N)
-for(ii in 1:N){
-    tm <- tms[[ii]]
-    omega <- 1/period_est[ii]
-    coeffs[ii,] <- ComputeCoeffs(TMtoLC(tm),omega,tem)
-}
-
-
 features <- cbind(coeffs,period_est,rss.n)
 colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n")
 
 
-d1 <- density(features[cl=="rr",6],bw="SJ")
-d2 <- density(features[cl=="not",6],bw="SJ")
-xlim <- range(c(d1$x,d2$x))
-ylim <- range(c(d1$y,d2$y))
-plot(0,0,xlim=xlim,ylim=ylim,xlab="RSS",ylab="Density")
-points(d1$x,d1$y,col="black",type='l')
-points(d2$x,d2$y,col="red",type='l')
-legend("topright",c("rr","not rr"),lty=1,col=1:2)
+## d1 <- density(features[cl=="rr",6],bw="SJ")
+## d2 <- density(features[cl=="not",6],bw="SJ")
+## xlim <- range(c(d1$x,d2$x))
+## ylim <- range(c(d1$y,d2$y))
+## plot(0,0,xlim=xlim,ylim=ylim,xlab="RSS",ylab="Density")
+## points(d1$x,d1$y,col="black",type='l')
+## points(d2$x,d2$y,col="red",type='l')
+## legend("topright",c("rr","not rr"),lty=1,col=1:2)
 
 cols <- c("#00000030",'red')
 names(cols) <- c("not","rr")
@@ -129,6 +122,7 @@ to_use <- dat$predict=="rr"
 rf_rr <- data.frame(ra=ra[to_use],dec=dec[to_use],d=10^(dat$mu[to_use]/5 + 1)/1000)
 save(rf_rr,file="rf_rr.RData")
 
+table(predict(rf.fit),cl)
 
 
 
@@ -144,21 +138,18 @@ names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
 rrlyrae$ID <- paste0("LC_",rrlyrae$ID,".dat")
 
 
+nrow(dat[dat$cl=="rr",])
 ###### get coefficients AND classifications for ALL light curves here
 rr_model <- data.frame(names(tms),dat)
 names(rr_model)[1] <- "ID"
 out <- merge(rrlyrae,rr_model,all=TRUE)
-out <- out[!is.na(out$cl),] ## only use observations which we have classes for
 
 
-to_use <- out$predict=='rr'
-plot(out$d[to_use],10^(out$mu[to_use]/5 + 1)/1000,col=(1*(out$cl[to_use]=='not')+1),
-     xlab="Ground Truth Distance in kpc (Sesar 2010)",
-     ylab="Estimate in kpc",
-     cex.lab=1.3)
-abline(a=0,b=1)
-
-not_rr <- to_use & out$cl!='rr'
-points(rep(min(out$d[to_use],na.rm=TRUE),sum(not_rr)),10^(out$mu[not_rr]/5 + 1)/1000,
-       col='red',pch=19)
-##dev.off()
+lim <- range(c(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000))
+pdf("distance_comparison.pdf",width=7,height=7)
+par(mar=c(5,5,1,1))
+plot(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000,
+     xlab="Sesar 2010 Distance",
+     ylab="Estimate from Sparsely Sampled",
+     xlim=lim,ylim=lim,cex.lab=1.8)
+dev.off()
