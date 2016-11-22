@@ -1,8 +1,8 @@
 ## by James Long
-## date June 15, 2016
+## date November 21, 2016
 
 template.py
- - python wrapper demonstrating use of FitTemplate function
+ - python wrapper demonstrating use FitTemplate, ComputeCoeffs functions
 
 template.R 
  - fits RR Lyrae template to light curve
