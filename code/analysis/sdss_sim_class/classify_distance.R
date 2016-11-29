@@ -129,9 +129,9 @@ table(predict(rf.fit),cl)
 ########## PLOT DISTANCES FOR LIGHTCURVES
 dat <- data.frame(cl,features)
 
-fig.dir <- "figs_distance"
-unlink(fig.dir,recursive=TRUE)
-dir.create(fig.dir)
+## fig.dir <- "figs_distance"
+## unlink(fig.dir,recursive=TRUE)
+## dir.create(fig.dir)
 
 rrlyrae <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
 names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
@@ -143,9 +143,22 @@ nrow(dat[dat$cl=="rr",])
 rr_model <- data.frame(names(tms),dat)
 names(rr_model)[1] <- "ID"
 out <- merge(rrlyrae,rr_model,all=TRUE)
+out <- merge(rrlyrae,rr_model)
 
 
+plot(out$d,10^(out$mu/5 + 1)/1000,
+     xlab="Sesar 2010 Distance",
+     ylab="Estimate from Sparsely Sampled",
+     cex.lab=1.8)
+
+
+sum(rrlyrae[,1] %in% rr_model[,1])
+
+## why are there NAs here
 lim <- range(c(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000))
+
+
+
 pdf("distance_comparison.pdf",width=7,height=7)
 par(mar=c(5,5,1,1))
 plot(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000,
