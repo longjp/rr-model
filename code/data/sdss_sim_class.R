@@ -21,7 +21,9 @@ for(ii in 1:length(lcsRR)){
     lcsRR[[ii]] <- ToLC(x[,3:ncol(x)])
 }
 
-names(lcsRR) <- paste0("LC_",sub(".dat","",sub("raw/table1/","",fs)),".dat")
+lcsRR_fnames <- sub(".dat","",sub("raw/table1/","",fs))
+names(lcsRR) <- lcsRR_fnames
+lcsRR <- lcsRR[order(names(lcsRR))]
 
 
 ##### TODO:
@@ -35,9 +37,24 @@ rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 temp <- read.table("raw/apj326724t3_mrt.txt",skip=30) ## get distances for rrlyrae, in different file
 identical(rrlyrae$V1,temp$V1) ## ids same
 rrlyrae$d <- temp$V5 ## put distances in rrlyrae data frame
+rrlyrae$ra <- temp$V2
+rrlyrae$dec <- temp$V3
+rrlyrae[,1] <- as.character(rrlyrae[,1])
+rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
+identical(rrlyrae[,1],names(lcsRR))
 
-## only use rr lyrae ab
-rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
+## use only "ab" rrlyrae
+rrab <- rrlyrae[,2] == "ab"
+rrlyrae <- rrlyrae[rrab,]  ## only use rr lyrae ab
+lcsRR <- lcsRR[rrab]
+
+
+periodsRR <- rrlyrae[,3]
+raRR <- rrlyrae$ra
+decRR <- rrlyrae$dec
+distanceRR <- rrlyrae$d
+##save(tms,tms_FULL,periods,cl,ra,dec,distance,file="clean/sdss_sim_class.RData")
+
 
 ## load light curves
 folder <- "raw/AllLCs/"
@@ -48,41 +65,43 @@ fnames <- fnames[fnames!="LC_reorganize.tcl.dat"] ## get rid of non lc file
 nr <- vapply(fnames,function(x){nrow(read.table(paste(folder,x,sep="/")))},c(0))
 fnames <- fnames[nr > 75]
 
-## order fnames and rrlyrae
+## get non--rlyrae
 Nnot <- 1000 ## number of non--rrlyrae to select
-rrlyrae[,1] <- paste0("LC_",rrlyrae[,1],".dat")
-rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
-fnot <- sample(fnames[!(fnames %in% rrlyrae[,1])],Nnot)
-fnames <- fnames[fnames %in% rrlyrae[,1]]
-fnames <- fnames[order(fnames)]
-rrlyrae <- rrlyrae[rrlyrae[,1] %in% fnames,]
-fnames <- c(fnames,fnot)
-periods <- c(rrlyrae[,3],rep(0,Nnot))
-distance <- c(rrlyrae$d,rep(0,Nnot))
-cl <- c(rep("rr",nrow(rrlyrae)),rep("not",Nnot))
+fnot <- fnames[!(fnames %in% paste0("LC_",lcsRR_fnames,".dat"))]
+fnot <- sample(fnot,Nnot)
+cat <- read.table("raw/stripe82candidateVar_v1.1.dat",header=TRUE)
+ids <- gsub(".dat","",gsub("LC_","",fnot))
+mean(ids %in% cat$ID) ## should = 1 (ie all ids in catalog)
+raNOTRR <- cat$ra[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
+decNOTRR <- cat$dec[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
+
+
+## compile attributes for each light curve
+periods <- c(periodsRR,rep(0,Nnot)) ## if not rrl, period=0
+distance <- c(distanceRR,rep(0,Nnot)) # if not rrl, distance=0
+ra <- c(raRR,raNOTRR)
+dec <- c(decRR,decNOTRR)
+cl <- c(rep("rr",length(lcsRR)),rep("not",Nnot))
 
 ## find ra, dec for all fnames light curves
-cat <- read.table("raw/stripe82candidateVar_v1.1.dat",header=TRUE)
-ids <- gsub(".dat","",gsub("LC_","",fnames))
-mean(ids %in% cat$ID) ## should = 1 (ie all ids in catalog)
-ra <- cat$ra[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
-dec <- cat$dec[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
 
 ## load light curves
-lcs <- vector("list",length(fnames))
-for(ii in 1:length(fnames)){
-    lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
+lcsNOT <- vector("list",length(fnot))
+for(ii in 1:length(fnot)){
+    lcsNOT[[ii]] <- read.table(paste(folder,fnot[ii],sep="/"))
 }
-for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
-names(lcs) <- fnames
+for(ii in 1:length(lcsNOT)) names(lcsNOT[[ii]]) <- c("time","band","mag","sigma")
+names(lcsNOT) <- fnot
 
 
 
+## merge nonRRL and RRL
+lcs <- c(lcsRR,lcsNOT)
 
 
 ## save original data
 tms_FULL <- lapply(lcs,LCtoTM)
-names(tms_FULL) <- fnames
+names(tms_FULL) <- names(lcs)
 
 ## downsampled to total of Nobs observations
 Nobs <- 20
@@ -93,7 +112,7 @@ for(ii in 1:length(lcs)){
     lcs[[ii]] <- lc[ix,]
 }
 tms <- lapply(lcs,LCtoTM)
-names(tms) <- fnames
+names(tms) <- names(lcs)
 
 ## output lightcurves and periods
 save(tms,tms_FULL,periods,cl,ra,dec,distance,file="clean/sdss_sim_class.RData")
