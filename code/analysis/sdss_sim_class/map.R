@@ -9,15 +9,9 @@ rr <- vector("list",2)
 names(rr) <- c("true","rr_model")
 
 #### FOR MAKING "TRUE" MAP
-rr_class <- read.table("../../data/raw/apj326724t2_mrt.txt",skip=42)
-rr_class <- rr_class[,1:2]
-names(rr_class) <- c("ID","class")
-tr <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
-tr <- tr[,1:6]
-names(tr) <- c("ID","ra","dec","ar","d","dg")
-tr <- merge(tr,rr_class)
-tr <- tr[tr$class=="ab",]
-tr <- tr[,c("ra","dec","d")]
+load("../../data/clean/sdss_sim_class.RData")
+to_use <- cl=="rr"
+tr <- data.frame(ra=ra[to_use],dec=dec[to_use],d=distance[to_use])
 rr[[1]] <- tr
 
 #### FOR MAKING RR MODEL ESTIMATED MAP
@@ -102,7 +96,3 @@ dev.off()
 #### TODO:
 ## 2. does cdh affect halo model too?
 ## 3. fix edge effects of density estimator
-
-
-plot(1:10,1:10,axes=FALSE)
-axis(1,1:10,1:10,line=-4)

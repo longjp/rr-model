@@ -3,9 +3,16 @@ rm(list=ls())
 set.seed(1234)
 source('../common/funcs.R')
 
+## load rrl and get distances
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
+temp <- read.table("raw/apj326724t3_mrt.txt",skip=30) ## get distances for rrlyrae, in different file
+identical(rrlyrae$V1,temp$V1) ## ids same
+rrlyrae$d <- temp$V5 ## put distances in rrlyrae data frame
+
+## only use rr lyrae ab
 rrlyrae <- rrlyrae[rrlyrae[,2] == "ab",]
 
+## load light curves
 folder <- "raw/AllLCs/"
 fnames <- list.files(folder)
 fnames <- fnames[fnames!="LC_reorganize.tcl.dat"] ## get rid of non lc file
@@ -24,6 +31,7 @@ fnames <- fnames[order(fnames)]
 rrlyrae <- rrlyrae[rrlyrae[,1] %in% fnames,]
 fnames <- c(fnames,fnot)
 periods <- c(rrlyrae[,3],rep(0,Nnot))
+distance <- c(rrlyrae$d,rep(0,Nnot))
 cl <- c(rep("rr",nrow(rrlyrae)),rep("not",Nnot))
 
 ## find ra, dec for all fnames light curves
@@ -57,4 +65,4 @@ tms <- lapply(lcs,LCtoTM)
 names(tms) <- fnames
 
 ## output lightcurves and periods
-save(tms,tms_FULL,periods,cl,ra,dec,file="clean/sdss_sim_class.RData")
+save(tms,tms_FULL,periods,cl,ra,dec,distance,file="clean/sdss_sim_class.RData")
