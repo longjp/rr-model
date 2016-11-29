@@ -3,6 +3,33 @@ rm(list=ls())
 set.seed(1234)
 source('../common/funcs.R')
 
+####### get RRL light curves from table 1 provided by sesar
+ToLC <- function(x){
+    band <- rep(c("u","g","r","i","z"),each=nrow(x))
+    names(x) <- rep(c("time","mag","sigma"),5)
+    x <- rbind(x[,1:3],x[,4:6],x[,7:9],x[,10:12],x[,13:15])
+    x <- data.frame(time=x[,1],band=band,mag=x[,2],sigma=x[,3])
+    return(x[x[,3] > -90,])
+}
+
+fs <- list.files("raw/table1",full=TRUE)
+fs <- fs[!grepl("README",fs)]
+
+lcsRR <- vector("list",length(fs))
+for(ii in 1:length(lcsRR)){
+    x <- read.table(fs[ii])
+    lcsRR[[ii]] <- ToLC(x[,3:ncol(x)])
+}
+
+names(lcsRR) <- paste0("LC_",sub(".dat","",sub("raw/table1/","",fs)),".dat")
+
+
+##### TODO:
+## 1. do not select any lcs with filename in names(lcsRR) as non-RR
+## 2. get periods, distances, ra, dec for lcsRR from apj tables
+## 3. run map.R on distances, ra, dec from 2.
+
+
 ## load rrl and get distances
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 temp <- read.table("raw/apj326724t3_mrt.txt",skip=30) ## get distances for rrlyrae, in different file
@@ -47,6 +74,10 @@ for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }
 for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
+names(lcs) <- fnames
+
+
+
 
 
 ## save original data
