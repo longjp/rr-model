@@ -1,4 +1,5 @@
 rm(list=ls())
+set.seed(1234)
 
 ## load necessary libraries
 library('parallel')
@@ -24,6 +25,7 @@ period_est <- period_est[,1] ## just use best fit period
 
 rss.n <- rep(0,N)
 coeffs <- matrix(0,ncol=4,nrow=N)
+cols <- matrix(0,ncol=2,nrow=N)
 for(ii in 1:N){
     tm <- tms[[ii]]
     omega <- 1/period_est[ii]
@@ -37,10 +39,12 @@ for(ii in 1:N){
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
     }
     rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
+    mean_mags <- vapply(tm,function(x){mean(x[,2])},c(0))
+    cols[ii,] <- c(mean_mags['i'] - mean_mags['g'],mean_mags['r'] - mean_mags['i'])
 }
 
-features <- cbind(coeffs,period_est,rss.n)
-colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n")
+features <- cbind(coeffs,period_est,rss.n,cols)
+colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n","ig","ri")
 
 
 ## d1 <- density(features[cl=="rr",6],bw="SJ")
@@ -64,7 +68,6 @@ dev.off()
 cols <- c(1,2)
 rands <- sample(nrow(features))
 names(cols) <- c("not","rr")
-par(mar=c(5,5,1,1))
 
 colnames(features)
 pdf("features_template_downsampled.pdf",width=8,height=8)
@@ -104,9 +107,13 @@ dev.off()
 pdf(paste0(fig.dir,"/period_vs_EBV.pdf"),height=6,width=7)
 par(mar=c(5,5,1,1))
 plot(features[,5],features[,2],col=cl.plot,pch=cl.plot,
-     xlab="Period Estimate",ylab="E[B-V] Estimate",cex.lab=1.3)
+     xlab="Period Estimate",ylab="E[B-V] Estimate",cex.lab=1.3,
+     ylim=c(-.5,2))
 legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
+
+
+
 
 
 
@@ -114,7 +121,7 @@ dev.off()
 ########## AND DISTANCE ESTIMATES (for input into coords.R)
 
 
-dat <- data.frame(cl,features[,-1])
+dat <- na.roughfix(data.frame(cl,features[,-1]))
 rf.fit <- randomForest(cl~.,data=dat)
 dat$predict <- predict(rf.fit)
 dat$mu <- features[,"mu"]
@@ -127,42 +134,16 @@ table(predict(rf.fit),cl)
 
 
 ########## PLOT DISTANCES FOR LIGHTCURVES
-dat <- data.frame(cl,features)
-
-## fig.dir <- "figs_distance"
-## unlink(fig.dir,recursive=TRUE)
-## dir.create(fig.dir)
-
-rrlyrae <- read.table("../../data/raw/apj326724t3_mrt.txt",skip=30)
-names(rrlyrae)[1:5] <- c("ID","ra","dec","ar","d")
-rrlyrae$ID <- paste0("LC_",rrlyrae$ID,".dat")
-
-
-nrow(dat[dat$cl=="rr",])
-###### get coefficients AND classifications for ALL light curves here
-rr_model <- data.frame(names(tms),dat)
-names(rr_model)[1] <- "ID"
-out <- merge(rrlyrae,rr_model,all=TRUE)
-out <- merge(rrlyrae,rr_model)
-
-
-plot(out$d,10^(out$mu/5 + 1)/1000,
-     xlab="Sesar 2010 Distance",
-     ylab="Estimate from Sparsely Sampled",
-     cex.lab=1.8)
-
-
-sum(rrlyrae[,1] %in% rr_model[,1])
-
-## why are there NAs here
-lim <- range(c(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000))
-
-
-
 pdf("distance_comparison.pdf",width=7,height=7)
+to_use <- distance <= 120
 par(mar=c(5,5,1,1))
-plot(out[out$cl=="rr","d"],10^(out[out$cl=="rr","mu"]/5 + 1)/1000,
-     xlab="Sesar 2010 Distance",
-     ylab="Estimate from Sparsely Sampled",
-     xlim=lim,ylim=lim,cex.lab=1.8)
+x <- distance[cl=="rr" & to_use]
+y <- 10^((features[cl=="rr" & to_use,"mu"])/5 + 1)/1000
+lim <- c(0,120)
+plot(x,y,
+     xlab="Sesar 2010 Distance (kpc)",
+     ylab="Estimate from Sparsely Sampled (kpc)",
+     cex.lab=1.8,xlim=lim,ylim=lim,
+     xaxs='i',yaxs='i')
+abline(a=0,b=1)
 dev.off()
