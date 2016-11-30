@@ -95,7 +95,7 @@ MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
         z.cont <- as.vector(z.cont)
         cols <- rev(brewer.pal(10,name="RdBu"))
         decLocations <- quantile(z.cont[grid.ind],
-                                 probs = seq(0.5,0.99,length.out=9),type=4)
+                                 probs = seq(0.55,0.99,length.out=9),type=4)
         dec <- findInterval(z.cont,c(-Inf,decLocations, Inf))
         points(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20)
     }
