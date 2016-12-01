@@ -79,17 +79,19 @@ plot(out_FULL[,"g","amp"],
      period_est_lomb_FULL,
      col=mark[cl],pch=mark[cl],
      xlab="g amplitude",
-     ylab="period",cex.lab=1.5,
-     log='x')
+     ylab="period (days)",cex.lab=1.3,
+     log='x',xlim=c(.01,5),ylim=c(.2,1))
+legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
+
 
 pdf("features_lomb_downsampled.pdf",width=6,height=5)
 par(mar=c(5,5,1,1))
 plot(out[,"g","amp"],
      period_est_lomb,
      col=mark[cl],pch=mark[cl],
-     cex.lab=1.5,
+     cex.lab=1.3,
      xlab="g amplitude",
-     ylab="period",cex.lab=1.5,
-     log='x')
+     ylab="period (days)",cex.lab=1.3,
+     log='x',xlim=c(.01,5),ylim=c(.2,1))
 dev.off()

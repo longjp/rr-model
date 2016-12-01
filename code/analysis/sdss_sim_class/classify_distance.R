@@ -112,8 +112,17 @@ plot(features[,5],features[,2],col=cl.plot,pch=cl.plot,
 legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
 
+load("../../fit_template/template.RData")
 
+ampg <- diff(range(tem$templates['g',]))/2
 
+pdf("features_template_downsampled.pdf",height=5,width=6)
+par(mar=c(5,5,1,1))
+plot(features[,'a']*ampg,period_est,col=cl.plot,pch=cl.plot,
+     xlab="g amplitude",ylab="period (days)",cex.lab=1.3,
+     log='x',xlim=c(.01,5),ylim=c(.2,1))
+legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
+dev.off()
 
 
 
