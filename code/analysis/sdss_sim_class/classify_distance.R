@@ -154,5 +154,9 @@ plot(x,y,
      ylab="Estimate from Sparsely Sampled (kpc)",
      cex.lab=1.8,xlim=lim,ylim=lim,
      xaxs='i',yaxs='i')
-abline(a=0,b=1)
+abline(a=0,b=1,lwd=2)
+error_budget <- 0.1
+lines(0:120,(1-error_budget)*(0:120),lty=2,lwd=2)
+lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
+legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
 dev.off()
