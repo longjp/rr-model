@@ -122,13 +122,13 @@ MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
     locs <- 30*(1:5)
     te <- locs-90
     te[te < 0] <- 360+te[te<0]
-    for(ii in 1:length(locs))
+    for(ii in 1:length(locs)){
+        ra_loc <- paste0("RA ",te[ii])
         text(dist*cos(locs[ii]*2*pi/360),
              dist*sin(locs[ii]*2*pi/360),
-             bquote(.(te[ii])~degree),cex=3)
+             bquote(.(ra_loc)~degree),cex=3)
+    }
 }
-
-
 
 
 NearestNeighborDensity2d <- function(x,x1r,x2r,n=100,k=sqrt(nrow(x))){
