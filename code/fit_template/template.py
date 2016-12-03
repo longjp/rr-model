@@ -1,4 +1,4 @@
-## python wrapper for template.R
+## python wrapper for fit_template.R
 ## by james long
 import numpy as np
 import rpy2.robjects as robjects
@@ -9,7 +9,7 @@ import matplotlib.patches as mpatches
 
 ## set up rpy2 so we can call R functions
 r=robjects.r
-r.source("template.R")
+r.source("fit_template.R")
 r.load("template.RData") ## loads r.tem, see later code for usage
 FitTemplate=robjects.r['FitTemplate']
 ComputeCoeffs=robjects.r['ComputeCoeffs']

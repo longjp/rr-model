@@ -4,7 +4,7 @@ rm(list=ls())
 library('parallel')
 library('multiband')
 load("../../fit_template/template.RData")
-source("../../fit_template/template.R")
+source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")
 
