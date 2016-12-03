@@ -26,12 +26,6 @@ names(lcsRR) <- lcsRR_fnames
 lcsRR <- lcsRR[order(names(lcsRR))]
 
 
-##### TODO:
-## 1. do not select any lcs with filename in names(lcsRR) as non-RR
-## 2. get periods, distances, ra, dec for lcsRR from apj tables
-## 3. run map.R on distances, ra, dec from 2.
-
-
 ## load rrl and get distances
 rrlyrae <- read.table("raw/apj326724t2_mrt.txt",skip=42)
 temp <- read.table("raw/apj326724t3_mrt.txt",skip=30) ## get distances for rrlyrae, in different file
