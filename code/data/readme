@@ -1,12 +1,15 @@
 ======= description of files
-== raw/ contains raw data, see below for locations it was acquired from
+== raw/ contains raw data
+   - automatically downloaded by running download.R
+   - see below for locations it was acquired from
 == clean/ data after cleaning, generally .RData files with tms for
    lightcurves and periods
 == funcs.R functions used for processing raw data
-== All other files process a particular raw data set 
+== download.R downloads all raw data not in repo already
+== other files process a particular raw data set into R data file
 
 
-======= to get started, download and unzip the files below in the raw/ folder
+======= files in raw/ folder, after running download.R
 1) stripe82candidateVar_v1.1.dat
   - file available here:
     http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
@@ -16,6 +19,14 @@
 3) apj326724t2_mrt.txt
   - file available here:
     http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt
-4) table1/
+4) apj326724t3_mrt.txt
+  - file available here:
+    http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t3_mrt.txt
+5) table1/
   - rrlyrae light curves provided by sesar, for unknown reason,
     includes some light curves not in AllLCS for
+  - obtained via person correspondance with sesar
+6) period_comparisons.txt
+  - obtained via person correspondance with sesar
+7) PS1_sample_LCs/
+  - panstarrs light curves obtain via personal correspondance with sesar
