@@ -20,7 +20,7 @@ untar("raw/AllLCs.tar.gz",exdir="raw/AllLCs")
 ## download 3) and 4)
 download.file("http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t3_mrt.txt",
               "raw/apj326724t3_mrt.txt",method="wget")
-download.file("http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt"
+download.file("http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt",
               "raw/apj326724t2_mrt.txt",method="wget")
 
 
