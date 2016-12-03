@@ -12,10 +12,10 @@
 ======= files in raw/ folder, after running download.R
 1) stripe82candidateVar_v1.1.dat
   - file available here:
-    http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
+  http://www.astro.washington.edu/users/ivezic/sdss/catalogs/stripe82candidateVar_v1.1.dat.gz
 2) AllLCs
   - directory available here:
-    http://www.astro.washington.edu/users/ivezic/sdss/catalogs/S82variables.html
+    http://www.astro.washington.edu/users/ivezic/sdss/catalogs/AllLCs.tar.gz
 3) apj326724t2_mrt.txt
   - file available here:
     http://iopscience.iop.org/0004-637X/708/1/717/suppdata/apj326724t2_mrt.txt

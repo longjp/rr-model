@@ -47,7 +47,6 @@ periodsRR <- rrlyrae[,3]
 raRR <- rrlyrae$ra
 decRR <- rrlyrae$dec
 distanceRR <- rrlyrae$d
-##save(tms,tms_FULL,periods,cl,ra,dec,distance,file="clean/sdss_sim_class.RData")
 
 
 ## load light curves
