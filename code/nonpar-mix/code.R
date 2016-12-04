@@ -11,6 +11,7 @@ x <- rnorm(n,mean=c(0,3)[cl],sd=1)
 plot(density(x,bw="SJ"))
 
 
+
 xo <- sort(x)
 
 plot(xo,(1:n)/n)
@@ -61,29 +62,39 @@ ComputeSecondDeriv <- function(x){
 }
 
 EstimateParams <- function(data,FbD){
-    out <- EstMixMdl(x,FbD)
+    data <- sort(data)
+    out <- EstMixMdl(data,FbD)
     ix <- which.max(ComputeSecondDeriv(out$distance))
     alpha_hat <- out$alpha_grid[ix]
     Fs_est <- out$fs[ix,]
     xs <- data[diff(c(0,Fs_est)) > 0]
     fs <- density(xs)
-    fs <- approxfun(fs$x,fs$y)
+    fs <- approxfun(fs$x,fs$y,rule=2)
     f <- density(data)
-    f <- approxfun(f$x,f$y)
+    f <- approxfun(f$x,f$y,rule=2)
     return(list(alpha_hat=alpha_hat,fs=fs,f=f))
 }
 
 
 FbD <- pnorm
-params <- EstimateParams(xo,FbD)
-probs <- (params$alpha_hat*params$fs(xo)) / params$f(xo)
+params <- EstimateParams(x,FbD)
+probs <- (params$alpha_hat*params$fs(x)) / params$f(x)
 hist(probs)
-## why do we get NA's in probs
-## apparently b/c edge effects, for low density areas should assign to closest
-## side or something
-hist(xo[is.na(probs)])
 
-## write function that takes (cl,probs) pair and outputs ROC curve
+
+
+ComputeROCCurve <- function(cl,probs){
+    cl_pred <- cl[order(probs,decreasing=TRUE)]
+    return(cbind(cumsum(-cl_pred + 1)/sum(cl==0),cumsum(cl_pred)/sum(cl==1)))
+}
+
+plot(ComputeROCCurve(cl-1,probs),type='l')
+
+
+probs_true <- alpha*dnorm(x,mean=3)
+
+
+
 
 
 out <- EstMixMdl(x,FbD)
