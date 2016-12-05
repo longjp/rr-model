@@ -66,12 +66,18 @@ EstimateParams <- function(data,FbD){
 ## training data from two classes, make kde for each class
 ## and return classifications
 OneDKDEClassifier <- function(train_cl,train_x,test_x){
-    f1 <- density(train_x[train_cl==1])
-    f1 <- CreateApproxFun(f1)
-    f2 <- density(train_x[train_cl==2])
-    f2 <- CreateApproxFun(f2)
+    fb <- density(train_x[train_cl==1])
+    fb <- CreateApproxFun(fb)
+    fs <- density(train_x[train_cl==2])
+    fs <- CreateApproxFun(fs)
     alpha <- mean(train_cl==2)
-    num <- (1-alpha)*f1(test_x)
-    den <- ((1-alpha)*f1(test_x) + alpha*f2(test_x))
+    num <- (1-alpha)*fb(test_x)
+    den <- num + alpha*fs(test_x)
     return(num/den)
+}
+
+
+ComputeROCCurve <- function(cl,probs){
+    cl_pred <- cl[order(probs,runif(length(probs)),decreasing=TRUE)]
+    return(cbind(cumsum(cl_pred)/sum(cl==1),cumsum(-cl_pred + 1)/sum(cl==0)))
 }
