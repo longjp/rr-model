@@ -1,14 +1,47 @@
 rm(list=ls())
-library(Iso)
+source("funcs.R")
+##load("features.RData")
 set.seed(1234)
+
+## TODO:
+## compare oneD classifier to non-parametric mm on simulated
+## compare 1 dimensional kde classifiers to non-parametric mm method
+## compare 1 dimensional classifiers to random forest
+
+
+
+
+
 
 
 ## simulate two classes
 n <- 1000
 alpha <- 0.5
-cl <- sample(1:2,n,replace=TRUE,prob=c(1-alpha,alpha))
-x <- rnorm(n,mean=c(0,3)[cl],sd=1)
-plot(density(x,bw="SJ"))
+class_means <- c(0,3)
+train_cl <- sample(1:2,n,replace=TRUE,prob=c(1-alpha,alpha))
+train_x <- rnorm(n,mean=class_means[train_cl],sd=1)
+plot(density(train_x,bw="SJ"))
+test_cl <- sample(1:2,n,replace=TRUE,prob=c(1-alpha,alpha))
+test_x <- rnorm(n,mean=class_means[test_cl],sd=1)
+plot(density(test_x,bw="SJ"))
+## calculate probs using standard kde classifier
+probs_est <- OneDKDEClassifier(train_cl,train_x,test_x)
+## calculate true probs
+num_true <- (1-alpha)*dnorm(test_x,mean=class_means[1],sd=1)
+den_true <- num_true + alpha*dnorm(test_x,mean=class_means[2],sd=1)
+probs_true <- num_true / den_true
+## calculate probs using mixture model
+fb <- density(train_x[train_cl==1])
+fb <- CreateApproxFun(fb)
+FbD <- ecdf(train_x[train_cl==1])
+params <- EstimateParams(test_x,FbD)
+num <- (1-params$alpha_hat)*fb(test_x)
+den <- num + params$alpha_hat*params$fs(test_x)
+probs_mm <-  num / den
+
+
+probs <- cbind(probs_true,probs_est,probs_mm)
+pairs(probs)
 
 
 
@@ -27,60 +60,14 @@ plot(xo,cdf,type='l',lwd=2)
 points(xo,out,type='l',col='blue',lwd=2)
 points(xo,pnorm(xo,mean=3),col="orange",lwd=2,type='l')
 
-### run non-decreasing least squares
-EstMixMdl <- function(data,FbD,alpha_grid=(1:200)/200){
-    ## Length of the data set
-    data <- sort(data)
-    ## Sorts the data set
-    data.1 <- unique(data)
-    ## Finds the unique data points
-    Fn <- ecdf(data)
-    ## Computes the empirical DF of the data
-    Fn.1 <- Fn(data.1)
-    ## Empirical DF of the data at the data points
-    ## Calculate the known F_b at the data points
-    Fb <- FbD(data.1)
-    ## Compute the weights (= frequency/n) of the unique data values, i.e., dF_n
-    Freq <- diff(c(0,Fn.1))
-    distance <- rep(0,length(alpha_grid))
-    F.isS <- matrix(0,nrow=length(alpha_grid),ncol=length(Fn.1))
-    for(ii in 1:length(alpha_grid)){
-        ## Assumes a value of the mixing proportion
-        F.hat <- (Fn.1-(1-alpha_grid[ii])*Fb)/alpha_grid[ii]
-        ## Computes the naive estimator of F_s
-        F.is <- pava(F.hat,Freq,decreasing=FALSE) ## Computes the Isotonic Estimator of F_s
-        F.is[F.is<=0] <- 0
-        F.is[F.is>=1] <- 1
-        F.isS[ii,] <- F.is
-        distance[ii] <- alpha_grid[ii]*sqrt(sum(((F.hat-F.is)^2)*Freq))
-    }
-    return(list(distance=distance,alpha_grid=alpha_grid,fs=F.isS))
-}
-
-ComputeSecondDeriv <- function(x){
-    return(c(0,0,diff(diff(x))))
-}
-
-EstimateParams <- function(data,FbD){
-    data <- sort(data)
-    out <- EstMixMdl(data,FbD)
-    ix <- which.max(ComputeSecondDeriv(out$distance))
-    alpha_hat <- out$alpha_grid[ix]
-    Fs_est <- out$fs[ix,]
-    xs <- data[diff(c(0,Fs_est)) > 0]
-    fs <- density(xs)
-    fs <- approxfun(fs$x,fs$y,rule=2)
-    f <- density(data)
-    f <- approxfun(f$x,f$y,rule=2)
-    return(list(alpha_hat=alpha_hat,fs=fs,f=f))
-}
-
 
 FbD <- pnorm
 params <- EstimateParams(x,FbD)
 probs <- (params$alpha_hat*params$fs(x)) / params$f(x)
 hist(probs)
 
+
+probs <- (params$alpha_hat*params$fs(x)) / (params$alpha_hat*params$fs(x) + (1-params$alpha_hat)*dnorm(x))
 
 
 ComputeROCCurve <- function(cl,probs){
@@ -91,11 +78,24 @@ ComputeROCCurve <- function(cl,probs){
 plot(ComputeROCCurve(cl-1,probs),type='l')
 
 
-probs_true <- alpha*dnorm(x,mean=3)
+probs_true <- alpha*dnorm(x,mean=3) / (alpha*dnorm(x,mean=3) + (1-alpha)*dnorm(x,mean=0))
+plot(probs_true,probs)
+abline(a=0,b=1)
+
+par(mfcol=c(2,1))
+plot(x,probs_true)
+abline(v=1.5)
+plot(x,probs)
+abline(v=1.5)
+abline(v=x[cl==1],col='grey')
 
 
 
 
+roc_est <- ComputeROCCurve(cl-1,probs)
+roc_true <- ComputeROCCurve(cl-1,probs_true)
+plot(roc_est,type='l')
+points(roc_true,col='red',type='l')
 
 out <- EstMixMdl(x,FbD)
 d <- out$distance
