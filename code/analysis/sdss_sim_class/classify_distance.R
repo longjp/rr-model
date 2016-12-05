@@ -131,12 +131,15 @@ dev.off()
 
 
 dat <- na.roughfix(data.frame(cl,features[,-1]))
+save(dat,file="features.RData")
 rf.fit <- randomForest(cl~.,data=dat)
 dat$predict <- predict(rf.fit)
 dat$mu <- features[,"mu"]
 to_use <- dat$predict=="rr"
 rf_rr <- data.frame(ra=ra[to_use],dec=dec[to_use],d=10^(dat$mu[to_use]/5 + 1)/1000)
 save(rf_rr,file="rf_rr.RData")
+
+
 
 table(predict(rf.fit),cl)
 
