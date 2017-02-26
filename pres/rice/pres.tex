@@ -61,22 +61,6 @@
 
 \frame{\titlepage}
 
-\frame{\tableofcontents}
-
-\AtBeginSection[]
-{
-  \begin{frame}<beamer>
-    \frametitle{Outline}
-    \tableofcontents[currentsection,currentsubsection]
-  \end{frame}
-}
-
-
-%%%%%%%%
-%%%%%%%% TODO: redo first section with more emphasis on multiband, lomb scargle
-%%%%%%%%
-
-
 \begin{frame}{Collaboration}
 
 %% astronomers
@@ -100,17 +84,17 @@
   
   \begin{textblock*}{3cm}(1.5cm,2cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
-Lucas Macri
+$\, \, $Lucas Macri
 \end{textblock*}
 
 
   \begin{textblock*}{3cm}(5cm,2cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
+ $\, $ \includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
 Jennifer Marshall
 \end{textblock*}
 
   \begin{textblock*}{3cm}(8.5cm,2cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/stringer.jpg}\\
+ $\, $\includegraphics[width=\w,height=\h]{figs/stringer.jpg}\\
 Katelyn Stringer
 \end{textblock*}
 
@@ -120,21 +104,61 @@ Katelyn Stringer
 
   \begin{textblock*}{3cm}(4cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/zhenfeng.jpg}\\
-Zhenfeng Lin
+$\, \, $Zhenfeng Lin
 \end{textblock*}
 
   \begin{textblock*}{3cm}(7cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
-James Long
+$\, \, \, $James Long
 \end{textblock*}
   
 
 \end{frame}
 
 
-\section{Time Domain Astronomy, Variable Stars, Galactic Halo, DES}
 
-\begin{frame}{Periodic Variable Stars}
+\frame{\tableofcontents}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+
+%%%%%%%%
+%%%%%%%% TODO: redo first section with more emphasis on multiband, lomb scargle
+%%%%%%%%
+
+
+
+\section{Distance Determination, Variable Stars, Milky Way Halo}
+
+\begin{frame}{What is the distance to these objects?}
+
+  \begin{center}
+    \includegraphics[scale=0.2]{figs/des_image.jpg}\\
+  \end{center}
+  \textbf{Problem:}
+  \begin{equation*}
+    \text{ brightness } \propto \frac{\text{luminosity}}{\text{distance}^2}
+  \end{equation*}
+  but only brightness can be directly measured.
+  \end{frame}
+
+\begin{frame}{Standard Candles}
+  \textbf{standard candles:} class of objects with same luminosity
+  \begin{itemize}
+  \item supernovae
+  \item cepheid variable stars
+  \item rr lyrae variable stars
+  \item several other
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{RR Lyrae are Periodic Variable Stars}
 \textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
 \begin{center}
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
@@ -157,18 +181,17 @@ James Long
 
 \begin{frame}{SDSS--III Stripe 82}
 \begin{itemize}
-\item Collected $\approx 60,000$ variables in Stripe 82 Region
+\item Discovered $\approx 60,000$ variables
 \item Variables belong to different \textbf{classes}
 \item Some periodic, some not
 \end{itemize}
 
+\underline{Three Examples}
 
-\underline{Two Examples}
-
-\vspace{-.2in}
+\vspace{-.1in}
 
 \begin{center}
-Eclipsing Binary\\
+{\small 1) Eclipsing Binary (Unfolded and Folded)}\\
 \includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
 \includegraphics[scale=.15]{figs/folded_4183016.pdf}
 \end{center}
@@ -183,14 +206,14 @@ Eclipsing Binary\\
 
 
 \begin{center}
-Quasar\\
+{\small 2) Quasar (unfolded)} \hspace{9 mm} {\small 3) RR Lyrae (folded)}\\
 \includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
+\includegraphics[scale=.15]{figs/folded_13350.pdf}
 \end{center}
 
 \att{See Ivezic \cite{ivezic2007sloan}}
 
 \end{frame}
-
 
 \begin{frame}{Example of Variable Star Science}
 \begin{itemize}
@@ -225,7 +248,7 @@ d = 10^{(V-M_V +5)/5}
 %% \end{frame}
 
 
-\begin{frame}{Mapping Galactic Halo with DES}
+\begin{frame}{Mapping the Galactic Halo with DES}
 
 \textbf{Dark Energy Survey (DES)}
 \begin{itemize}
@@ -324,23 +347,25 @@ Total of $26$ parameters, model estimates period well.
 \end{frame}
 
 
-\begin{frame}{Problem: Sparsely Sampled Light Curves}
+\begin{frame}{Challenge: DES Light Curves are Sparsely Sampled}
 
 
 \begin{center}
-\includegraphics[scale=.3]{figs/unfolded_panstarrs.pdf}
+\includegraphics[scale=.3]{figs/des_2.pdf}
 \end{center}
 
 \vspace{-.2in}
 
 \begin{center}
-\small{Pan--STARRS light curve. Period estimation difficult for this quality data.}
+\small{Dark Energy Survey light curve. Period estimation, classification, and distance estimation difficult for this quality data.}
 \end{center}
-
 
 \end{frame}
 
+\subsection{Heteroskedasticity and Approximate Models}
 
+
+\subsection{Improved Models for RR Lyrae Stars}
 
 
 %% \begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
@@ -460,7 +485,7 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 %% \end{frame}
 
-\section{Results on Stripe 82 Data}
+\section{Results on Stripe 82 and DES}
 
 \begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
 
@@ -609,12 +634,6 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{columns}
 \end{frame}
 
-
-
-
-  
-
-\section{Dark Energy Survey Results}
 
 \section{Related and Ongoing Work}
 
