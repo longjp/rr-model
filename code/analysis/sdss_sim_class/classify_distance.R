@@ -23,7 +23,12 @@ dir.create(fig.dir)
 
 period_est <- period_est[,1] ## just use best fit period
 
+sigs <- unlist(lapply(tms,function(tm){lapply(tm,function(x){x$sigma})}))
+hist(sigs[sigs<.1])
+
 rss.n <- rep(0,N)
+rss.n2 <- rep(0,N)
+rss.n3 <- rep(0,N)
 coeffs <- matrix(0,ncol=4,nrow=N)
 cols <- matrix(0,ncol=2,nrow=N)
 for(ii in 1:N){
@@ -33,18 +38,28 @@ for(ii in 1:N){
     coes <- ComputeCoeffs(lc,omega,tem)
     coeffs[ii,] <- coes
     dev <- rep(0,length(tm))
+    dev2 <- rep(0,length(tm))
+    dev3 <- rep(0,length(tm))
     for(jj in 1:length(tm)){
         pred <- (coes[1] + tem$betas[jj] + coes[2]*tem$dust[jj]
             + coes[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coes[4]) %% 1))
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
+        dev2[jj] <- sum(abs((pred - tm[[jj]][,2])/tm[[jj]][,3]))
+        dev3[jj] <- sum(abs((pred - tm[[jj]][,2])/(tm[[jj]][,3] + .2)))
     }
     rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
+    rss.n2[ii] <- sum(dev2) / sum(vapply(tm,nrow,c(0)))
+    rss.n3[ii] <- sum(dev3) / sum(vapply(tm,nrow,c(0)))
     mean_mags <- vapply(tm,function(x){mean(x[,2])},c(0))
     cols[ii,] <- c(mean_mags['i'] - mean_mags['g'],mean_mags['r'] - mean_mags['i'])
 }
 
-features <- cbind(coeffs,period_est,rss.n,cols)
-colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n","ig","ri")
+features <- cbind(coeffs,period_est,rss.n,rss.n2,rss.n3,cols)
+colnames(features) <- c("mu","E[B-V]","a","phi","period","rss.n","rss.n2","rss.n3","ig","ri")
+
+features_sdss <- features
+cl_sdss <- cl
+save(features_sdss,cl_sdss,file="feats.RData")
 
 
 ## d1 <- density(features[cl=="rr",6],bw="SJ")
@@ -95,13 +110,26 @@ pairs(cbind("amp"=log10(features[,"a"]),
             "dev"=log10(features[,"rss.n"])),
       col=cl.plot,pch=cl.plot)
 
-pdf(paste0(fig.dir,"/a_vs_dev_log.pdf"),height=6,width=7)
+##pdf(paste0(fig.dir,"/a_vs_dev_log.pdf"),height=6,width=7)
 par(mar=c(5,5,1,1))
 plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
      xlab="Amplitude",ylab="RSS/n",cex.lab=1.3,
      log="xy",xlim=c(.01,5))
 legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
-dev.off()
+dev.new()
+par(mar=c(5,5,1,1))
+plot(features[,3],features[,7],col=cl.plot,pch=cl.plot,
+     xlab="Amplitude",ylab="RSS2/n",cex.lab=1.3,
+     log="xy",xlim=c(.01,5))
+legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
+dev.new()
+par(mar=c(5,5,1,1))
+plot(features[,3],features[,8],col=cl.plot,pch=cl.plot,
+     xlab="Amplitude",ylab="RSS3/n",cex.lab=1.3,
+     log="xy",xlim=c(.01,5))
+legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
+
+##dev.off()
 
 
 pdf(paste0(fig.dir,"/period_vs_EBV.pdf"),height=6,width=7)
