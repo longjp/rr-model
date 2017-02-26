@@ -9,7 +9,7 @@
 
 \logo{\includegraphics[height=1.5cm]{STAT_Horz-Aggie-Maroon.pdf}\vspace{220pt}}
 
-
+\usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{verbatim}
@@ -35,6 +35,17 @@
 \usepackage{graphicx}
 \newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 
+
+\newcommand{\att}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny Source: #1}
+      \end{textblock*}}
+
+
+\newcommand{\foot}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny #1}
+      \end{textblock*}}
+
+
 \newtheorem{assumptions}{Assumptions}
 
 \setbeamertemplate{headline}[default]
@@ -42,7 +53,7 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{bibliography item}[text]
 
-\title{Discovery and Characterization of RR Lyrae from Sparsely Sampled Light Curves Using Parsimonious Models}
+\title{Mapping the Milky Way Halo: Modeling and Classification of Sparsely Sampled Vector Valued Functions}
 \author{James Long}
 \institute{Texas A\&M University}
 \date{\today}
@@ -66,7 +77,7 @@
 %%%%%%%%
 
 
-\begin{frame}{Texas A\&M Collaboration}
+\begin{frame}{Collaboration}
 
 %% astronomers
 %%   \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
@@ -83,29 +94,45 @@
 %% Wenlong Yuan
 %% \end{textblock*}
 
-
-%% statisticians
-  \begin{textblock*}{3cm}(1.5cm,3.1cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(1.25cm,1.3cm) % {block width} (coords)
+    \textbf{Astronomers:}
+  \end{textblock*}
+  
+  \begin{textblock*}{3cm}(1.5cm,2cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
 Lucas Macri
 \end{textblock*}
 
 
-  \begin{textblock*}{3cm}(5cm,3.1cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(5cm,2cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
 Jennifer Marshall
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(8.5cm,3.1cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(8.5cm,2cm) % {block width} (coords)
+\includegraphics[width=\w,height=\h]{figs/stringer.jpg}\\
+Katelyn Stringer
+\end{textblock*}
+
+  \begin{textblock*}{3cm}(1.25cm,5.5cm) % {block width} (coords)
+    \textbf{Statisticians:}
+  \end{textblock*}
+
+  \begin{textblock*}{3cm}(4cm,6.25cm) % {block width} (coords)
+\includegraphics[width=\w,height=\h]{figs/zhenfeng.jpg}\\
+Zhenfeng Lin
+\end{textblock*}
+
+  \begin{textblock*}{3cm}(7cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
 James Long
 \end{textblock*}
-
+  
 
 \end{frame}
 
 
-\section{Time Domain Astronomy, Variable Stars, Galactic Halo}
+\section{Time Domain Astronomy, Variable Stars, Galactic Halo, DES}
 
 \begin{frame}{Periodic Variable Stars}
 \textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
@@ -128,7 +155,7 @@ James Long
 \end{frame}
 
 
-\begin{frame}{SDSS--III Stripe 82 \cite{ivezic2007sloan}}
+\begin{frame}{SDSS--III Stripe 82}
 \begin{itemize}
 \item Collected $\approx 60,000$ variables in Stripe 82 Region
 \item Variables belong to different \textbf{classes}
@@ -160,6 +187,7 @@ Quasar\\
 \includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
 \end{center}
 
+\att{See Ivezic \cite{ivezic2007sloan}}
 
 \end{frame}
 
@@ -175,12 +203,14 @@ d = 10^{(V-M_V +5)/5}
 
 \begin{center}
 \includegraphics[scale=.2]{figs/sesar_map.png}\\
-\footnotesize{Sesar \cite{sesar2010light} using SDSS Stripe 82 Data}
+
 \end{center}
 
 \item Compare observed structure to cosmological simulations.
 
 \end{itemize}
+
+\att{Sesar \cite{sesar2010light} using SDSS Stripe 82 Data}
 
 \end{frame}
 
@@ -199,16 +229,22 @@ d = 10^{(V-M_V +5)/5}
 
 \textbf{Dark Energy Survey (DES)}
 \begin{itemize}
-\item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+\item $\approx$ 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
 \item depths to 24 mag in $i$
-\item 5000 square degrees
-\item few million variable stars
+\item 5000 square degrees (1/9$^{th}$ entire sky)
+\item 68 million stars
 \end{itemize}
 
-\vspace{.3in}
+\vspace{.1in}
+
+\includegraphics[scale=0.3]{figs/des_sdss_stripe82.pdf}
+\includegraphics[scale=0.2]{figs/des_2.pdf}
+%% see one-class/des for code for des image
+
+\vspace{.1in}
 
 \begin{center}
-DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
+DES is deeper and wider but much more sparsely sampled.
 \end{center}
 
 \end{frame}
@@ -240,7 +276,7 @@ DES is deeper and wider than SDSS Stripe 82, but much more sparsely sampled.
 %%%%%%%% TODO: discuss panstarrs / DES, performance of lomb scargle
 %%%%%%%%
 
-\section{Period Estimation Methods}
+\section{Modeling and Classifying Variable Stars}
 
 
 
@@ -327,7 +363,7 @@ Total of $26$ parameters, model estimates period well.
 %%%%%%%%
 
 
-\section{Parsimonious Model for RR Lyrae Variables}
+%\section{Parsimonious Model for RR Lyrae Variables}
 
 %% \begin{frame}{Parsimonious RR Lyrae Model}
 
@@ -424,9 +460,9 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 %% \end{frame}
 
-\section{Simulations}
+\section{Results on Stripe 82 Data}
 
-\begin{frame}{Simulation}
+\begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
 
   \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
 Downsample Stripe 82 variables to 20 observations across all bands:
@@ -457,7 +493,7 @@ Downsample Stripe 82 variables to 20 observations across all bands:
 \end{frame}
 
 
-\begin{frame}{Simulation Results for Period Estimation}
+\begin{frame}{Results for Period Estimation}
 
 
 
@@ -475,7 +511,7 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 
-\begin{frame}{Simulation Results for Classification}
+\begin{frame}{Results for Classification}
 
 \begin{center}
 Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
@@ -505,6 +541,80 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 \end{frame}
 
+%% \begin{frame}{Results for Constructing Milky Way Halo Maps}
+%%   \def \tw {.1}
+  
+%%   \begin{figure}[t]
+%% %\begin{center}
+%%   %\centering
+%%   \begin{minipage}{0.5\textwidth}
+%%  \subfloat[RRL Locations, SDSS Stripe 82]{\label{fig:density_true_points}
+%%  \includegraphics[scale=\tw]{figs/density_true_points.png}
+%%  %  \rule{4cm}{3cm}`
+%%  }\\
+%%  \subfloat[Overdensities, SDSS Stripe 82]{\label{fig:density_true}
+%%  \includegraphics[scale=.1]{figs/density_true.png}
+%%  %  \rule{4cm}{3cm}`
+%%  }
+%%   \end{minipage}
+
+  
+%% %  \hspace{\fill}
+%%   \begin{minipage}{0.5\textwidth}
+%%  \subfloat[RRL Location, Downsampled SDSS Stripe 82]{\label{fig:density_rr_model_sampled_points}
+%%  \includegraphics[scale=.1]{figs/density_rr_model_sampled_points.png}
+%% %   \rule{4cm}{3cm}
+%%  }\\
+%%     \subfloat[Overdensities, Downsampled SDSS Stripe 82]{\label{fig:density_rr_model_sampled}
+%%  \includegraphics[scale=.1]{figs/density_rr_model_sampled.png}
+%% %   \rule{4cm}{3cm}
+%%  }
+%%  \end{minipage}
+%% \caption{(a) Location of RRL stars in SDSS Stripe 82. The light curves used to make this map were well sampled so the classifications and distance estimates are quite accurate (i.e. all black points are actually RRL and their location on this map is close to their true location) (b) Overdensities (relative to the oblate MW halo model) represented by redder regions.   (c) The same map in (a) but constructed using poorly sampled light curves. Some of the classifications are incorrect (i.e. some black points are not in fact RRL) and distances contain more scatter. (d) The overdensities determined using sparsely sampled light curves.}
+%% %\end{center}
+%% \end{figure}
+
+
+%% \end{frame}
+
+
+
+
+
+
+
+
+\begin{frame}{Results for Constructing Milky Way Halo Maps}
+  \def \tw {.1}
+  
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[scale=\tw]{figs/density_true_points.png}\\
+        RRL Locations, SDSS\\
+        \includegraphics[scale=\tw]{figs/density_true.png}\\
+        Overdensities, SDSS
+      \end{center}
+  \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+    \includegraphics[scale=\tw]{figs/density_rr_model_sampled_points.png}\\
+    RRL Locations, Downsampled\\
+    \includegraphics[scale=\tw]{figs/density_rr_model_sampled.png}\\
+    Overdensities, Downsampled
+    \end{center}
+  \end{column}
+
+\end{columns}
+\end{frame}
+
+
+
+
+  
+
+\section{Dark Energy Survey Results}
 
 \section{Related and Ongoing Work}
 
