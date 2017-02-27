@@ -4,6 +4,9 @@ source("../../../code/common/funcs.R")
 
 cat <- read.table("stripe82candidateVar_v1.1.dat",header=TRUE)
 
+cex.lab <- 2
+cex.axis <- 2
+
 make_plot <- function(lc,period,id=NULL){
     names(lc) <- c("time","band","mag","sigma")
     bands <- unique(lc$band)
@@ -15,7 +18,7 @@ make_plot <- function(lc,period,id=NULL){
     pdf(paste0("../figs/folded_",id,".pdf"),width=12,height=6)
     par(mar=c(5,5,1,1))
     plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab=paste0("Phase (period = ",round(period,2),")"),
-         ylab="Magnitude",cex.lab=1.5,xaxs='i')
+         ylab="Magnitude",cex.lab=cex.lab,xaxs='i',cex.axis=cex.axis)
     for(jj in 1:length(bands)){
         temp <- lc[lc$band==bands[jj],]
         segments((temp$time %% period)/period,temp$mag-temp$sigma,
@@ -29,7 +32,8 @@ make_plot <- function(lc,period,id=NULL){
     xlim <- range(lc$time)
     pdf(paste0("../figs/unfolded_",id,".pdf"),width=12,height=6)
     par(mar=c(5,5,1,1))
-    plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Time",ylab="Magnitude",cex.lab=1.5,xaxs='i')
+    plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Time (MJD)",ylab="Magnitude",cex.lab=cex.lab,xaxs='i',
+         cex.axis=cex.axis)
     for(jj in 1:length(bands)){
         temp <- lc[lc$band==bands[jj],]
         segments(temp$time,temp$mag-temp$sigma,temp$time,temp$mag+temp$sigma,col='grey')
@@ -77,3 +81,14 @@ tm <- LCtoTM(lc)
 out <- pgls(tm,period_min=0.2,period_max=1,BCD_flag=FALSE)
 period <- out$period_seq_all[which.min(out$rss_ls)]
 make_plot(lc,period,"panstarrs")
+
+
+## plot 10 des light curves
+fs <- list.files("des-lcs",full.names=TRUE)
+for(ii in 1:10){
+    lc <- read.csv(fs[ii],sep="\t",header=TRUE)
+    lc <- lc[,c(1,4,2,3)]
+    lc <- lc[complete.cases(lc),]
+    names(lc) <- c("time","band","mag","sigma")
+    make_plot(lc,period,paste0("des_",ii))
+}
