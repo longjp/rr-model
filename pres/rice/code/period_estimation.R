@@ -68,13 +68,22 @@ nband <- length(bands)
 legend("bottomleft",paste0(bands," Band"),col=1:nband,pch=1:nband,cex=1.3)
 dev.off()
 
+cex.lab <- 2
+cex.axis <- 2
+err.scale <- 2
+
+
 ## draw model on plot
 xlim <- c(0,1)
 ylim <- range(lc[,3])
 pdf("../figs/rrlyrae_model_fit.pdf",height=6,width=12)
-plot(0,0,xlim=xlim,ylim=rev(ylim),xaxs='i',xlab=paste0("Phase (period=",round(p_est,2),")"),ylab="Magnitude",cex.lab=1.5)
+plot(0,0,xlim=xlim,ylim=rev(ylim),xaxs='i',
+     xlab=paste0("Phase (period=",round(p_est,2),")"),ylab="Magnitude",cex.lab=cex.lab,cex.axis=cex.axis)
 for(ii in 1:length(bands)){
     points((lcs[[ii]][,1]%%p_est)/p_est,lcs[[ii]][,2],col=ii,pch=ii)
+    segments((lcs[[ii]][,1]%%p_est)/p_est,lcs[[ii]][,2] + err.scale*lcs[[ii]][,3],
+    (lcs[[ii]][,1]%%p_est)/p_est,lcs[[ii]][,2] - err.scale*lcs[[ii]][,3],
+    col='grey')
     X <- construct_design(2*pi/p_est,K,lcs[[ii]][,1])
     beta <- compute_params(2*pi/p_est,K,lcs[[ii]][,2],lcs[[ii]][,3]^2,X)
     t <- (lcs[[ii]][,1] %% p_est)/p_est

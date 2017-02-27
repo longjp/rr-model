@@ -6,6 +6,7 @@ cat <- read.table("stripe82candidateVar_v1.1.dat",header=TRUE)
 
 cex.lab <- 2
 cex.axis <- 2
+err.scale <- 2
 
 make_plot <- function(lc,period,id=NULL){
     names(lc) <- c("time","band","mag","sigma")
@@ -21,8 +22,8 @@ make_plot <- function(lc,period,id=NULL){
          ylab="Magnitude",cex.lab=cex.lab,xaxs='i',cex.axis=cex.axis)
     for(jj in 1:length(bands)){
         temp <- lc[lc$band==bands[jj],]
-        segments((temp$time %% period)/period,temp$mag-temp$sigma,
-        (temp$time %% period)/period,temp$mag+temp$sigma,col='grey')
+        segments((temp$time %% period)/period,temp$mag-err.scale*temp$sigma,
+        (temp$time %% period)/period,temp$mag+err.scale*temp$sigma,col='grey')
         points((temp$time %% period)/period,temp$mag,col=jj,pch=jj,cex=1.5)
     }
     legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
@@ -36,7 +37,8 @@ make_plot <- function(lc,period,id=NULL){
          cex.axis=cex.axis)
     for(jj in 1:length(bands)){
         temp <- lc[lc$band==bands[jj],]
-        segments(temp$time,temp$mag-temp$sigma,temp$time,temp$mag+temp$sigma,col='grey')
+        segments(temp$time,temp$mag-err.scale*temp$sigma,
+                 temp$time,temp$mag+err.scale*temp$sigma,col='grey')
         points(temp$time,temp$mag,col=jj,pch=jj,cex=1.5)
     }
     legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
