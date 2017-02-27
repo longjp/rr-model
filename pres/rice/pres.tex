@@ -78,7 +78,7 @@
 %% Wenlong Yuan
 %% \end{textblock*}
 
-  \begin{textblock*}{3cm}(5cm,1.35cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(5.2cm,1.35cm) % {block width} (coords)
     \textbf{Astronomers}
   \end{textblock*}
   
@@ -98,7 +98,7 @@ Jennifer Marshall
 Katelyn Stringer
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(3cm,5.5cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(3.15cm,5.5cm) % {block width} (coords)
     \textbf{Statisticians}
   \end{textblock*}
 
@@ -158,8 +158,18 @@ $\, \, \, $James Long
 \end{frame}
 
 \begin{frame}{Standard Candles}
-  \textbf{standard candles:} class of objects with same luminosity\\
-  \textbf{rr lyrae (rrl):} standard candle variable star
+  \textbf{Standard Candles:} Class of objects with same luminosity
+  \begin{itemize}
+  \item know absolute luminosity of standard candle
+  \item determine object is standard candle and estimate its brightness
+  \end{itemize}
+
+  \vspace{.3in}
+  
+  \textbf{RR Lyrae (RRL):} Standard candle variable star
+  \begin{itemize}
+  \item All RR Lyrae have (approximately) same luminosity
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{RR Lyrae are Periodic Variable Stars}
@@ -168,9 +178,11 @@ $\, \, \, $James Long
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
 \end{center}
 
-\begin{center}
-  Star observed $\approx 250$ times in $5$ bands ($u,g,r,i,z$).
-\end{center}
+
+  \begin{itemize}
+    \item Star observed $\approx 250$ times in $5$ bands ($u,g,r,i,z$).
+    \item Known as a \textit{light curve}.
+  \end{itemize}
 
 %% \begin{itemize}
 %% \item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
@@ -188,41 +200,69 @@ $\, \, \, $James Long
 \end{frame}
 
 
-\begin{frame}{SDSS--III Stripe 82}
+\begin{frame}{Sloan Digital Sky Survey (SDSS) III -- Stripe 82}
 \begin{itemize}
-\item Discovered $\approx 60,000$ variables
+\item Discovered $\approx 60,000$ variable stars
+\item $\approx 250$ brightness measurements / star
 \item Variables belong to different \textbf{classes}
-\item Some periodic, some not
 \end{itemize}
 
-\underline{Three Examples}
 
-\vspace{-.1in}
+  \begin{center}
+    \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+    \end{center}
 
+
+%\underline{Example Light Curve}
+%\vspace{-.1in}
 \begin{center}
-{\small 1) Eclipsing Binary (Unfolded and Folded)}\\
+Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 \includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
 \includegraphics[scale=.15]{figs/folded_4183016.pdf}
-\end{center}
-
-\vspace{-.2in}
-
-%% \begin{center}
-%% RR Lyrae\\
-%% \includegraphics[scale=.15]{figs/unfolded_4099.pdf}
-%% \includegraphics[scale=.15]{figs/folded_4099.pdf}
-%% \end{center}
-
-
-\begin{center}
-{\small 2) Quasar (unfolded)} \hspace{9 mm} {\small 3) RR Lyrae (folded)}\\
-\includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
-\includegraphics[scale=.15]{figs/folded_13350.pdf}
 \end{center}
 
 \att{See Ivezic \cite{ivezic2007sloan}}
 
 \end{frame}
+
+
+
+
+%% \begin{frame}{SDSS--III Stripe 82}
+%% \begin{itemize}
+%% \item Discovered $\approx 60,000$ variables
+%% \item Variables belong to different \textbf{classes}
+%% \item Some periodic, some not
+%% \end{itemize}
+
+%% \underline{Three Examples}
+
+%% \vspace{-.1in}
+
+%% \begin{center}
+%% {\small 1) Eclipsing Binary (Unfolded and Folded)}\\
+%% \includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
+%% \includegraphics[scale=.15]{figs/folded_4183016.pdf}
+%% \end{center}
+
+%% \vspace{-.2in}
+
+%% %% \begin{center}
+%% %% RR Lyrae\\
+%% %% \includegraphics[scale=.15]{figs/unfolded_4099.pdf}
+%% %% \includegraphics[scale=.15]{figs/folded_4099.pdf}
+%% %% \end{center}
+
+
+%% \begin{center}
+%% {\small 2) Quasar (unfolded)} \hspace{9 mm} {\small 3) RR Lyrae (folded)}\\
+%% \includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
+%% \includegraphics[scale=.15]{figs/folded_13350.pdf}
+%% \end{center}
+
+%% \att{See Ivezic \cite{ivezic2007sloan}}
+
+%% \end{frame}
 
 \begin{frame}{Identifying the RRL in SDSS Stripe 82}
   Sesar 2010:
@@ -232,32 +272,49 @@ $\, \, \, $James Long
   \item Estimated Distances to RRL
   \end{enumerate}
 
-\begin{center}
-\includegraphics[scale=.4]{figs/sdss_color_period.pdf}
-\end{center}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+
+      \vspace{.1in}
+      
+      \underline{Steps 1 and 2}\\
+      \includegraphics[scale=.35]{figs/sdss_color_period.pdf}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace{-.2in}
+      
+      \underline{Step 3}
+      
+      \vspace{-.2in}
+      \begin{center}
+      \includegraphics[scale=.1]{figs/density_true_points.png}\\
+      \includegraphics[scale=.17]{figs/sesar_map.png}
+      \end{center}
+    \end{column}
+\end{columns}
 
   
 \end{frame}
 
-\begin{frame}{Mapping Milky Way Halo with RRL}
+%% \begin{frame}{Mapping Milky Way Halo with RRL}
 
-  \begin{center}
-    \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
-    \end{center}
+%%   \begin{center}
+%%     \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+%%     \end{center}
   
-\begin{center}
-  \includegraphics[scale=.13]{figs/density_true_points.png}
-  \includegraphics[scale=.2]{figs/sesar_map.png}\\
-\end{center}
+%% \begin{center}
+%%   \includegraphics[scale=.13]{figs/density_true_points.png}\\
+%%   \includegraphics[scale=.2]{figs/sesar_map.png}
+%% \end{center}
 
-%% \begin{itemize}
-%% \item Compare maps to cosmological simulations.
-%% \item Answer missing satellites problem.
-%% \end{itemize}
+%% %% \begin{itemize}
+%% %% \item Compare maps to cosmological simulations.
+%% %% \item Answer missing satellites problem.
+%% %% \end{itemize}
 
-\att{Sesar \cite{sesar2010light}}
+%% \att{Sesar \cite{sesar2010light}}
 
-\end{frame}
+%% \end{frame}
 
 
 
@@ -270,15 +327,19 @@ $\, \, \, $James Long
 %% \end{itemize}
 %% \end{frame}
 
+%% \begin{frame}{The Dark Energy Survey}
+%% \todo{picture of telescope}
+%% \end{frame}
+
 
 \begin{frame}{Mapping the Galactic Halo with DES}
 
 \textbf{Dark Energy Survey (DES)}
 \begin{itemize}
 \item $\approx$ 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+\item 68 million stars
 \item depths to 24 mag in $i$
 \item 5000 square degrees ($\approx$ 1/9$^{th}$ entire sky)
-\item 68 million stars
 \end{itemize}
 
 \vspace{.1in}
@@ -289,44 +350,34 @@ $\, \, \, $James Long
 \vspace{.1in}
 
 \begin{center}
-  DES is deeper and wider but much more sparsely sampled.\\
-Need more efficient statistical methods for DES data.
+  DES is deeper and wider but much more sparsely sampled.
 \end{center}
 
 \end{frame}
 
-%% \begin{frame}{Size of Variable Star Data Sets is Growing}
-%% \begin{itemize}
-%% \item \textit{Hipparcos} (1989--1993): 2712 
-%% \item \textit{OGLE} (1992--present): 100,000s
-%% \item \textit{DES} (ongoing): $\sim$ 10 million
-%% \item \textit{LSST} (starting 2020): $\sim$ 1 billion
 
-%% \vspace{.4in}
-
-%% Data sets of varying quality:
-%% \begin{center}
-%% \includegraphics[scale=.3]{figs/m33_unfolded.pdf}
-%% \end{center}
-
-
-%% \end{itemize}
-
-%% %\textbf{Dramatic Differences in Data Quality:}
-
-%% \end{frame}
-
-
-
-%%%%%%%%
-%%%%%%%% TODO: discuss panstarrs / DES, performance of lomb scargle
-%%%%%%%%
 
 \section{Modeling and Classifying Variable Stars}
 
+\begin{frame}{Notation for Variable Star}
 
+  Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
+\begin{itemize}
+\item $b=1,\ldots,B$ denotes band (ie filter)
+\item $n_b$ is number of measurements in band $b$
+\item $m_{jb}$ is brightness at time $t_{jb}$ with uncertainty $\sigma_{jb}$
+\item $\sigma_{jb}$ is known
+\end{itemize}
 
-\begin{frame}{Sinusoid Based Models}
+\todo{put light curve here}
+
+\begin{center}
+  Heteroskedastic error with known variance.
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Fourier Based Models}
 
 \textbf{Method:} Model light curve variation in each filter as sinusoid with $K$ harmonics. \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}
 
@@ -370,25 +421,24 @@ Total of $26$ parameters, model estimates period well.
 \end{frame}
 
 
-\begin{frame}{Challenge: DES Light Curves are Sparsely Sampled}
+%% \begin{frame}{Challenge: DES Light Curves are Sparsely Sampled}
 
 
-\begin{center}
-\includegraphics[scale=.3]{figs/des_2.pdf}
-\end{center}
+%% \begin{center}
+%% \includegraphics[scale=.3]{figs/des_2.pdf}
+%% \end{center}
 
-\vspace{-.2in}
+%% \vspace{-.2in}
 
-\begin{center}
-\small{Dark Energy Survey light curve. Period estimation, classification, and distance estimation difficult for this quality data.}
-\end{center}
+%% \begin{center}
+%% \small{Dark Energy Survey light curve. Period estimation, classification, and distance estimation difficult for this quality data.}
+%% \end{center}
 
-\end{frame}
-
-\subsection{Heteroskedasticity and Approximate Models}
+%% \end{frame}
 
 
-\subsection{Improved Models for RR Lyrae Stars}
+
+
 
 
 %% \begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
@@ -410,41 +460,15 @@ Total of $26$ parameters, model estimates period well.
 %%%%%%%% TODO: introduce model, discuss fitting
 %%%%%%%%
 
+\begin{frame}{Application to DES Data}
+\todo{state that cannot fit 2 harmonic model to DES light curves. one harmonic model heavily misspecified}
+\end{frame}
 
-%\section{Parsimonious Model for RR Lyrae Variables}
 
-%% \begin{frame}{Parsimonious RR Lyrae Model}
+\subsection{Fitting Approximate Models with Heteroskedastic Errors}
 
-%% \underline{global parameters} common for all RR Lyrae:
-%% {\footnotesize
-%% \begin{align*}
-%% M_b &=  \text{ absolute magnitude band $b$ }\\
-%% R_b &= \text{ attenuation caused by dust in band $b$ }\\
-%% \gamma_b &= \text{ normalized shape of light curve in band $b$ }\\
-%% \end{align*}
-%% }
 
-%% \vspace{.2in}
-
-%% \begin{equation*}
-%% m_b(t) = \mu + M_b + E[B-V]R_b + a\gamma_b(\omega t + \phi)
-%% \end{equation*}
-
-%% \vspace{.2in}
-
-%% \underline{individual parameters} specific to each RR Lyrae:
-%% {\footnotesize
-%% \begin{align*}
-%% \mu &= \text{ distance modulus }\\
-%% E[B-V] &= \text{ amount of dust }\\
-%% a &= \text{ amplitude of variation }\\
-%% \omega &= \text{ frequency of variation }\\
-%% \phi &= \text{ phase }
-%% \end{align*}
-%% }
-
-%% \end{frame}
-
+\subsection{Improved Models for RR Lyrae Stars}
 
 \begin{frame}{Parsimonious RR Lyrae Model}
 
@@ -458,7 +482,7 @@ individual parameters fit for each RR Lyrae
 \vspace{.2in}
 
 \begin{itemize}
-\item Data $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
+\item $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
 \item Normal measurement error model:
 \begin{equation*}
 m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
@@ -658,7 +682,7 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{frame}
 
 
-\section{Related and Ongoing Work}
+\section{Ongoing and Related Work}
 
 \begin{frame}{Related Work}
 
