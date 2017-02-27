@@ -87,10 +87,26 @@ make_plot(lc,period,"panstarrs")
 
 ## plot 10 des light curves
 fs <- list.files("des-lcs",full.names=TRUE)
+lcs <- vector("list",length(fs))
+for(ii in 1:length(fs)){
+    lcs[[ii]] <- read.csv(fs[ii],sep="\t",header=TRUE)
+}
+
+lc_len <- vapply(lcs,nrow,c(0))
+
+
 for(ii in 1:10){
-    lc <- read.csv(fs[ii],sep="\t",header=TRUE)
+    lc <- lcs[[ii]]
     lc <- lc[,c(1,4,2,3)]
     lc <- lc[complete.cases(lc),]
     names(lc) <- c("time","band","mag","sigma")
     make_plot(lc,period,paste0("des_",ii))
 }
+
+
+ix <- which.max(lc_len)
+lc <- lcs[[ix]]
+lc <- lc[,c(1,4,2,3)]
+lc <- lc[complete.cases(lc),]
+names(lc) <- c("time","band","mag","sigma")
+make_plot(lc,period,paste0("des_",ix))
