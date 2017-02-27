@@ -98,22 +98,22 @@ Jennifer Marshall
 Katelyn Stringer
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(3.15cm,5.5cm) % {block width} (coords)
-    \textbf{Statisticians}
+  \begin{textblock*}{3cm}(2.8cm,5.5cm) % {block width} (coords)
+    \textbf{Statistician}
   \end{textblock*}
 
-  \begin{textblock*}{3cm}(1.5cm,6.25cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(2.7cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/zhenfeng.jpg}\\
 $\, \, $Zhenfeng Lin
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(5cm,6.25cm) % {block width} (coords)
-\includegraphics[width=\w,height=\h]{figs/long.jpg}\\
-$\, \, \, $James Long
-\end{textblock*}
+%%   \begin{textblock*}{3cm}(5cm,6.25cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
+%% $\, \, \, $James Long
+%% \end{textblock*}
 
-  \begin{textblock*}{3cm}(8cm,6.7cm) % {block width} (coords)
-\includegraphics[scale=.3]{figs/des_logo.png}\\
+  \begin{textblock*}{3cm}(6cm,6.7cm) % {block width} (coords)
+\includegraphics[scale=.45]{figs/des_logo.png}\\
 \end{textblock*}
 
   
@@ -121,8 +121,11 @@ $\, \, \, $James Long
 \end{frame}
 
 
+\begin{frame}{Outline}
+  \tableofcontents
+  \end{frame}
 
-\frame{\tableofcontents}
+%\frame{\tableofcontents}
 
 \AtBeginSection[]
 {
@@ -144,7 +147,7 @@ $\, \, \, $James Long
 \begin{frame}{What is the distance to these objects?}
 
   \begin{center}
-    \includegraphics[scale=0.4]{figs/des_small.png}\\
+    \includegraphics[scale=0.5]{figs/des_small.png}\\
   \end{center}
   \textbf{Problem:}
   \begin{equation*}
@@ -172,7 +175,7 @@ $\, \, \, $James Long
   \end{itemize}
 \end{frame}
 
-\begin{frame}{RR Lyrae are Periodic Variable Stars}
+\begin{frame}{RR Lyrae Variable Star}
 \textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
 \begin{center}
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
@@ -192,10 +195,11 @@ $\, \, \, $James Long
 \end{frame}
 
 
-\begin{frame}{Folded Light Curve of Periodic Variable}
+\begin{frame}{Folded Light Curve of RR Lyrae}
 \textbf{Folded light curve:} Brightness versus time modulo period.
 \begin{center}
-\includegraphics[scale=.3]{figs/folded_13350.pdf}
+\includegraphics[scale=.3]{figs/folded_13350.pdf}\\
+Distance to this star is proportional to mean magnitude, after accounting for \underline{dust} and \underline{PL relation}.
 \end{center}
 \end{frame}
 
@@ -264,11 +268,11 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 %% \end{frame}
 
-\begin{frame}{Identifying the RRL in SDSS Stripe 82}
+\begin{frame}{Identifying RRL, Mapping MW Halo with SDSS}
   Sesar 2010:
   \begin{enumerate}
-  \item Extracted features from 60,000 variables (eg period, amplitude)
-  \item Identified 450 RR Lyrae
+  \item Extracted features for $\approx 60,000$ variables (eg period, amplitude)
+  \item Identified $\approx 400$ RR Lyrae
   \item Estimated Distances to RRL
   \end{enumerate}
 
@@ -293,7 +297,12 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
     \end{column}
 \end{columns}
 
+\att{Sesar 2010 \cite{sesar2010light}}
   
+\end{frame}
+
+\begin{frame}{Importance of MW Halo Maps}
+\todo{compare cosmological simulations to observed structure}
 \end{frame}
 
 %% \begin{frame}{Mapping Milky Way Halo with RRL}
@@ -350,7 +359,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 \vspace{.1in}
 
 \begin{center}
-  DES is deeper and wider but much more sparsely sampled.
+  DES is \underline{deeper} and \underline{wider} but \underline{sparsely sampled}.
 \end{center}
 
 \end{frame}
@@ -359,17 +368,20 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \section{Modeling and Classifying Variable Stars}
 
-\begin{frame}{Notation for Variable Star}
+\subsection{Well Sampled Light Curves}
+
+\begin{frame}{Well Sampled Star}
 
   Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
 \begin{itemize}
 \item $b=1,\ldots,B$ denotes band (ie filter)
 \item $n_b$ is number of measurements in band $b$
-\item $m_{jb}$ is brightness at time $t_{jb}$ with uncertainty $\sigma_{jb}$
-\item $\sigma_{jb}$ is known
+\item $m_{jb}$ is brightness at time $t_{jb}$ with known uncertainty $\sigma_{jb}$
 \end{itemize}
 
-\todo{put light curve here}
+\begin{center}
+\includegraphics[scale=0.3]{figs/unfolded_7904669.pdf}
+\end{center}
 
 \begin{center}
   Heteroskedastic error with known variance.
@@ -377,7 +389,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \end{frame}
 
-\begin{frame}{Fourier Based Models}
+\begin{frame}{Fourier Period Estimation}
 
 \textbf{Method:} Model light curve variation in each filter as sinusoid with $K$ harmonics. \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}
 
@@ -483,7 +495,7 @@ individual parameters fit for each RR Lyrae
 
 \begin{itemize}
 \item $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
-\item Normal measurement error model:
+\item Model:
 \begin{equation*}
 m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
 \end{equation*}
@@ -526,6 +538,21 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \end{itemize}
 
 \end{frame}
+
+\begin{frame}{Example Fits to SDSS Light Curves}
+
+\end{frame}
+
+\begin{frame}{Example Fits to DES Light Curves}
+
+\end{frame}
+
+\begin{frame}{Summary of Fitting}
+
+  \todo{State: don't use error variance because worried about model misspecification. mention carroll's article on when measurement errors are estiamte, even more suspicious.} 
+  
+\end{frame}
+
 
 
 %% \begin{frame}{Visualization of Warm Start for $\phi$}
