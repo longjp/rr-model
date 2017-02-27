@@ -135,6 +135,15 @@ $\, \, $Zhenfeng Lin
   \end{frame}
 }
 
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+
 
 %%%%%%%%
 %%%%%%%% TODO: redo first section with more emphasis on multiband, lomb scargle
@@ -421,7 +430,7 @@ Total of $26$ parameters, model estimates period well.
 
 \end{frame}
 
-\begin{frame}{Output from Model Useful for Classification}
+\begin{frame}{Model Output Used for Classification}
 
 \begin{center}
 \includegraphics[scale=.4]{figs/sdss_color_period.pdf}
@@ -472,9 +481,12 @@ Total of $26$ parameters, model estimates period well.
 %%%%%%%% TODO: introduce model, discuss fitting
 %%%%%%%%
 
-\begin{frame}{Application to DES Data}
-\todo{state that cannot fit 2 harmonic model to DES light curves. one harmonic model heavily misspecified}
+\begin{frame}{Methodology Fails on DES Data}
+  \underline{Case 1:} With $K=1$ harmonic (sine function), model is misspecified.
+  \underline{Case 2:} With $K>1$ harmonic, model has too many parameters.
 \end{frame}
+
+
 
 
 \subsection{Fitting Approximate Models with Heteroskedastic Errors}

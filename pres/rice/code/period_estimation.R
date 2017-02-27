@@ -56,27 +56,33 @@ p_est <- (2*pi)/omegas[which.min(rss)]
 par(mar=c(5,5,1,1))
 
 
+cex.lab <- 2
+cex.axis <- 2
+err.scale <- 2
+
+
 xlim <- range(lc[,1])
 ylim <- range(lc[,3])
 pdf("../figs/rrlyrae_nomodel_fit.pdf",height=6,width=12)
-plot(0,0,xlim=xlim,ylim=rev(ylim),xaxs='i',xlab="Time",ylab="Magnitude",cex.lab=1.5)
+par(mar=c(5,5,1,1))
+plot(0,0,xlim=xlim,ylim=rev(ylim),xaxs='i',xlab="Time",ylab="Magnitude",
+     cex.lab=cex.lab,cex.axis=cex.axis)
 for(ii in 1:length(bands)){
-    segments(lcs[[ii]][,1],lcs[[ii]][,2]-lcs[[ii]][,3],lcs[[ii]][,1],lcs[[ii]][,2]+lcs[[ii]][,3],col='grey')
+    segments(lcs[[ii]][,1],lcs[[ii]][,2]-err.scale*lcs[[ii]][,3],
+             lcs[[ii]][,1],lcs[[ii]][,2]+err.scale*lcs[[ii]][,3],col='grey')
     points(lcs[[ii]][,1],lcs[[ii]][,2],ylim=rev(range(lc[,3])),col=ii,pch=ii)
 }
 nband <- length(bands)
 legend("bottomleft",paste0(bands," Band"),col=1:nband,pch=1:nband,cex=1.3)
 dev.off()
 
-cex.lab <- 2
-cex.axis <- 2
-err.scale <- 2
 
 
 ## draw model on plot
 xlim <- c(0,1)
 ylim <- range(lc[,3])
 pdf("../figs/rrlyrae_model_fit.pdf",height=6,width=12)
+par(mar=c(5,5,1,1))
 plot(0,0,xlim=xlim,ylim=rev(ylim),xaxs='i',
      xlab=paste0("Phase (period=",round(p_est,2),")"),ylab="Magnitude",cex.lab=cex.lab,cex.axis=cex.axis)
 for(ii in 1:length(bands)){
