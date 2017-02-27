@@ -483,16 +483,97 @@ Total of $26$ parameters, model estimates period well.
 
 \begin{frame}{Methodology Fails on DES Data}
   \underline{Case 1:} With $K=1$ harmonic (sine function), model is misspecified.
+  \begin{center}
+    \includegraphics[scale=.2]{figs/rrlyrae_model_fit_sine.pdf}
+  \end{center}
   \underline{Case 2:} With $K>1$ harmonic, model has too many parameters.
+  \begin{center}
+    \includegraphics[scale=0.2]{figs/unfolded_des_351.pdf}
+  \end{center}
+  %% put best sampled star here
 \end{frame}
 
 
 
 
-\subsection{Fitting Approximate Models with Heteroskedastic Errors}
+\subsection{Case 1: Fitting Approximate Models with Heteroskedastic Errors}
+
+\begin{frame}{Approximate Models with Heteroskedastic Error}
+
+  Maximum likelihood estimator for period:
+  \begin{equation*}
+    \widehat{\omega} = \argmin{\omega} \min_{\V{a},\V{\beta},\V{\phi}} \sum_{b=1}^B \sum_{j=1}^{n_b} \left(\frac{m_{bj} - \beta_{b} - a_b\sin(\omega t_{bj} + \phi_b)}{\sigma_{bj}}\right)^2
+  \end{equation*}
+  
+  
+  \textbf{Hope:} Period of best fitting sine function close to true period of function.\\
+
+  \vspace{.2in}
+
+  \textbf{Question:} Does weighting observations by inverse of the variance make sense when model is approximate?
+  
+\end{frame}
+
+\begin{frame}{Simple Case: Linear Regression with WLS}
+\begin{itemize}
+\item Observe $\{(y_i,x_i,\sigma_i)\}_{i=1}^n$ i.i.d. where
+  \begin{equation*}
+    y_i = f(x_i) + \epsilon_i 
+  \end{equation*}
+  where $\E[\epsilon_i] = 0$  and $\Var(\epsilon_i) = \sigma_i^2$
+\item Compute weighted least squares estimator:
+  \begin{equation*}
+    \widehat{\beta}(W) = (X^TWX)^{-1}X^TWY
+  \end{equation*}
+  where
+  \begin{itemize}
+    \item $W$ is diagonal weight matrix.
+    \item $Y = (y_1,\ldots,y_n)^T$
+    \item $X = (x_1^T,\ldots,x_n^T)^T$
+  \end{itemize}
+\end{itemize}
+
+\begin{center}
+\textbf{If $f(x) = x^T\beta$ then $\widehat{\beta}(\Sigma^{-1})$ is best linear unbiased\\ ($\Sigma$ diagonal, $\Sigma_{ii} = \sigma_i^2$).}
+\end{center}
+\end{frame}
+
+\begin{frame}{What are we estimating?}
+\includegraphics[scale=0.3]{figs/data.pdf}
+\end{frame}
+
+\begin{frame}{Asymptotic Variance}
+
+\end{frame}
+
+\begin{frame}{Optimal Weighting}
+
+\end{frame}
+
+\begin{frame}{Small Simulation}
+
+\end{frame}
+
+\begin{frame}{Back to Variable Stars}
+
+\end{frame}
+
+\begin{frame}{Simulated Results on Variable Stars}
+
+\end{frame}
+
+\begin{frame}{Conclusions}
+
+\end{frame}
 
 
-\subsection{Improved Models for RR Lyrae Stars}
+
+
+\subsection{Case 2: Improved Models for RR Lyrae Stars}
+
+\begin{frame}{Building a Better Model}
+
+\end{frame}
 
 \begin{frame}{Parsimonious RR Lyrae Model}
 
