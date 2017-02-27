@@ -22,8 +22,8 @@
 \usepackage{bm}
 \usepackage[absolute,overlay]{textpos}
 
-\newcommand{\Var}{\text{Var }}
-\newcommand{\Cov}{\text{Cov }}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
 \newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
@@ -31,6 +31,10 @@
 \newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
 \newcommand{\w}{1in}
 \newcommand{\h}{1in}
+
+\newcommand{\rightarrowp}{\overset{P}{\to}}
+\newcommand{\rightarrowd}{\overset{d}{\to}}
+
 
 \usepackage{graphicx}
 \newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
@@ -500,7 +504,7 @@ Total of $26$ parameters, model estimates period well.
 
 \begin{frame}{Approximate Models with Heteroskedastic Error}
 
-  Maximum likelihood estimator for period:
+  Sine model maximum likelihood estimator for period:
   \begin{equation*}
     \widehat{\omega} = \argmin{\omega} \min_{\V{a},\V{\beta},\V{\phi}} \sum_{b=1}^B \sum_{j=1}^{n_b} \left(\frac{m_{bj} - \beta_{b} - a_b\sin(\omega t_{bj} + \phi_b)}{\sigma_{bj}}\right)^2
   \end{equation*}
@@ -514,13 +518,13 @@ Total of $26$ parameters, model estimates period well.
   
 \end{frame}
 
-\begin{frame}{Simple Case: Linear Regression with WLS}
+\begin{frame}{Simple Case: Linear Regression and WLS}
 \begin{itemize}
 \item Observe $\{(y_i,x_i,\sigma_i)\}_{i=1}^n$ i.i.d. where
   \begin{equation*}
-    y_i = f(x_i) + \epsilon_i 
+    y_i = f(x_i) + \sigma_i\epsilon_i 
   \end{equation*}
-  where $\E[\epsilon_i] = 0$  and $\Var(\epsilon_i) = \sigma_i^2$
+  where $\E[\epsilon_i] = 0$  and $\Var(\epsilon_i) = 1$
 \item Compute weighted least squares estimator:
   \begin{equation*}
     \widehat{\beta}(W) = (X^TWX)^{-1}X^TWY
@@ -534,19 +538,91 @@ Total of $26$ parameters, model estimates period well.
 \end{itemize}
 
 \begin{center}
-\textbf{If $f(x) = x^T\beta$ then $\widehat{\beta}(\Sigma^{-1})$ is best linear unbiased\\ ($\Sigma$ diagonal, $\Sigma_{ii} = \sigma_i^2$).}
+\textbf{If $f(x) = x^T\beta$ then $\widehat{\beta}(\Sigma^{-1})$ is best linear unbiased.\\ ($\Sigma$ diagonal, $\Sigma_{ii} = \sigma_i^2$)}
 \end{center}
 \end{frame}
 
 \begin{frame}{What are we estimating?}
-\includegraphics[scale=0.3]{figs/data.pdf}
+The ``true'' $\beta$ is the best linear approximation to $f$ i.e.
+  \begin{equation*}
+  \beta \equiv \argmin{\beta} \E[(f(x) - x^T\beta)^2] = \E[xx^T]^{-1}\E[xf(x)]
+\end{equation*}
+  Optimal MSE prediction among linear functions of $x$:
+  \begin{equation*}
+    \beta = \argmin{\beta} \E[(y - x^T\beta)^2]
+  \end{equation*}
+
+  
+Example:
+  
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[scale=0.3]{figs/data.pdf}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{align*}
+        &x_i \sim Unif[0,1]\\
+        &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
+          \begin{array}{lr}
+            0.05 \! &:  \! \sigma=0.01,1.0\\ 
+            0.9  \! &: \! \sigma=0.1\\
+          \end{array} \right.\\
+        &y_i = x_i^2 + \epsilon_i
+        \end{align*}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Asymptotic Variance}
+\begin{frame}{Weight Matrix}
+  Define the non--linearity as
+  \begin{equation*}
+    g(x) = f(x) - x^T\beta
+  \end{equation*}
+  Consider weight matrices of the form
 
+  \todo{emphasize that $w$ is a function of $\sigma$.}
+\end{frame}
+
+\begin{frame}{Asymptotic Results}
+
+  \begin{theorem}
+    Under regularity conditions and $x_i \, \indep \, \sigma_i$,
+  \begin{equation*}
+    \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w))
+  \end{equation*}
+  where
+  \begin{equation*}
+    \nu(w) = \frac{\E[w^2]\overbrace{\E[xx^T]^{-1}\E[g^2(x)xx^T]\E[xx^T]^{-1}}^{\equiv A} + \E[\sigma^2w^2]\overbrace{\E[xx^T]^{-1}}^{\equiv B}}{\E[w]^2}.
+  \end{equation*}
+  \end{theorem}
+  
+  \textbf{Special Case:}
+   If model is linear $g(x)=0$ and
+    \begin{equation*}
+      \nu(w) = \frac{\E[\sigma^2w^2]\E[xx^T]^{-1}}{\E[w]^2},
+    \end{equation*}
+   which is minimized by $w(\sigma) = \sigma^{-2}$.
+  
 \end{frame}
 
 \begin{frame}{Optimal Weighting}
+
+  Consider linear function
+  \begin{equation*}
+    \Gamma: \mathbb{R}^p \times \mathbb{R}^p \rightarrow \mathbb{R}
+  \end{equation*}
+  such that $\Gamma(C) > 0$ for all $C$ positive definite. Then
+  
+  \begin{theorem}
+    \begin{equation*}
+      w(\sigma) = \argmin{w} \Gamma(\nu(w)) = \frac{1}{\sigma^2 + \Gamma(A)\Gamma(B)^{-1}}
+    \end{equation*}
+    \end{theorem}
+
+  \begin{itemize}
+  \item If no--nonlinearity, $A=0$ and $w(\sigma) = \sigma^{-2}$ is optimal.
+  \item $\Gamma(A)\Gamma(B)^{-1}$ reduces influence of low variance observations.
+  \end{itemize}
 
 \end{frame}
 
