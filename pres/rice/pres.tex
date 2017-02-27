@@ -78,8 +78,8 @@
 %% Wenlong Yuan
 %% \end{textblock*}
 
-  \begin{textblock*}{3cm}(1.25cm,1.3cm) % {block width} (coords)
-    \textbf{Astronomers:}
+  \begin{textblock*}{3cm}(5cm,1.35cm) % {block width} (coords)
+    \textbf{Astronomers}
   \end{textblock*}
   
   \begin{textblock*}{3cm}(1.5cm,2cm) % {block width} (coords)
@@ -98,19 +98,24 @@ Jennifer Marshall
 Katelyn Stringer
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(1.25cm,5.5cm) % {block width} (coords)
-    \textbf{Statisticians:}
+  \begin{textblock*}{3cm}(3cm,5.5cm) % {block width} (coords)
+    \textbf{Statisticians}
   \end{textblock*}
 
-  \begin{textblock*}{3cm}(4cm,6.25cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(1.5cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/zhenfeng.jpg}\\
 $\, \, $Zhenfeng Lin
 \end{textblock*}
 
-  \begin{textblock*}{3cm}(7cm,6.25cm) % {block width} (coords)
+  \begin{textblock*}{3cm}(5cm,6.25cm) % {block width} (coords)
 \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
 $\, \, \, $James Long
 \end{textblock*}
+
+  \begin{textblock*}{3cm}(8cm,6.7cm) % {block width} (coords)
+\includegraphics[scale=.3]{figs/des_logo.png}\\
+\end{textblock*}
+
   
 
 \end{frame}
@@ -139,23 +144,22 @@ $\, \, \, $James Long
 \begin{frame}{What is the distance to these objects?}
 
   \begin{center}
-    \includegraphics[scale=0.2]{figs/des_image.jpg}\\
+    \includegraphics[scale=0.4]{figs/des_small.png}\\
   \end{center}
   \textbf{Problem:}
   \begin{equation*}
     \text{ brightness } \propto \frac{\text{luminosity}}{\text{distance}^2}
   \end{equation*}
-  but only brightness can be directly measured.
-  \end{frame}
+\begin{center}
+  Only brightness can be directly measured.
+  \end{center}
+
+\foot{Image Source: DES Collaboration}
+\end{frame}
 
 \begin{frame}{Standard Candles}
-  \textbf{standard candles:} class of objects with same luminosity
-  \begin{itemize}
-  \item supernovae
-  \item cepheid variable stars
-  \item rr lyrae variable stars
-  \item several other
-  \end{itemize}
+  \textbf{standard candles:} class of objects with same luminosity\\
+  \textbf{rr lyrae (rrl):} standard candle variable star
 \end{frame}
 
 \begin{frame}{RR Lyrae are Periodic Variable Stars}
@@ -163,11 +167,16 @@ $\, \, \, $James Long
 \begin{center}
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
 \end{center}
-\begin{itemize}
-\item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
-\item Data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$.
-\item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$.
-\end{itemize}
+
+\begin{center}
+  Star observed $\approx 250$ times in $5$ bands ($u,g,r,i,z$).
+\end{center}
+
+%% \begin{itemize}
+%% \item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
+%% \item Data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$.
+%% \item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$.
+%% \end{itemize}
 \end{frame}
 
 
@@ -215,27 +224,41 @@ $\, \, \, $James Long
 
 \end{frame}
 
-\begin{frame}{Example of Variable Star Science}
-\begin{itemize}
-\item For RR Lyrae variable stars distance is a function of mean brightness in $V$:
-\begin{equation*}
-d = 10^{(V-M_V +5)/5}
-\end{equation*}
-\item Discover structure in the Milky Way halo by finding, estimating distances to RR Lyrae
-
+\begin{frame}{Identifying the RRL in SDSS Stripe 82}
+  Sesar 2010:
+  \begin{enumerate}
+  \item Extracted features from 60,000 variables (eg period, amplitude)
+  \item Identified 450 RR Lyrae
+  \item Estimated Distances to RRL
+  \end{enumerate}
 
 \begin{center}
-\includegraphics[scale=.2]{figs/sesar_map.png}\\
-
+\includegraphics[scale=.4]{figs/sdss_color_period.pdf}
 \end{center}
 
-\item Compare observed structure to cosmological simulations.
+  
+\end{frame}
 
-\end{itemize}
+\begin{frame}{Mapping Milky Way Halo with RRL}
 
-\att{Sesar \cite{sesar2010light} using SDSS Stripe 82 Data}
+  \begin{center}
+    \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+    \end{center}
+  
+\begin{center}
+  \includegraphics[scale=.13]{figs/density_true_points.png}
+  \includegraphics[scale=.2]{figs/sesar_map.png}\\
+\end{center}
+
+%% \begin{itemize}
+%% \item Compare maps to cosmological simulations.
+%% \item Answer missing satellites problem.
+%% \end{itemize}
+
+\att{Sesar \cite{sesar2010light}}
 
 \end{frame}
+
 
 
 
@@ -254,20 +277,20 @@ d = 10^{(V-M_V +5)/5}
 \begin{itemize}
 \item $\approx$ 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
 \item depths to 24 mag in $i$
-\item 5000 square degrees (1/9$^{th}$ entire sky)
+\item 5000 square degrees ($\approx$ 1/9$^{th}$ entire sky)
 \item 68 million stars
 \end{itemize}
 
 \vspace{.1in}
-
-\includegraphics[scale=0.3]{figs/des_sdss_stripe82.pdf}
-\includegraphics[scale=0.2]{figs/des_2.pdf}
+\includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+\includegraphics[scale=0.2]{figs/unfolded_des_2.pdf}
 %% see one-class/des for code for des image
 
 \vspace{.1in}
 
 \begin{center}
-DES is deeper and wider but much more sparsely sampled.
+  DES is deeper and wider but much more sparsely sampled.\\
+Need more efficient statistical methods for DES data.
 \end{center}
 
 \end{frame}
