@@ -1,0 +1,34 @@
+== to do for introduction
+- importance of finding structure in milky way halo
+- how / why are RRL standard candles
+- lay out talk a bit more, what are you going to do
+- mention somewhere that these light curves are vector valued functions
+
+sdss stripe 82 color: ffa560
+des 314ee3
+
+slides 7,8,9 ---> make labels bigger
+
+
+== introduction
+in order to understand the universe we must know where astronomical objects are. however determining distance to objects is challenging due to the degeneracy between luminosity and distance.
+
+standard candles are classes of objects with the same luminosity. Thus by estimating a standard candle's brightness (apparent luminosity) we can infer its distance. one type of standard candle is a rr lyrae (rrl) variable star. as data, rrl are vector valued functions sampled at irregular intervals. in order to use rrl as standard candles, we must separate them from all non-rrl stars. since rrl have particular characteristics relative to other stars, this classification task can be accomplished by constructing statistical classifiers on extracted features.
+
+rrl were used to map the milky way halo over the sdss stripe 82 region of the sky, approximately 300 sq degrees. these maps address important open questions in cosmology, such as the missing satellites problem. while fairly straightfoward for well-sampled sdss stripe 82 light curves, this procedure is much more challenging for the dark energy survey because of the sparse sampling. however the des data set is exciting because it offers the opportunity to make maps of the milky way halo over a 5000 sq deg region of sky (more than 10x SDSS Stripe 82) to a depth of perhaps 200 kpc.
+
+== methodology
+
+standard statistical tools in variable star astronomy involve fitting fourier models to light curves. these models have many parameters or are misspecified. these models fail to identify and characterize rrl for des.
+   - fitting misspecified models with heteroskedastic error
+   - we have developed a parsimonious rrl model with five free parameters. the model incorporates some of the physical aspects of rrl variation while remaining computationally tractible to fit to a large number of stars.
+
+
+== approximate models
+   Many models are approximations. Sometimes these approximations are useful. For example, the period of the best fitting sine function may approximate well the true period of a non-sinusoidal function. Astronomers typically minimize a weighted sum of squares. This procedure is equivalent to maximum likelihood with a normal measurement error model. Does this weighting make sense when the model is an approximation? Consider the simpler case of using linear regression to estimate a non-linear function.  When observations have different error variances, weighted least squares is typically used to estimate the slope because, in the case of a correctly specified model, the covariance of the parameter estimates is minimized for WLS. In the approximate model setting, the asymptotic variance has two components. The asymptotic variance can be larger for WLS than for OLS. It is possible to construct estimators which have an optimal weighting of the form $(\sigma_i^2 + \Delta)^{-1}$.
+
+== results
+
+== ongoing and related work
+
+
