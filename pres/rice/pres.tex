@@ -292,17 +292,22 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
   \begin{columns}
     \begin{column}{0.5\textwidth}
 
-      \vspace{.1in}
-      
-      \underline{Steps 1 and 2}\\
-      \includegraphics[scale=.35]{figs/sdss_color_period.pdf}
-    \end{column}
+      \vspace{-.22in}
+
+      \begin{center}
+        \underline{Steps 1 and 2}
+        \includegraphics[scale=.35]{figs/sdss_color_period.pdf}
+      \end{center}
+      \end{column}
     \begin{column}{0.5\textwidth}
-      \vspace{-.2in}
-      
+
+      \vspace{-.55in}
+
+      \begin{center}
       \underline{Step 3}
+      \end{center}
       
-      \vspace{-.2in}
+      \vspace{-.35in}
       \begin{center}
       \includegraphics[scale=.1]{figs/density_true_points.png}\\
       \includegraphics[scale=.17]{figs/sesar_map.png}
@@ -504,17 +509,19 @@ Total of $26$ parameters, model estimates period well.
 
 \begin{frame}{Approximate Models with Heteroskedastic Error}
 
-  Sine model maximum likelihood estimator for period:
+  Sine model MLE for period:
   \begin{equation*}
     \widehat{\omega} = \argmin{\omega} \min_{\V{a},\V{\beta},\V{\phi}} \sum_{b=1}^B \sum_{j=1}^{n_b} \left(\frac{m_{bj} - \beta_{b} - a_b\sin(\omega t_{bj} + \phi_b)}{\sigma_{bj}}\right)^2
   \end{equation*}
   
   
-  \textbf{Hope:} Period of best fitting sine function close to true period of function.\\
+  
 
-  \vspace{.2in}
-
-  \textbf{Question:} Does weighting observations by inverse of the variance make sense when model is an approximation?
+  \textbf{Questions:}
+  \begin{itemize}
+  \item Is period of best fitting sine function converging to true period of function?\\
+  \item Does weighting observations by inverse of the variance make sense when model is an approximation?
+  \end{itemize}
   
 \end{frame}
 
