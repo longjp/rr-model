@@ -285,7 +285,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
   Sesar 2010:
   \begin{enumerate}
   \item Extracted features for $\approx 60,000$ variables (eg period, amplitude)
-  \item Identified $\approx 400$ RR Lyrae
+  \item Identified $\approx 350$ RR Lyrae
   \item Estimated Distances to RRL
   \end{enumerate}
 
@@ -386,9 +386,9 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \section{Modeling and Classifying Variable Stars}
 
-\subsection{Well Sampled Light Curves}
+\subsection{Fourier Modeling of Light Curves}
 
-\begin{frame}{Well Sampled Star}
+\begin{frame}{Light Curve Notation}
 
   Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
 \begin{itemize}
@@ -407,7 +407,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \end{frame}
 
-\begin{frame}{Fourier Period Estimation}
+\begin{frame}{Fourier Period Estimation and Feature Extraction}
 
 \textbf{Method:} Model light curve variation in each filter as sinusoid with $K$ harmonics. \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}
 
@@ -441,6 +441,10 @@ Total of $26$ parameters, model estimates period well.
 
 \begin{frame}{Model Output Used for Classification}
 
+  \begin{center}
+    Fit $K=2$ model to all 60,000 light curves. RRL separate well.
+  \end{center}
+  
 \begin{center}
   \includegraphics[scale=.2]{figs/sdss_color_period.png}
   \includegraphics[scale=.2]{figs/sdss_gamp_period.png}
@@ -491,22 +495,36 @@ Total of $26$ parameters, model estimates period well.
 %%%%%%%% TODO: introduce model, discuss fitting
 %%%%%%%%
 
-\begin{frame}{Problem: Methodology Fails on DES Data}
-  \underline{Case 1:} With $K=1$ harmonic (sine function), model is misspecified.
+\begin{frame}{Applying Methodology to DES Data}
+  DES will collect $\approx$ 50 observations for each star.
+
+  \begin{itemize}
+    \item \textbf{Strategy 1:} Fourier feature extraction with $K=1$ harmonic (16 parameters). But this simple model is misspecified.
+
   \begin{center}
-    \includegraphics[scale=.2]{figs/rrlyrae_model_fit_sine.pdf}
+    \includegraphics[scale=.25]{figs/rrlyrae_model_fit_sine.pdf}
   \end{center}
-  \underline{Case 2:} With $K>1$ harmonic, model has too many parameters.
-  \begin{center}
-    \includegraphics[scale=0.2]{figs/unfolded_des_351.pdf}
-  \end{center}
+
+\item \textbf{Stategy 2:} Fourier feature extraction with $K>1$ harmonics. But with $K=2$ harmonics, 26 parameters and 50 data points. Large variance in parameter estimates.
+  \end{itemize}
   %% put best sampled star here
+\end{frame}
+
+
+\begin{frame}{Outline of Methodology}
+
+\underline{Fitting Approximate Models with Heteroskedastic Errors}\\
+
+\vspace{.4in}
+
+\underline{Improved Models for RR Lyrae Stars}
+  
 \end{frame}
 
 
 
 
-\subsection{Case 1: Fitting Approximate Models with Heteroskedastic Errors}
+\subsection{Fitting Approximate Models with Heteroskedastic Errors}
 
 \begin{frame}{Approximate Models with Heteroskedastic Error}
 
@@ -533,7 +551,7 @@ Total of $26$ parameters, model estimates period well.
     y_i = f(x_i) + \sigma_i\epsilon_i 
   \end{equation*}
   where $\E[\epsilon_i] = 0$  and $\Var(\epsilon_i) = 1$
-\item Compute weighted least squares estimator:
+\item Weighted least squares (WLS) estimator is
   \begin{equation*}
     \widehat{\beta}(W) = (X^TWX)^{-1}X^TWY
   \end{equation*}
@@ -601,9 +619,9 @@ Example:
   
   \textbf{Important Cases:}
   \begin{itemize}
-  \item OLS: $\widehat{W}_{ii} = w(\sigma_{i}) = 1$
-  \item ``Standard'' WLS: $\widehat{W}_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$
-  \item $\widehat{W}_{ii} = (\sigma_{i}^{2} + c)^{-1}$ for any constant $c$
+  \item $\widehat{W}_{ii} = w(\sigma_{i}) = 1$ (OLS)
+  \item $\widehat{W}_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
+  \item $\widehat{W}_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for some constant $c$)
   \end{itemize}
 \end{frame}
 
@@ -612,7 +630,7 @@ Example:
   \vspace{-.05in}
   
   \begin{theorem}
-    Under regularity conditions and $x_i \, \indep \, \sigma_i$,
+    Under regularity conditions, $x_i \, \indep \, \sigma_i$, and Weight Matrix Assumptions,
   \begin{equation*}
     \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w))
   \end{equation*}
@@ -633,13 +651,13 @@ Example:
   
 \end{frame}
 
-\begin{frame}{Determining the Optimal Weight Matrix}
+\begin{frame}{Optimal Weight Matrix}
 
   Consider linear function
   \begin{equation*}
     \Gamma: \mathbb{R}^p \times \mathbb{R}^p \rightarrow \mathbb{R}
   \end{equation*}
-  such that $\Gamma(C) > 0$ for all $C$ positive definite. Then
+  such that $\Gamma(C) > 0$ for all $C$ positive definite.
   
   \begin{theorem}[Optimal Weighting]
     \begin{equation*}
@@ -701,7 +719,7 @@ Example:
 
 
 
-\subsection{Case 2: Improved Models for RR Lyrae Stars}
+\subsection{Improved Models for RR Lyrae Stars}
 
 \begin{frame}{Building a Better Model}
 
@@ -784,7 +802,7 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 %% \end{frame}
 
-\section{Results on Stripe 82 and DES}
+\section{Results on SDSS Stripe 82 and DES}
 
 \begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
 
