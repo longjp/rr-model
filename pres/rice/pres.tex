@@ -514,7 +514,7 @@ Total of $26$ parameters, model estimates period well.
 
   \vspace{.2in}
 
-  \textbf{Question:} Does weighting observations by inverse of the variance make sense when model is approximate?
+  \textbf{Question:} Does weighting observations by inverse of the variance make sense when model is an approximation?
   
 \end{frame}
 
@@ -531,9 +531,9 @@ Total of $26$ parameters, model estimates period well.
   \end{equation*}
   where
   \begin{itemize}
-    \item $W$ is diagonal weight matrix.
-    \item $Y = (y_1,\ldots,y_n)^T$
-    \item $X = (x_1^T,\ldots,x_n^T)^T$
+    \item $W$ is diagonal weight matrix
+    \item $Y = (y_1,\ldots,y_n)^T$ is response
+    \item $X = (x_1^T,\ldots,x_n^T)^T$ is design
   \end{itemize}
 \end{itemize}
 
@@ -543,58 +543,78 @@ Total of $26$ parameters, model estimates period well.
 \end{frame}
 
 \begin{frame}{What are we estimating?}
-The ``true'' $\beta$ is the best linear approximation to $f$ i.e.
+Define the ``true'' $\beta$ as the best linear approximation to $f$ i.e.
   \begin{equation*}
   \beta \equiv \argmin{\beta} \E[(f(x) - x^T\beta)^2] = \E[xx^T]^{-1}\E[xf(x)]
 \end{equation*}
-  Optimal MSE prediction among linear functions of $x$:
-  \begin{equation*}
-    \beta = \argmin{\beta} \E[(y - x^T\beta)^2]
-  \end{equation*}
+  %% $\beta^T x$ is optimal MSE predictor among linear functions of $x$:
+  %% \begin{equation*}
+  %%   \beta = \argmin{\beta} \E[(y - x^T\beta)^2]
+  %% \end{equation*}
 
-  
 Example:
-  
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[scale=0.3]{figs/data.pdf}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{align*}
-        &x_i \sim Unif[0,1]\\
-        &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
-          \begin{array}{lr}
-            0.05 \! &:  \! \sigma=0.01,1.0\\ 
-            0.9  \! &: \! \sigma=0.1\\
-          \end{array} \right.\\
-        &y_i = x_i^2 + \epsilon_i
-        \end{align*}
-    \end{column}
-  \end{columns}
+
+\vspace{-.2in}
+
+\begin{center}
+        \includegraphics[scale=0.4]{figs/data.pdf}
+  \end{center}
+
+
+  %% \begin{columns}
+  %%   \begin{column}{0.5\textwidth}
+  %%     \includegraphics[scale=0.3]{figs/data.pdf}
+  %%   \end{column}
+  %%   \begin{column}{0.5\textwidth}
+  %%     \begin{align*}
+  %%       &x_i \sim Unif[0,1]\\
+  %%       &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
+  %%         \begin{array}{lr}
+  %%           0.05 \! &:  \! \sigma=0.01,1.0\\ 
+  %%           0.9  \! &: \! \sigma=0.1\\
+  %%         \end{array} \right.\\
+  %%       &y_i = x_i^2 + \epsilon_i
+  %%       \end{align*}
+  %%   \end{column}
+  %% \end{columns}
 \end{frame}
 
 \begin{frame}{Weight Matrix}
-  Define the non--linearity as
-  \begin{equation*}
-    g(x) = f(x) - x^T\beta
-  \end{equation*}
-  Consider weight matrices of the form
 
-  \todo{emphasize that $w$ is a function of $\sigma$.}
+  \begin{assumptions}[Weight Matrix]
+  Consider diagonal, positive definite weight matrices
+  \begin{equation*}
+    \widehat{W}_{ii} = w(\sigma_i) +
+  \end{equation*}
+  where $w(\cdot)$ is some function.
+  \end{assumptions}
+
+  \vspace{.2in}
+  
+  \textbf{Important Cases:}
+  \begin{itemize}
+  \item OLS: $\widehat{W}_{ii} = w(\sigma_{i}) = 1$
+  \item ``Standard'' WLS: $\widehat{W}_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$
+  \item $\widehat{W}_{ii} = (\sigma_{i}^{2} + c)^{-1}$ for any constant $c$
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Asymptotic Results}
+\begin{frame}{Asymptotic Variance}
 
+  \vspace{-.05in}
+  
   \begin{theorem}
     Under regularity conditions and $x_i \, \indep \, \sigma_i$,
   \begin{equation*}
     \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w))
   \end{equation*}
-  where
+  where $g(x) = f(x) - x^T\beta$ and
   \begin{equation*}
     \nu(w) = \frac{\E[w^2]\overbrace{\E[xx^T]^{-1}\E[g^2(x)xx^T]\E[xx^T]^{-1}}^{\equiv A} + \E[\sigma^2w^2]\overbrace{\E[xx^T]^{-1}}^{\equiv B}}{\E[w]^2}.
   \end{equation*}
   \end{theorem}
+
+  \vspace{-.05in}
   
   \textbf{Special Case:}
    If model is linear $g(x)=0$ and
@@ -605,7 +625,7 @@ Example:
   
 \end{frame}
 
-\begin{frame}{Optimal Weighting}
+\begin{frame}{Determining the Optimal Weight Matrix}
 
   Consider linear function
   \begin{equation*}
@@ -613,16 +633,19 @@ Example:
   \end{equation*}
   such that $\Gamma(C) > 0$ for all $C$ positive definite. Then
   
-  \begin{theorem}
+  \begin{theorem}[Optimal Weighting]
     \begin{equation*}
       w(\sigma) = \argmin{w} \Gamma(\nu(w)) = \frac{1}{\sigma^2 + \Gamma(A)\Gamma(B)^{-1}}
     \end{equation*}
-    \end{theorem}
+  \end{theorem}
 
-  \begin{itemize}
-  \item If no--nonlinearity, $A=0$ and $w(\sigma) = \sigma^{-2}$ is optimal.
-  \item $\Gamma(A)\Gamma(B)^{-1}$ reduces influence of low variance observations.
-  \end{itemize}
+  \begin{theorem}[Adaptivity]
+    Under regularity conditions, 
+  \end{theorem}
+
+  %% \begin{itemize}
+  %% \item $\Gamma(A)\Gamma(B)^{-1}$ reduces influence of low variance observations.
+  %% \end{itemize}
 
 \end{frame}
 
@@ -630,13 +653,38 @@ Example:
 
 \end{frame}
 
-\begin{frame}{Back to Variable Stars}
+%% \begin{frame}{Back to Variable Stars}
 
+%% \end{frame}
+
+%% \begin{frame}{Simulated Results on Variable Stars}
+
+%% \input{figs/period_est_results_simple}
+  
+%% \end{frame}
+
+
+\begin{frame}{Application to Variable Star Period Estimation}
+\begin{itemize}
+\item 238 SDSS Stripe 82 (g--band data only).
+\item Downsample light curves to 10, 20, 30, and 40 photometric measurements.
+
+\todo{insert example of downsample light curve}
+  
+\item Compare minimizing weighted and unweighted sums of squares for period estimation.
+
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Simulated Results on Variable Stars}
 
+\begin{frame}{Results}
+
+\input{figs/period_est_results_simple.tex}
+
+%% \vspace{.1in}
+%% \textbf{Conclusion:} Not using the photometric errors is better than using them because the sinusoidal model is misspecified.
 \end{frame}
+
 
 \begin{frame}{Conclusions}
 

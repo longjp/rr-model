@@ -1,0 +1,11 @@
+\begin{table}[ht]
+\centering
+\begin{tabular}{c|ccc|ccc|ccc}
+ &  & $K=1$ & &   & $K=2$ &  &  & $K=3$ &  \\ 
+  \hline
+ & $\Sigma^{-1}$ &  $I$ & $\Delta$ & $\Sigma^{-1}$ &  $I$ & $\Delta$ & $\Sigma^{-1}$ &  $I$ & $\Delta$\\
+  \hline10&0.09&0.16&0.15&0.13&0.11&0.11&0.03&0.03&0.03\\20&0.46&0.58&0.59&0.63&0.68&0.69&0.69&0.77&0.77\\30&0.64&0.78&0.79&0.71&0.82&0.83&0.82&0.86&0.85\\40&0.75&0.79&0.79&0.80&0.85&0.85&0.87&0.92&0.92\\\hline
+\end{tabular}
+\caption{Fraction of periods estimated correctly using different weightings for models with $K=1,2,3$ harmonics. Ignoring the observation uncertainties ($I$) in the fitting is superior to using them ($\Sigma^{-1}$). The strategy for determining an optimal weight function ($\Delta$) does not provide much improvement over ignoring the weights. More complex models ($K=3$) perform worse than simple models ($K=1$) when there is limited data ($n=10$), but better when the functions are better sampled ($n=40$). The standard deviation on these accuracies is no larger than $\sqrt{0.5(1-0.5)/238} \approx 0.032$ .}
+\label{tab:period_est_results}
+\end{table}
