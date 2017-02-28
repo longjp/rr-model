@@ -59,6 +59,7 @@ cols <- c(alpha("black",.01),alpha("red",1))
 
 cex.lab <- 2
 cex.axis <- 2
+cex.legend <- 2
 
 ## use rr lyrae features estimated by sesar, tighter
 png("../figs/sdss_color_period.png",height=700,width=800)
@@ -69,7 +70,7 @@ plot(cat$P,cat$ug,col=cols[isab+1],ylim=c(-.5,3.5),log="x",
 box()
 axis(1,at=c(0.1,1,10,100,1000),labels=c(0.1,1,10,100,1000),cex.axis=cex.axis)
 axis(2,cex.axis=cex.axis)
-legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
+legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=cex.legend)
 dev.off()
 
 
@@ -81,6 +82,7 @@ plot(cat$P,cat$gAmpl,col=cols[isab+1],log="x",
 box()
 axis(1,at=c(0.1,1,10,100,1000),labels=c(0.1,1,10,100,1000),cex.axis=cex.axis)
 axis(2,cex.axis=cex.axis)
+legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=cex.legend)
 dev.off()
 
 

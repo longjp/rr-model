@@ -505,7 +505,7 @@ Total of $26$ parameters, model estimates period well.
     \includegraphics[scale=.25]{figs/rrlyrae_model_fit_sine.pdf}
   \end{center}
 
-\item \textbf{Stategy 2:} Fourier feature extraction with $K>1$ harmonics. But with $K=2$ harmonics, 26 parameters and 50 data points. Large variance in parameter estimates.
+\item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. With $K=2$, 26 parameters and 50 data points. Large variance in parameter estimates.
   \end{itemize}
   %% put best sampled star here
 \end{frame}
@@ -514,11 +514,21 @@ Total of $26$ parameters, model estimates period well.
 \begin{frame}{Outline of Methodology}
 
 \underline{Fitting Approximate Models with Heteroskedastic Errors}\\
+\begin{itemize}
+\item Define what approximate / misspecified model is estimating.
+\item With heteroskedasticity, optimal weighting no longer $\sigma^{-2}$.
+\item Construct adaptive estimator for optimal weight.
+\end{itemize}
 
-\vspace{.4in}
 
-\underline{Improved Models for RR Lyrae Stars}
-  
+\vspace{.2in}
+
+\underline{Improved Model for RR Lyrae Stars}
+\begin{itemize}
+\item Build parsimonious (few free parameters) RRL model.
+\item Assess model accuracy on SDSS Stripe 82 RRL.
+\end{itemize}
+
 \end{frame}
 
 
@@ -719,7 +729,7 @@ Example:
 
 
 
-\subsection{Improved Models for RR Lyrae Stars}
+\subsection{Improved Model for RR Lyrae Stars}
 
 \begin{frame}{Building a Better Model}
 
@@ -804,6 +814,9 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 
 \section{Results on SDSS Stripe 82 and DES}
 
+
+\subsection{SDSS Stripe 82}
+
 \begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
 
   \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
@@ -826,8 +839,8 @@ Downsample Stripe 82 variables to 20 observations across all bands:
   \begin{textblock*}{12cm}(1.75cm,6.1cm) % {block width} (coords)
 \begin{itemize}
 \item Can we estimate periods correctly for RR Lyrae?
-\item Can we separate RR Lyrae from non--RR Lyrae? 
 \item Can we estimate distances accurately?
+\item Can we separate RR Lyrae from non--RR Lyrae? 
 \item Can we reproduce halo maps of Sesar 2010?
 \end{itemize}
 \end{textblock*}
@@ -853,6 +866,21 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 
+\begin{frame}{Simulation Results for Distance Estimation}
+\begin{itemize}
+\item Use model to estimate distance modulus ($\mu$) for RR Lyrae.
+\item Convert $\mu$ to distance (d) in parsecs: $d = 10^{\mu/5 + 1}$
+\end{itemize}
+
+\begin{center}
+\includegraphics[scale=.35]{figs/distance_comparison.pdf}
+\end{center}
+
+
+
+\end{frame}
+
+
 \begin{frame}{Results for Classification}
 
 \begin{center}
@@ -866,21 +894,6 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \item Potential to use model output as feature input to classifier.
 %\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
 \end{itemize}
-\end{frame}
-
-
-\begin{frame}{Simulation Results for Distance Estimation}
-\begin{itemize}
-\item Use model to estimate distance modulus ($\mu$) for RR Lyrae.
-\item Convert $\mu$ to distance (d) in parsecs: $d = 10^{\mu/5 + 1}$
-\end{itemize}
-
-\begin{center}
-\includegraphics[scale=.35]{figs/distance_comparison.pdf}
-\end{center}
-
-
-
 \end{frame}
 
 %% \begin{frame}{Results for Constructing Milky Way Halo Maps}
@@ -923,7 +936,9 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 
 
-
+\begin{frame}{Classification Process}
+  \todo{describe classification setup here}
+\end{frame}
 
 
 \begin{frame}{Results for Constructing Milky Way Halo Maps}
@@ -950,6 +965,21 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 \end{columns}
 \end{frame}
+
+
+
+
+\subsection{Dark Energy Survey}
+
+\begin{frame}{DES Overview}
+\todo{describe survey briefly}
+\end{frame}
+
+
+\begin{frame}{FORNAX Satellite Galaxy}
+
+\end{frame}
+
 
 
 \section{Ongoing and Related Work}
