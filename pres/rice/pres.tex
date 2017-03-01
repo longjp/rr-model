@@ -59,7 +59,7 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{bibliography item}[text]
 
-\title{Mapping the Milky Way Halo: Modeling and Classification of Sparsely Sampled Vector Valued Functions}
+\title{Mapping the Milky Way Halo: Modeling Sparsely Sampled Vector Valued Functions}
 \author{James Long}
 \institute{Texas A\&M University}
 \date{\today}
@@ -411,20 +411,29 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \begin{frame}{Fourier Period Estimation and Feature Extraction}
 
-\textbf{Method:} Model light curve variation in each filter as sinusoid with $K$ harmonics. \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}
+\textbf{Method:} $K$ harmonic Fourier expansion in each filter:
 
 \begin{equation*}
-m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \epsilon_{jb}
+m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \sigma_{jb}\epsilon_{jb}
 \end{equation*}
-where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+where $\epsilon_{jb} \sim N(0,1)$, independent.
 
 \begin{itemize}
-\item $(2K + 1)B + 1$ parameters. Pure sine $3B + 1$ parameters.
-\item Maximum likelihood has closed form solution at fixed $\omega$
-\begin{itemize}
-\item Maximization strategy: Grid search on $\omega$.
+\item $(2K + 1)B + 1$ total parameters:
+  \begin{itemize}
+  \item $KB$ amplitudes ($a_{bk}$)
+  \item $KB$ phases ($\phi_{bk}$)
+  \item $B$ means ($\beta_b$)
+  \item 1 frequency ($\omega$)
+    \end{itemize}
+\item Maximum likelihood estimation:
+  \begin{itemize}
+\item Closed form at fixed $\omega$
+\item Grid search on $\omega$
 \end{itemize}
 \end{itemize}
+
+\foot{Many names in astronomy: Lomb--Scargle, Generalized Lomb--Scargle, Analysis of Variance, CLEAN. See \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}}
 
 \end{frame}
 
@@ -444,7 +453,7 @@ Total of $26$ parameters, model estimates period well.
 \begin{frame}{Model Output Used for Classification}
 
   \begin{center}
-    Fit $K=2$ model to all 60,000 light curves. RRL separate well.
+    Fit $K=2$ model to light curves. RR Lyrae separate well.
   \end{center}
   
 \begin{center}
@@ -624,7 +633,7 @@ Example:
   \begin{equation*}
     W_{ii} = w(\sigma_i)
   \end{equation*}
-  where $w(\cdot)$ is some function.
+  where $w(\cdot) > 0$ and $\E[w(\sigma)^4] < \infty$.
   \end{assumptions}
 
   \vspace{.2in}
@@ -633,7 +642,7 @@ Example:
   \begin{itemize}
   \item $W_{ii} = w(\sigma_{i}) = 1$ (OLS)
   \item $W_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
-  \item $W_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for some constant $c$)
+  \item $W_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for any constant $c$)
   \end{itemize}
 \end{frame}
 
@@ -644,7 +653,7 @@ Example:
   \begin{theorem}
     Under regularity conditions, $x_i \, \indep \, \sigma_i$, and Weight Matrix Assumptions,
   \begin{equation*}
-    \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w))
+    \sqrt{n}(\widehat{\beta}(W) - \beta) \rightarrowd N(0,\nu(w))
   \end{equation*}
   where $g(x) = f(x) - x^T\beta$ and
   \begin{equation*}
@@ -659,17 +668,26 @@ Example:
     \begin{equation*}
       \nu(w) = \frac{\E[\sigma^2w^2]\E[xx^T]^{-1}}{\E[w]^2},
     \end{equation*}
-   which is minimized by $w(\sigma) = \sigma^{-2}$.
+   which is minimized by $w^*(\sigma) = \sigma^{-2}$ (ie $\nu(w^*) \preceq \nu(w)$).
   
 \end{frame}
 
-\begin{frame}{Optimal Weight Matrix}
+\begin{frame}{Optimal Weight Function}
 
   Consider linear function
   \begin{equation*}
     \Gamma: \mathbb{R}^p \times \mathbb{R}^p \rightarrow \mathbb{R}
   \end{equation*}
   such that $\Gamma(C) > 0$ for all $C$ positive definite.
+
+\vspace{.2in}
+  
+  Examples:
+  \begin{itemize}
+  \item $\Gamma(C) = C_{11} \, \, \,$ ($\Var(\widehat{\beta}_1)$)
+  \item $\Gamma(C) = Tr(C) \, \, \,$ ($\sum \Var(\widehat{\beta}_j)$)
+  \end{itemize}
+
   
   \begin{theorem}[Optimal Weighting]
     \begin{equation*}
@@ -677,7 +695,7 @@ Example:
     \end{equation*}
   \end{theorem}
 
-  \todo{discuss uniqueness of set}
+Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
   
 \end{frame}
   
@@ -692,11 +710,12 @@ Example:
         \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w^*))
       \end{equation*}
       \end{theorem}
-    Thus
     \begin{theorem}
+      Under regularity conditions
       \begin{equation*}
-        \Gamma(\nu(\widehat{\beta}(\widehat{W}))) < \min(\Gamma(\nu(\widehat{\beta}(I))),\Gamma(\nu(\widehat{\beta}(\Sigma^{-1}))))
+        \Gamma(\nu(\widehat{\beta}(\widehat{W}))) \leq \min(\Gamma(\nu(\widehat{\beta}(I))),\Gamma(\nu(\widehat{\beta}(\Sigma^{-1}))))
       \end{equation*}
+      with strict inequality if $\E[g^2(x)xx^T]\succ 0$ and $P(\sigma=c)\neq 1$ for any $c$.
       \end{theorem}
 
     
@@ -712,7 +731,7 @@ Example:
 
 
 
-\begin{frame}{Small Simulation}
+\begin{frame}{Simulation: Approximate $x^2$ with Linear Function}
 
   \textbf{Simulation Parameters:}
   \begin{align*}
@@ -732,23 +751,23 @@ Example:
       \beta = \E[xx^T]^{-1}\E[xf(x)] = -1/6 + x
   \end{equation*}
 
-  \textbf{Compare Sampling Distribution:}
+  \textbf{Compare Sampling Distribution of:}
   \begin{equation*}
-    \widehat{\beta} = (X^T\widehat{W}X)^{-1}\widehat{W}XY
+    \widehat{\beta}(\widehat{W}) = (X^T\widehat{W}X)^{-1}\widehat{W}XY
   \end{equation*}
-  for $\widehat{W}=\Sigma^{-1}$, $\widehat{W} = I$, and $\widehat{W} = (\Sigma + \widehat{\Delta})^{-1}$
+  for  \hfill a)  $\widehat{W}=\Sigma^{-1}$ \hfill b)   $\widehat{W} = I$,  \hfill c)   $\widehat{W} = (\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$
   
   
 \end{frame}
 
-\begin{frame}{Small Simulation}
+\begin{frame}{Simulation: Approximate $x^2$ with Linear Function}
 
   
 \def \tw {.26}
 
-\includegraphics[scale=\tw]{figs/estimator_wls.pdf}
-\includegraphics[scale=\tw]{figs/estimator_ols.pdf}
-\includegraphics[scale=\tw]{figs/estimator_dls.pdf}
+\includegraphics[scale=\tw]{figs/pres_estimator_wls.pdf}
+\includegraphics[scale=\tw]{figs/pres_estimator_ols.pdf}
+\includegraphics[scale=\tw]{figs/pres_estimator_dls.pdf}
   
 \end{frame}
 
