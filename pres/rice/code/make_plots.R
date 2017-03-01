@@ -8,7 +8,7 @@ cex.lab <- 2
 cex.axis <- 2
 err.scale <- 2
 
-make_plot <- function(lc,period,id=NULL){
+make_plot <- function(lc,period,id=NULL,plot_legend=TRUE){
     names(lc) <- c("time","band","mag","sigma")
     bands <- unique(lc$band)
     bands <- as.character(bands)
@@ -26,7 +26,9 @@ make_plot <- function(lc,period,id=NULL){
         (temp$time %% period)/period,temp$mag+err.scale*temp$sigma,col='grey')
         points((temp$time %% period)/period,temp$mag,col=jj,pch=jj,cex=1.5)
     }
-    legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
+    if(plot_legend){
+        legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
+    }
     dev.off()
     
     ylim <- range(lc$mag)
@@ -41,7 +43,9 @@ make_plot <- function(lc,period,id=NULL){
                  temp$time,temp$mag+err.scale*temp$sigma,col='grey')
         points(temp$time,temp$mag,col=jj,pch=jj,cex=1.5)
     }
-    legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
+    if(plot_legend){
+        legend("bottomleft",paste0(bands," Band"),col=1:length(bands),pch=1:length(bands),cex=1.5)
+    }
     dev.off()
 }
 
@@ -49,10 +53,25 @@ make_plot <- function(lc,period,id=NULL){
 rrlyrae <- read.table("apj326724t2_mrt.txt",skip=42)
 
 
+
+
+
 id <- 4183016
 lc <- read.table(paste0("AllLCs/LC_",id,".dat"))
 period <- cat$P[cat$ID==id]
 make_plot(lc,period,id)
+
+
+
+id <- 4099
+lc <- read.table(paste0("AllLCs/LC_",id,".dat"))
+lc <- lc[lc[,2]=="g",]
+period <- cat$P[cat$ID==id]
+make_plot(lc,period,paste0(id,"_g"),plot_legend=FALSE)
+lc <- lc[sample(1:nrow(lc),10),]
+make_plot(lc,period,paste0(id,"_g_down"),plot_legend=FALSE)
+
+
 
 id <- 4099
 lc <- read.table(paste0("AllLCs/LC_",id,".dat"))

@@ -22,6 +22,8 @@
 \usepackage{bm}
 \usepackage[absolute,overlay]{textpos}
 
+\usefonttheme[onlymath]{serif}
+
 \newcommand{\Var}{\text{Var}}
 \newcommand{\Cov}{\text{Cov}}
 \newcommand{\E}{\mathbb{E}}
@@ -176,8 +178,8 @@ $\, \, $Zhenfeng Lin
 \begin{frame}{Standard Candles}
   \textbf{Standard Candles:} Class of objects with same luminosity
   \begin{itemize}
-  \item know absolute luminosity of standard candle
-  \item determine object is standard candle and estimate its brightness
+  \item Know absolute luminosity of standard candle.
+  \item Determine object is standard candle and estimate its brightness.
   \end{itemize}
 
   \vspace{.3in}
@@ -377,7 +379,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 \vspace{.1in}
 
 \begin{center}
-  DES is \underline{deeper} and \underline{wider} but \underline{sparsely sampled}.
+  DES is \underline{deeper and wider} but \underline{sparsely sampled}.
 \end{center}
 
 \end{frame}
@@ -499,13 +501,13 @@ Total of $26$ parameters, model estimates period well.
   DES will collect $\approx$ 50 observations for each star.
 
   \begin{itemize}
-    \item \textbf{Strategy 1:} Fourier feature extraction with $K=1$ harmonic (16 parameters). But this simple model is misspecified.
+    \item \textbf{Strategy 1:} Fourier feature extraction with $K=1$ harmonic (16 parameters). \underline{Problem:} This simple model is misspecified.
 
   \begin{center}
     \includegraphics[scale=.25]{figs/rrlyrae_model_fit_sine.pdf}
   \end{center}
 
-\item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. With $K=2$, 26 parameters and 50 data points. Large variance in parameter estimates.
+\item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. With $K=2$, 26 parameters and 50 data points. \underline{Problem:} Large variance in parameter estimates.
   \end{itemize}
   %% put best sampled star here
 \end{frame}
@@ -702,13 +704,54 @@ Example:
 
 \begin{frame}{Application to Variable Star Period Estimation}
 \begin{itemize}
-\item 238 SDSS Stripe 82 (g--band data only).
-\item Downsample light curves to 10, 20, 30, and 40 photometric measurements.
+\item 238 SDSS Stripe 82 (g--band data only)
+\item Downsample light curves to 10, 20, 30, and 40 observations.
 
-\todo{insert example of downsample light curve}
+\def \tw {.15}
   
-\item Compare minimizing weighted and unweighted sums of squares for period estimation.
+  %%\begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
+%% \begin{center}
+%% \includegraphics[scale=\tw]{figs/unfolded_13350.pdf}
+%% \includegraphics[scale=\tw]{figs/rightarrow.png}
+%% \includegraphics[scale=\tw]{figs/unfolded_13350down.pdf}
+%% \end{center}
 
+
+%% \begin{figure}[center]
+%% \includegraphics[scale=\tw]{figs/unfolded_13350.pdf}
+%% \includegraphics[scale=\tw]{figs/rightarrow.png}
+%% \includegraphics[scale=\tw]{figs/unfolded_13350down.pdf}
+%% \end{figure}
+
+\begin{minipage}{6in}
+  \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g.pdf}}
+  \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/rightarrow.png}}
+  \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g_down.pdf}}
+\end{minipage}
+
+%%\end{textblock*}
+
+
+%%  \begin{textblock*}{3cm}(5.5cm,3.5cm) % {block width} (coords)
+
+%%\end{textblock*}
+
+%%  \begin{textblock*}{3cm}(6.75cm,3.1cm) % {block width} (coords)
+
+%%\end{textblock*}
+  
+\item Compare
+  \begin{equation*}
+    \widehat{\omega}(\Sigma^{-1}) = \argmin{\omega} \min_{a,\beta,\phi} \sum_{j=1}^{n} \left(\frac{m_{j} - \beta - a\sin(\omega t_{j} + \phi)}{\sigma_{j}}\right)^2
+  \end{equation*}
+
+  \begin{equation*}
+    \widehat{\omega}(I) = \argmin{\omega} \min_{a,\beta,\phi} \sum_{j=1}^{n} \left(m_{j} - \beta - a\sin(\omega t_{j} + \phi)\right)^2
+  \end{equation*}
+
+  
+  
+  
 \end{itemize}
 \end{frame}
 
@@ -1061,6 +1104,20 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
   \bibliography{refs}}
 \end{frame}
 
+\section*{Additional Results}
+
+\begin{frame}{Dependence Assumption}
+\todo{write here}
+\end{frame}
+
+\begin{frame}{Are uncertainties estimated correctly?}
+\todo{show example from SDSS suggesting they are.}
+\end{frame}
+
+
+\begin{frame}{$K=1,2,3$ Misspecified Model Results}
+\input{figs/period_est_results_simple.tex}
+\end{frame}
+
+
 \end{document}
-
-
