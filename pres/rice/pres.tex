@@ -551,7 +551,7 @@ Total of $26$ parameters, model estimates period well.
   \textbf{Questions:}
   \begin{itemize}
   \item Is period of best fitting sine function converging to true period of function?\\
-  \item Does weighting observations by inverse of the variance make sense when model is an approximation?
+  \item Is weighting observations by inverse of the variance optimal when model is an approximation?
   \end{itemize}
   
 \end{frame}
@@ -622,7 +622,7 @@ Example:
   \begin{assumptions}[Weight Matrix]
   Consider diagonal, positive definite weight matrices
   \begin{equation*}
-    \widehat{W}_{ii} = w(\sigma_i) +
+    W_{ii} = w(\sigma_i)
   \end{equation*}
   where $w(\cdot)$ is some function.
   \end{assumptions}
@@ -631,9 +631,9 @@ Example:
   
   \textbf{Important Cases:}
   \begin{itemize}
-  \item $\widehat{W}_{ii} = w(\sigma_{i}) = 1$ (OLS)
-  \item $\widehat{W}_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
-  \item $\widehat{W}_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for some constant $c$)
+  \item $W_{ii} = w(\sigma_{i}) = 1$ (OLS)
+  \item $W_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
+  \item $W_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for some constant $c$)
   \end{itemize}
 \end{frame}
 
@@ -673,23 +673,85 @@ Example:
   
   \begin{theorem}[Optimal Weighting]
     \begin{equation*}
-      w(\sigma) = \argmin{w} \Gamma(\nu(w)) = \frac{1}{\sigma^2 + \Gamma(A)\Gamma(B)^{-1}}
+      w^*(\sigma) = \argmin{w} \Gamma(\nu(w)) = \frac{1}{\sigma^2 + \Gamma(A)\Gamma(B)^{-1}}
     \end{equation*}
   \end{theorem}
 
-  \begin{theorem}[Adaptivity]
-    Under regularity conditions, 
-  \end{theorem}
+  \todo{discuss uniqueness of set}
+  
+\end{frame}
+  
+  \begin{frame}{Adaptive Estimation of Optimal Weighting}
+    \begin{theorem}
+      Under regularity conditions, there exist estimators $\widehat{A}$ and $\widehat{B}$ and
+      \begin{equation*}
+        \widehat{W}_{ii} = \frac{1}{\sigma_i^2 + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1}}
+      \end{equation*}
+      such that
+      \begin{equation*}
+        \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w^*))
+      \end{equation*}
+      \end{theorem}
+    Thus
+    \begin{theorem}
+      \begin{equation*}
+        \Gamma(\nu(\widehat{\beta}(\widehat{W}))) < \min(\Gamma(\nu(\widehat{\beta}(I))),\Gamma(\nu(\widehat{\beta}(\Sigma^{-1}))))
+      \end{equation*}
+      \end{theorem}
+
+    
+  \end{frame}
+  
+  %% \begin{theorem}[Adaptivity]
+  %%   Under regularity conditions, 
+  %% \end{theorem}
 
   %% \begin{itemize}
   %% \item $\Gamma(A)\Gamma(B)^{-1}$ reduces influence of low variance observations.
   %% \end{itemize}
 
+
+
+\begin{frame}{Small Simulation}
+
+  \textbf{Simulation Parameters:}
+  \begin{align*}
+        &n=100\\
+        &x_i \sim Unif[0,1]\\
+        &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
+          \begin{array}{lr}
+            0.05 \! &:  \! \sigma=0.01,1.0\\ 
+            0.9  \! &: \! \sigma=0.1\\
+          \end{array} \right.\\
+        &\epsilon_i \sim N(0,1)\\
+        &y_i = x_i^2 + \epsilon_i\sigma_i
+  \end{align*}
+
+  \textbf{Best Linear Approximation:}
+  \begin{equation*}
+      \beta = \E[xx^T]^{-1}\E[xf(x)] = -1/6 + x
+  \end{equation*}
+
+  \textbf{Compare Sampling Distribution:}
+  \begin{equation*}
+    \widehat{\beta} = (X^T\widehat{W}X)^{-1}\widehat{W}XY
+  \end{equation*}
+  for $\widehat{W}=\Sigma^{-1}$, $\widehat{W} = I$, and $\widehat{W} = (\Sigma + \widehat{\Delta})^{-1}$
+  
+  
 \end{frame}
 
 \begin{frame}{Small Simulation}
 
+  
+\def \tw {.26}
+
+\includegraphics[scale=\tw]{figs/estimator_wls.pdf}
+\includegraphics[scale=\tw]{figs/estimator_ols.pdf}
+\includegraphics[scale=\tw]{figs/estimator_dls.pdf}
+  
 \end{frame}
+
 
 %% \begin{frame}{Back to Variable Stars}
 
@@ -758,8 +820,7 @@ Example:
 
 \begin{frame}{Results}
 
-\input{figs/period_est_results_simple.tex}
-
+\input{figs/period_est_results_very_simple.tex}
 %% \vspace{.1in}
 %% \textbf{Conclusion:} Not using the photometric errors is better than using them because the sinusoidal model is misspecified.
 \end{frame}
@@ -767,6 +828,8 @@ Example:
 
 \begin{frame}{Conclusions}
 
+\todo{huber--white sandwich estimators. generalizations to unknown error variance, dependence case. yanyuan ma work.}
+  
 \end{frame}
 
 
