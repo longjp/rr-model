@@ -180,7 +180,7 @@ x.tab <- xtable(CItab,
                 caption=cap,
                 label="tab:CI")
 print(x.tab,
-      file=paste0("figs/CI.tex"),
+      file=paste0("../figs/CI.tex"),
       type='latex',
       include.rownames=TRUE,
       sanitize.text.function = function(x){x})
@@ -194,7 +194,7 @@ xlim <- range(c(ols[,1],wls[,1],dls[,1],uls[,1]))
 ylim <- range(c(ols[,2],wls[,2],dls[,2],uls[,2]))
 
 ## ols
-pdf("figs/estimator_ols.pdf",width=6,height=5)
+pdf("../figs/estimator_ols.pdf",width=6,height=5)
 par(mar=c(5,5,1,1))
 plot(ols,xlim=xlim,ylim=ylim,col=points_col,
      xlab=expression(hat(beta)[1]),
@@ -206,7 +206,7 @@ points(beta1,beta2,col="red",pch=19,cex=1.5)
 dev.off()
 
 ## wls
-pdf("figs/estimator_wls.pdf",width=6,height=5)
+pdf("../figs/estimator_wls.pdf",width=6,height=5)
 par(mar=c(5,5,1,1))
 plot(wls,xlim=xlim,ylim=ylim,col=points_col,
      xlab=expression(hat(beta)[1]),
@@ -217,7 +217,7 @@ points(beta1,beta2,col="red",pch=19,cex=1.5)
 dev.off()
 
 ## adaptive, known variance
-pdf("figs/estimator_dls.pdf",width=6,height=5)
+pdf("../figs/estimator_dls.pdf",width=6,height=5)
 par(mar=c(5,5,1,1))
 plot(dls,xlim=xlim,ylim=ylim,col=points_col,
      xlab=expression(hat(beta)[1]),
@@ -228,12 +228,61 @@ points(beta1,beta2,col="red",pch=19,cex=1.5)
 dev.off()
 
 ## adaptive, unknown variance
-pdf("figs/estimator_uls.pdf",width=6,height=5)
+pdf("../figs/estimator_uls.pdf",width=6,height=5)
 par(mar=c(5,5,1,1))
 plot(uls,xlim=xlim,ylim=ylim,col=points_col,
      xlab=expression(hat(beta)[1]),
      ylab=expression(hat(beta)[2]),
      cex.lab=cex.lab)
+points(ellipse(centre=c(beta1,beta2),Nu1(A,B,sig,(sig^2 + Delta)^{-1},n),level=.95),type='l',col="red",lwd=2)
+points(beta1,beta2,col="red",pch=19,cex=1.5)
+dev.off()
+
+
+
+############# SAME AS ABOVE BUT BIGGER CAPTIONS FOR PRESENTATIONS
+rmar <- 0.5
+lmar <- 5.5
+cex.lab <- 2
+cex.axis <- 1.5
+cex.main <- 3
+xlim <- c(-.35,.05)
+ylim <- c(.65,1.35)
+height <- 6
+width <- 6
+## ols
+pdf("../figs/pres_estimator_ols.pdf",width=width,height=height)
+par(mar=c(5,lmar,5,rmar))
+plot(ols,xlim=xlim,ylim=ylim,col=points_col,
+     xlab=expression(hat(beta)[1]),
+     ylab=expression(hat(beta)[2]),
+     cex.lab=cex.lab,cex.axis=cex.axis,
+     main="b) I",cex.main=cex.main)
+points(ellipse(centre=c(beta1,beta2),Nu1(A,B,sig,rep(1,n),n),level=.95),
+       type='l',col="red",lwd=2)
+points(beta1,beta2,col="red",pch=19,cex=1.5)
+dev.off()
+
+## wls
+pdf("../figs/pres_estimator_wls.pdf",width=width,height=height)
+par(mar=c(5,lmar,5,rmar))
+plot(wls,xlim=xlim,ylim=ylim,col=points_col,
+     xlab=expression(hat(beta)[1]),
+     ylab=expression(hat(beta)[2]),
+     cex.lab=cex.lab,cex.axis=cex.axis,
+     main=expression(plain("a) ")*Sigma^{-1}),cex.main=cex.main)
+points(ellipse(centre=c(beta1,beta2),Nu1(A,B,sig,sig^{-2},n),level=.95),type='l',col="red",lwd=2)
+points(beta1,beta2,col="red",pch=19,cex=1.5)
+dev.off()
+
+## adaptive, known variance
+pdf("../figs/pres_estimator_dls.pdf",width=width,height=height)
+par(mar=c(5,lmar,5,rmar))
+plot(dls,xlim=xlim,ylim=ylim,col=points_col,
+     xlab=expression(hat(beta)[1]),
+     ylab=expression(hat(beta)[2]),
+     cex.lab=cex.lab,cex.axis=cex.axis,
+     main=expression(plain("c) ")*(Sigma + Gamma(hat(A))*Gamma(hat(B))^{-1})^{-1}),cex.main=cex.main)
 points(ellipse(centre=c(beta1,beta2),Nu1(A,B,sig,(sig^2 + Delta)^{-1},n),level=.95),type='l',col="red",lwd=2)
 points(beta1,beta2,col="red",pch=19,cex=1.5)
 dev.off()

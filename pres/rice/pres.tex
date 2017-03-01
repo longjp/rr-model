@@ -755,7 +755,7 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
   \begin{equation*}
     \widehat{\beta}(\widehat{W}) = (X^T\widehat{W}X)^{-1}\widehat{W}XY
   \end{equation*}
-  for  \hfill a)  $\widehat{W}=\Sigma^{-1}$ \hfill b)   $\widehat{W} = I$,  \hfill c)   $\widehat{W} = (\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$
+  for  $\widehat{W}= \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \,$  a)  $\Sigma^{-1}$ \hfill b)   $I$  \hfill c)   $(\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$
   
   
 \end{frame}
@@ -845,10 +845,20 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \end{frame}
 
 
-\begin{frame}{Conclusions}
+\begin{frame}{Related Work}
 
-\todo{huber--white sandwich estimators. generalizations to unknown error variance, dependence case. yanyuan ma work.}
-  
+
+\underline{Huber--white sandwich estimators:} Huber \cite{huber1967behavior}, White \cite{white1980using,white1981consequences}\\
+
+\underline{Partial Linear Model:} Ma \cite{ma2006efficient,ma2013doubly}\\
+
+
+
+\underline{Generalizations:} $x, \sigma$ dependent case. Unknown error variance.\\
+
+\vspace{1in}
+
+\footnotesize{Reference: ``A Note on Parameter Estimation for Misspecified Regression Models with Heteroskedastic Errors.'' J.P. Long. Major Revision at \textit{Electronic Journal of Statistics}.}
 \end{frame}
 
 
