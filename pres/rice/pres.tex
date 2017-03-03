@@ -159,7 +159,7 @@ $\, \, $Zhenfeng Lin
 
 \section{Distance Determination, Variable Stars, Milky Way Halo}
 
-\begin{frame}{What is the distance to these objects?}
+\begin{frame}{What are the distances to these objects?}
 
   \begin{center}
     \includegraphics[scale=0.5]{figs/des_small.png}\\
@@ -176,10 +176,11 @@ $\, \, $Zhenfeng Lin
 \end{frame}
 
 \begin{frame}{Standard Candles}
-  \textbf{Standard Candles:} Class of objects with same luminosity
+  \textbf{Standard Candle:} Class of objects with same luminosity
   \begin{itemize}
   \item Know absolute luminosity of standard candle.
   \item Determine object is standard candle and estimate its brightness.
+  \item Solve for distance.
   \end{itemize}
 
   \vspace{.3in}
@@ -190,30 +191,32 @@ $\, \, $Zhenfeng Lin
   \end{itemize}
 \end{frame}
 
-\begin{frame}{RR Lyrae Variable Star}
-\textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.
+\begin{frame}{RR Lyrae are Variable Stars}
+\textbf{Variable stars:} Stars that vary in brightness across time.
 \begin{center}
 \includegraphics[scale=.3]{figs/unfolded_13350.pdf}
 \end{center}
 
 
   \begin{itemize}
-    \item Star observed $\approx 250$ times in $5$ bands ($u,g,r,i,z$).
+    \item Star observed $\approx 250$ times in $5$ filter ($u,g,r,i,z$).
     \item Known as a \textit{light curve}.
   \end{itemize}
 
 %% \begin{itemize}
-%% \item Star observed $\approx 250$ times in $5$ bands, $u,g,r,i,z$.
+%% \item Star observed $\approx 250$ times in $5$ filters, $u,g,r,i,z$.
 %% \item Data for star is $D=\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}$ for $b=1,\ldots,B$.
-%% \item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in band $b$.
+%% \item Observe brightness $m_{jb}$ at time $t_{jb}$ with uncertainty $\sigma_{jb}$ in filter $b$.
 %% \end{itemize}
 \end{frame}
 
 
-\begin{frame}{Folded Light Curve of RR Lyrae}
-\textbf{Folded light curve:} Brightness versus time modulo period.
+\begin{frame}{RR Lyrae are Periodic Variables}
+\textbf{Periodic variables:} Stars that repeat brightness variation over a fixed period.\\
+
 \begin{center}
 \includegraphics[scale=.3]{figs/folded_13350.pdf}\\
+\textbf{Folded light curve:} Brightness versus time modulo period.
 Distance to this star is proportional to mean magnitude, after accounting for \underline{dust} and \underline{PL relation}.
 \end{center}
 \end{frame}
@@ -365,10 +368,11 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
 \textbf{Dark Energy Survey (DES)}
 \begin{itemize}
-\item $\approx$ 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
-\item 68 million stars
-\item depths to 24 mag in $i$
+\item ongoing survey (started 2013, 5 years of planned observing)
 \item 5000 square degrees ($\approx$ 1/9$^{th}$ entire sky)
+\item depths to 24 mag in $i$
+\item 68 million stars
+\item $\approx$ 10 observations in each filter ($g$,$i$,$r$,$z$,$Y$) over five years
 \end{itemize}
 
 \vspace{.1in}
@@ -394,8 +398,8 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
   Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
 \begin{itemize}
-\item $b=1,\ldots,B$ denotes band (ie filter)
-\item $n_b$ is number of measurements in band $b$
+\item $b=1,\ldots,B$ denotes filter (ie filter)
+\item $n_b$ is number of measurements in filter $b$
 \item $m_{jb}$ is brightness at time $t_{jb}$ with known uncertainty $\sigma_{jb}$
 \end{itemize}
 
@@ -453,7 +457,7 @@ Total of $26$ parameters, model estimates period well.
 \begin{frame}{Model Output Used for Classification}
 
   \begin{center}
-    Fit $K=2$ model to light curves. RR Lyrae separate well.
+    Fit $K=2$ model to light curves. RRL separate from non-RRL.
   \end{center}
   
 \begin{center}
@@ -516,7 +520,7 @@ Total of $26$ parameters, model estimates period well.
     \includegraphics[scale=.25]{figs/rrlyrae_model_fit_sine.pdf}
   \end{center}
 
-\item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. With $K=2$, 26 parameters and 50 data points. \underline{Problem:} Large variance in parameter estimates.
+\item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. $K=2$ model has 26 parameters. \underline{Problem:} Large variance in parameter estimates.
   \end{itemize}
   %% put best sampled star here
 \end{frame}
@@ -526,9 +530,9 @@ Total of $26$ parameters, model estimates period well.
 
 \underline{Fitting Approximate Models with Heteroskedastic Errors}\\
 \begin{itemize}
-\item Define what approximate / misspecified model is estimating.
-\item With heteroskedasticity, optimal weighting no longer $\sigma^{-2}$.
-\item Construct adaptive estimator for optimal weight.
+\item What is approximate / misspecified model estimating?
+\item With heteroskedasticity, is optimal weighting $\sigma^{-2}$?
+%\item Construct adaptive estimator for optimal weight.
 \end{itemize}
 
 
@@ -536,8 +540,7 @@ Total of $26$ parameters, model estimates period well.
 
 \underline{Improved Model for RR Lyrae Stars}
 \begin{itemize}
-\item Build parsimonious (few free parameters) RRL model.
-\item Assess model accuracy on SDSS Stripe 82 RRL.
+\item Build accurate, parsimonious (few free parameters) RRL model.
 \end{itemize}
 
 \end{frame}
@@ -557,9 +560,8 @@ Total of $26$ parameters, model estimates period well.
   
   
 
-  \textbf{Questions:}
+  \textbf{Question:}
   \begin{itemize}
-  \item Is period of best fitting sine function converging to true period of function?\\
   \item Is weighting observations by inverse of the variance optimal when model is an approximation?
   \end{itemize}
   
@@ -607,6 +609,9 @@ Example:
         \includegraphics[scale=0.4]{figs/data.pdf}
   \end{center}
 
+\vspace{-.2in}
+
+See Huber \cite{huber1967behavior} (1967) and White \cite{white1980using,white1981consequences} (1980,1981).
 
   %% \begin{columns}
   %%   \begin{column}{0.5\textwidth}
@@ -626,14 +631,15 @@ Example:
   %% \end{columns}
 \end{frame}
 
-\begin{frame}{Weight Matrix}
+\begin{frame}{How Should We Weight Observations?}
 
+  
   \begin{assumptions}[Weight Matrix]
-  Consider diagonal, positive definite weight matrices
+  Consider diagonal, positive definite weight matrices $W$ where
   \begin{equation*}
     W_{ii} = w(\sigma_i)
   \end{equation*}
-  where $w(\cdot) > 0$ and $\E[w(\sigma)^4] < \infty$.
+  for $w(\cdot) > 0$ and $\E[w(\sigma)^4] < \infty$.
   \end{assumptions}
 
   \vspace{.2in}
@@ -642,7 +648,6 @@ Example:
   \begin{itemize}
   \item $W_{ii} = w(\sigma_{i}) = 1$ (OLS)
   \item $W_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
-  \item $W_{ii} = w(\sigma_{i}) = (\sigma_{i}^{2} + c)^{-1}$ (for any constant $c$)
   \end{itemize}
 \end{frame}
 
@@ -655,7 +660,7 @@ Example:
   \begin{equation*}
     \sqrt{n}(\widehat{\beta}(W) - \beta) \rightarrowd N(0,\nu(w))
   \end{equation*}
-  where $g(x) = f(x) - x^T\beta$ and
+where $g(x) = f(x) - x^T\beta$ and
   \begin{equation*}
     \nu(w) = \frac{\E[w^2]\overbrace{\E[xx^T]^{-1}\E[g^2(x)xx^T]\E[xx^T]^{-1}}^{\equiv A} + \E[\sigma^2w^2]\overbrace{\E[xx^T]^{-1}}^{\equiv B}}{\E[w]^2}.
   \end{equation*}
@@ -674,13 +679,17 @@ Example:
 
 \begin{frame}{Optimal Weight Function}
 
-  Consider linear function
+  \textbf{General Case:} No weight function $w^*$ such that $\nu(w^*) \preceq \nu(w) \, \forall \, w$.
+
+  \vspace{.1in}
+  
+  \textbf{Minimize function of asymptotic variance:} Consider linear function
   \begin{equation*}
     \Gamma: \mathbb{R}^p \times \mathbb{R}^p \rightarrow \mathbb{R}
   \end{equation*}
   such that $\Gamma(C) > 0$ for all $C$ positive definite.
 
-\vspace{.2in}
+\vspace{.1in}
   
   Examples:
   \begin{itemize}
@@ -700,14 +709,14 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \end{frame}
   
   \begin{frame}{Adaptive Estimation of Optimal Weighting}
-    \begin{theorem}
+    \begin{theorem}[Adaptivity]
       Under regularity conditions, there exist estimators $\widehat{A}$ and $\widehat{B}$ and
       \begin{equation*}
         \widehat{W}_{ii} = \frac{1}{\sigma_i^2 + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1}}
       \end{equation*}
       such that
       \begin{equation*}
-        \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w^*))
+        \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w^*)).
       \end{equation*}
       \end{theorem}
     \begin{theorem}
@@ -734,6 +743,7 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \begin{frame}{Simulation: Approximate $x^2$ with Linear Function}
 
   \textbf{Simulation Parameters:}
+  %%\includegraphics[scale=0.3]{figs/data.pdf}
   \begin{align*}
         &n=100\\
         &x_i \sim Unif[0,1]\\
@@ -768,7 +778,14 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \includegraphics[scale=\tw]{figs/pres_estimator_wls.pdf}
 \includegraphics[scale=\tw]{figs/pres_estimator_ols.pdf}
 \includegraphics[scale=\tw]{figs/pres_estimator_dls.pdf}
-  
+
+\begin{center}
+  \begin{itemize}
+    \item $\Gamma(C) = Trace(C)$
+    \item Asymptotic variance for $\widehat{W} = (\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$ smallest.
+  \end{itemize}
+\end{center}
+
 \end{frame}
 
 
@@ -785,7 +802,7 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 
 \begin{frame}{Application to Variable Star Period Estimation}
 \begin{itemize}
-\item 238 SDSS Stripe 82 (g--band data only)
+\item 238 SDSS Stripe 82 RR Lyrae (g--filter data only)
 \item Downsample light curves to 10, 20, 30, and 40 observations.
 
 \def \tw {.15}
@@ -845,18 +862,16 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \end{frame}
 
 
-\begin{frame}{Related Work}
+\begin{frame}{Related Work and Considerations}
 
+\begin{itemize}
+\item \underline{Huber--white sandwich estimators:} Huber \cite{huber1967behavior}, White \cite{white1980using,white1981consequences}
+\item \underline{Partial Linear Model:} Ma \cite{ma2006efficient,ma2013doubly} discovered similar behavior.
+\item \underline{Generalizations:} $x, \sigma$ dependent case. Unknown error variance. Results contained in manuscript reference below.
+\item \underline{What about building a correct model?} ``All models are wrong, but some are useful.'' -- George Box
+\end{itemize}
 
-\underline{Huber--white sandwich estimators:} Huber \cite{huber1967behavior}, White \cite{white1980using,white1981consequences}\\
-
-\underline{Partial Linear Model:} Ma \cite{ma2006efficient,ma2013doubly}\\
-
-
-
-\underline{Generalizations:} $x, \sigma$ dependent case. Unknown error variance.\\
-
-\vspace{1in}
+\vspace{.3in}
 
 \footnotesize{Reference: ``A Note on Parameter Estimation for Misspecified Regression Models with Heteroskedastic Errors.'' J.P. Long. Major Revision at \textit{Electronic Journal of Statistics}.}
 \end{frame}
@@ -867,7 +882,14 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 \subsection{Improved Model for RR Lyrae Stars}
 
 \begin{frame}{Building a Better Model}
+Most RR Lyrae have similar shapes. Two examples:
 
+\begin{center}
+\includegraphics[scale=0.2]{figs/folded_4099.pdf}\\
+\includegraphics[scale=0.2]{figs/folded_13350.pdf}
+\end{center}
+
+\textbf{What varies?} Distance, dust, amplitude, period, phase.
 \end{frame}
 
 \begin{frame}{Parsimonious RR Lyrae Model}
@@ -875,7 +897,7 @@ Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
 
 \begin{center}
 global parameters fit once for all RR Lyrae\\
-\includegraphics[scale=.3]{figs/model.png}\\
+\includegraphics[scale=.35]{figs/rr_model.png}\\
 individual parameters fit for each RR Lyrae
 \end{center}
 
@@ -885,9 +907,9 @@ individual parameters fit for each RR Lyrae
 \item $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
 \item Model:
 \begin{equation*}
-m_{jb} = m_b(t_{jb}) + \epsilon_{jb}
+m_{jb} = m_b(t_{jb}) + \epsilon_{jb}\sigma_{jb}
 \end{equation*}
-where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
+where $\epsilon_{jb} \sim N(0,1)$ i.i.d.
 \end{itemize}
 \end{frame}
 
@@ -900,25 +922,13 @@ where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
 \end{frame}
 
 \begin{frame}{Parameter Estimation}
-%%\begin{itemize}
-%% \item Likelihood:
-%% \begin{equation*}
-%% m_{jb} = m_b(t_{jb}) + \epsilon_{jb} 
-%% \end{equation*}
-%% where $\epsilon_{jb} \sim N(0,\sigma_{jb}^2)$.
-%% \item Define
-%% \begin{align*}
-%% &RSS(\omega,\mu,E[B-V],a,\phi) \\
-%%  &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{bi}}\right)^2
-%% \end{align*}
-%% \end{itemize}
 \begin{align*}
 &RSS(\omega,\mu,E[B-V],a,\phi) \\
- &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(\frac{m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)}{\sigma_{jb}}\right)^2
+ &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)\right)^2
 \end{align*}
 
 
-Estimate parameters with maximum likelihood ($\chi^2$ minimization):
+Minimize RSS ($\chi^2$ minimization):
 \begin{itemize}
 \item Likelihood is highly multimodal in $\omega$, grid search.
 \item Model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates.
@@ -928,16 +938,48 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \end{frame}
 
 \begin{frame}{Example Fits to SDSS Light Curves}
-
+\begin{center}
+  \includegraphics[scale=0.3]{figs/1_one.pdf}
+\end{center}
 \end{frame}
 
-\begin{frame}{Example Fits to DES Light Curves}
-
+\begin{frame}{Example Fits to SDSS Light Curves}
+\begin{center}
+  \includegraphics[scale=0.3]{figs/2_one.pdf}
+\end{center}
 \end{frame}
+
+\begin{frame}{Example Fits to SDSS Light Curves}
+\begin{center}
+  \includegraphics[scale=0.3]{figs/3_one.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Example Fits to SDSS Light Curves}
+\begin{center}
+  \includegraphics[scale=0.3]{figs/4_one.pdf}
+\end{center}
+\end{frame}
+
+
 
 \begin{frame}{Summary of Fitting}
 
-  \todo{State: don't use error variance because worried about model misspecification. mention carroll's article on when measurement errors are estiamte, even more suspicious.} 
+  \begin{itemize}
+  \item Model has 5 free parameters.
+    \begin{itemize}
+    \item Fits much better than sinusoid (16 free parameters).
+    \item Comparable fit quality to Fourier with $K=2$ harmonics (26 parameters).
+    \item Interpretable parameters, eg dust and distance modulus.
+    \end{itemize}
+  \item Model is still approximate.
+    \begin{itemize}
+      \item Median residual: $0.034$
+      \item Median photometric error: $0.014$
+      \item Cautious with weighting RSS.
+    \end{itemize}
+
+    \end{itemize}
   
 \end{frame}
 
@@ -955,7 +997,7 @@ Estimate parameters with maximum likelihood ($\chi^2$ minimization):
 \begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
 
   \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
-Downsample Stripe 82 variables to 20 observations across all bands:
+Downsample Stripe 82 variables to 20 observations across all filters:
 \end{textblock*}
 
   \begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
@@ -975,7 +1017,6 @@ Downsample Stripe 82 variables to 20 observations across all bands:
 \begin{itemize}
 \item Can we estimate periods correctly for RR Lyrae?
 \item Can we estimate distances accurately?
-\item Can we separate RR Lyrae from non--RR Lyrae? 
 \item Can we reproduce halo maps of Sesar 2010?
 \end{itemize}
 \end{textblock*}
@@ -989,14 +1030,9 @@ Downsample Stripe 82 variables to 20 observations across all bands:
 
 \begin{center}
 Comparison of period estimates for 350 RR Lyrae\\
-\includegraphics[scale=.25]{figs/period_comparison.pdf}
+\includegraphics[scale=.4]{figs/period_est_comparison.pdf}
 \end{center}
 
-
-%% \begin{itemize}
-%% \item Sine Model: $6$\% of estimates within $0.01$\% of truth.
-%% \item RR Lyrae Model: $67$\% of estimates within $0.01$\% of truth.
-%% \end{itemize}
 
 \end{frame}
 
@@ -1016,20 +1052,22 @@ Comparison of period estimates for 350 RR Lyrae\\
 \end{frame}
 
 
-\begin{frame}{Results for Classification}
+%% \begin{frame}{Results for Classification}
 
-\begin{center}
-Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
-\includegraphics[scale=.33]{figs/period_vs_EBV.pdf}
-\includegraphics[scale=.33]{figs/a_vs_dev_log.pdf}
-\end{center}
+%% \begin{center}
+%% Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
+%% \includegraphics[scale=.33]{figs/period_vs_EBV.pdf}
+%% \includegraphics[scale=.33]{figs/a_vs_dev_log.pdf}
+%% \end{center}
 
-\begin{itemize}
-\item Visually good separation with small number of features.
-\item Potential to use model output as feature input to classifier.
-%\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
-\end{itemize}
-\end{frame}
+%% \begin{itemize}
+%% \item Visually good separation with small number of features.
+%% \item Potential to use model output as feature input to classifier.
+%% %\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
+%% \end{itemize}
+%% \end{frame}
+
+
 
 %% \begin{frame}{Results for Constructing Milky Way Halo Maps}
 %%   \def \tw {.1}
@@ -1071,8 +1109,16 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 
 
-\begin{frame}{Classification Process}
-  \todo{describe classification setup here}
+\begin{frame}{Reproducing Milky Way Halo Maps}
+\underline{Select 350 RR Lyrae and 1000 non--RR Lyrae from SDSS Stripe 82.}
+\begin{enumerate}
+  \item Fit RR Lyrae Model to light curves
+  \item Extract features
+  \item Build Random Forest Classifier
+  \item Classify RRL / not-RRL for out--of--bag data (cross--validation)
+  \item Estimate distances to stars classified as RRL
+  \item Construct MW Halo map
+\end{enumerate}
 \end{frame}
 
 
@@ -1106,11 +1152,6 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 
 \subsection{Dark Energy Survey}
 
-\begin{frame}{DES Overview}
-\todo{describe survey briefly}
-\end{frame}
-
-
 \begin{frame}{FORNAX Dwarf Spheroid Satellite Galaxy}
   \begin{center}
     \includegraphics[scale=0.04]{figs/Fornax_dwarf_galaxy.jpg}
@@ -1119,60 +1160,86 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
 \end{frame}
 
 \begin{frame}{Data Challenge}
+  \begin{itemize}
+  \item 3442 light curves from FORNAX region
+  \item Correctly identified 232/317 RR Lyrae in sample (blind test)
+  \item RRL estimated distances correspond with known distance to FORNAX (130--150 kpc)
+  \end{itemize}
+
+  
+\begin{minipage}{6in}
+  \raisebox{-0.5\height}{\includegraphics[scale=0.2]{figs/unfolded_des_7.pdf}}
+  \raisebox{-0.5\height}{\includegraphics[scale=0.3]{figs/fornax_rr_distances.pdf}}
+  %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g.pdf}}
+  %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/rightarrow.png}}
+  %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g_down.pdf}}
+\end{minipage}
+
+\begin{center}  
+  \textbf{Current Challenge:} Find satellite galaxy of FORNAX.
+\end{center}
 
 \end{frame}
 
-\section{Ongoing and Related Work}
+\begin{frame}[plain]
 
-\begin{frame}{Related Work}
-
-\textbf{Period Estimation Algorithms / Variable Star Models:}
-\begin{itemize}
-\item Sinusoid Based Methods
-\begin{itemize}
-\item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
-\item Generalized LS (GLS) \cite{zechmeister2009generalised}
-\item Multiband Extensions \cite{vanderplas2015periodograms,long2014estimating}.
-\item AoV \cite{schwarzenberg1996fast}
-\end{itemize}
-\item ``Non--parametric'' methods
-\begin{itemize}
-\item Phase Dispersion Minimization \cite{stellingwerf1978period}
-\item Supersmoother \cite{sesar2010light}
-\end{itemize}
-\item Template Based Methods
-\begin{itemize}
-\item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
-\item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
-\end{itemize}
-\end{itemize}
-
-\vspace{.1in}
-
-\textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
-\begin{itemize}
-\item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
-\end{itemize}
-
+  \begin{center}
+    {\huge Thank you. Questions?}
+    \end{center}
 
 \end{frame}
 
-\begin{frame}{Ongoing Work}
-\begin{itemize}
-\item Model refinements:
-\begin{itemize}
-\item $M_b$ dependence on period, metallicity.
-\item Bands other than $g,i,u,r,z$
-\item Parameterize $\gamma_b$ to account for shape differences across RRL
-\end{itemize}
-\item Propagate uncertainty to 3D halo density estimate
-\begin{itemize}
-\item Treat as Inference Problem: Bayesian posterior or frequentist confidence bands. Hierarchical model?
-\item Treat as Prediction Problem: Evaluate distance / density estimates using Stripe 82 data or follow--up observations.
-\end{itemize}
-\item Milky Way Halo maps using DES data
-\end{itemize}
-\end{frame}
+
+%% \section{Ongoing and Related Work}
+
+%% \begin{frame}{Related Work}
+
+%% \textbf{Period Estimation Algorithms / Variable Star Models:}
+%% \begin{itemize}
+%% \item Sinusoid Based Methods
+%% \begin{itemize}
+%% \item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
+%% \item Generalized LS (GLS) \cite{zechmeister2009generalised}
+%% \item Multifilter Extensions \cite{vanderplas2015periodograms,long2014estimating}.
+%% \item AoV \cite{schwarzenberg1996fast}
+%% \end{itemize}
+%% \item ``Non--parametric'' methods
+%% \begin{itemize}
+%% \item Phase Dispersion Minimization \cite{stellingwerf1978period}
+%% \item Supersmoother \cite{sesar2010light}
+%% \end{itemize}
+%% \item Template Based Methods
+%% \begin{itemize}
+%% \item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
+%% \item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
+%% \end{itemize}
+%% \end{itemize}
+
+%% \vspace{.1in}
+
+%% \textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
+%% \begin{itemize}
+%% \item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
+%% \item Sesar \cite{sesar2016machine} mapping MW halo with Pan--STARRS, developed RRL templates.
+%% \end{itemize}
+
+
+%% \end{frame}
+
+%% \begin{frame}{Ongoing and Upcoming Work}
+%% \begin{itemize}
+%% \item Model refinements:
+%% \begin{itemize}
+%% \item $M_b$ dependence on period, metallicity.
+%% \item Filters other than $g,i,u,r,z$
+%% \end{itemize}
+%% \item Milky Way Halo Maps
+%% \begin{itemize}
+%% \item Estimation of halo 
+%% \item Treat as Prediction Problem: Evaluate distance / density estimates using Stripe 82 data or follow--up observations.
+%% \end{itemize}
+%% \end{itemize}
+%% \end{frame}
 
 %% \begin{frame}{Conclusions}
 %% \begin{itemize}
@@ -1196,20 +1263,20 @@ Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
   \bibliography{refs}}
 \end{frame}
 
-\section*{Additional Results}
+%% \section*{Additional Results}
 
-\begin{frame}{Dependence Assumption}
-\todo{write here}
-\end{frame}
+%% \begin{frame}{Dependence Assumption}
+%% \todo{write here}
+%% \end{frame}
 
-\begin{frame}{Are uncertainties estimated correctly?}
-\todo{show example from SDSS suggesting they are.}
-\end{frame}
+%% \begin{frame}{Are uncertainties estimated correctly?}
+%% \todo{show example from SDSS suggesting they are.}
+%% \end{frame}
 
 
-\begin{frame}{$K=1,2,3$ Misspecified Model Results}
-\input{figs/period_est_results.tex}
-\end{frame}
+%% \begin{frame}{$K=1,2,3$ Misspecified Model Results}
+%% \input{figs/period_est_results.tex}
+%% \end{frame}
 
 
 \end{document}
