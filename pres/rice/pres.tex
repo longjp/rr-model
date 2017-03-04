@@ -398,7 +398,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 
   Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
 \begin{itemize}
-\item $b=1,\ldots,B$ denotes filter (ie filter)
+\item $b=1,\ldots,B$ denotes filter
 \item $n_b$ is number of measurements in filter $b$
 \item $m_{jb}$ is brightness at time $t_{jb}$ with known uncertainty $\sigma_{jb}$
 \end{itemize}
@@ -418,7 +418,7 @@ Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
 \textbf{Method:} $K$ harmonic Fourier expansion in each filter:
 
 \begin{equation*}
-m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(\omega t_{jb} + \phi_{bk}) + \sigma_{jb}\epsilon_{jb}
+m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(k \omega t_{jb} + \phi_{bk}) + \sigma_{jb}\epsilon_{jb}
 \end{equation*}
 where $\epsilon_{jb} \sim N(0,1)$, independent.
 
