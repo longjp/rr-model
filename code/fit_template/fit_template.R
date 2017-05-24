@@ -32,6 +32,42 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
     return(rss)
 }
 
+## for a given omega, return cofficients
+## example usage: run FitTemplate to determine rss as function of omegas,
+## find omega which minimizes rss, then find coeffs for this omega using ComputeCoeffs
+##
+## arguments
+##           lc : light curve, data frame with columns time, band, mag, error
+##        omega : frequency
+##          tem : input templates
+##           NN : number of newton steps, probably 10+ since no warm start
+##   use.errors : should photometric errors be used, generally not advised
+##
+##
+## value
+##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
+ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
+    tem <- CheckTemLC(tem,lc)
+    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    nb <- dat[[2]]
+    coeffs <- c(0,0,0,runif(1))
+    J <- 0
+    ## prevent infinite loops with J
+    while(coeffs[3]==0 & J < 10){
+        for(jj in 1:NN){
+            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+        }
+        J <- J + 1
+    }
+    ## convert NewtonUpdate "amplitude" to peak-to-peak g band amplitude
+    coeffs[3] <- coeffs[3]*diff(range(tem$templates["g",]))    
+    return(coeffs)
+}
+
+
 AugmentData <- function(lc,dust,betas,use.errors=FALSE){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
@@ -89,25 +125,6 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
 }
 
 
-## for a given omega, find coefficients
-ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
-    tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
-    m <- dat[[1]]$mag
-    dust <- dat[[1]]$dust
-    t <- dat[[1]]$time
-    nb <- dat[[2]]
-    coeffs <- c(0,0,0,runif(1))
-    J <- 0
-    ## prevent infinite loops with J
-    while(coeffs[3]==0 & J < 10){
-        for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
-        }
-        J <- J + 1
-    }
-    return(coeffs)
-}
 
 AmpAlphaDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
