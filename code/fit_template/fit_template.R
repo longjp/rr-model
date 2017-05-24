@@ -13,6 +13,7 @@
 ## value
 ##          rss : the residual sum of squares at each frequency in omegas     
 FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
+    multi <- CheckNumberBands(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -24,7 +25,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
     rss <- rep(0,length(omegas))
     for(ii in 1:length(omegas)){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs,multi)
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
@@ -47,6 +48,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
 ## value
 ##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
 ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
+    multi <- CheckNumberBands(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -58,7 +60,7 @@ ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
     ## prevent infinite loops with J
     while(coeffs[3]==0 & J < 10){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs)
+            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs,multi)
         }
         J <- J + 1
     }
@@ -161,21 +163,36 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
     return(gammaf)
 }
 
-## computes beta
 ComputeBeta <- function(m,dust,gammaf){
     X <- cbind(mu=1,d=dust,a=gammaf)
     B <- t(X)%*%X
     d <- t(X)%*%m
     z <- solve(B,d)
-   return(z[,1])
+    return(z[,1])
 }
 
-NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
+ComputeBetaOne <- function(m,gammaf){
+    X <- cbind(mu=1,a=gammaf)
+    B <- t(X)%*%X
+    d <- t(X)%*%m
+    z <- solve(B,d)
+    return(z[,1])
+}
+
+NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,multi){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
-    est <- ComputeBeta(m,dust,gammaf)
-    mu <- est["mu"]
-    a <- est["a"]
-    d <- est["d"]
+    if(multi){
+        est <- ComputeBeta(m,dust,gammaf)
+        mu <- est["mu"]
+        a <- est["a"]
+        d <- est["d"]
+    }
+    else {
+        est <- ComputeBetaOne(m,gammaf)
+        mu <- est["mu"]
+        a <- est["a"]
+        d <- 0
+    }        
     if(a > 0){
         gammafd <- ConstructGamma(t,nb,phi,omega,templated_funcs)
         mp <- m - mu - d*dust
@@ -193,12 +210,19 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
 
 
 
-AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
+AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,multi){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
-    est <- ComputeBeta(m,dust,gammaf)
-    mu <- est["mu"]
-    a <- est["a"]
-    d <- est["d"]
+    if(multi){
+        est <- ComputeBeta(m,dust,gammaf)
+        mu <- est["mu"]
+        a <- est["a"]
+        d <- est["d"]
+    }
+    else {
+        est <- ComputeBeta(m,gammaf)
+        mu <- est["mu"]
+        a <- est["a"]
+    }        
     if(a < 0) {
         a <- 0
     }
@@ -208,6 +232,7 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
 }
 
 ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
+    multi <- CheckNumberBands(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -218,7 +243,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
         coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
-                                     tem$template_funcs)
+                                     tem$template_funcs,multi)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
     }
@@ -251,4 +276,13 @@ CheckTemLC <- function(tem,lc){
 
 TBMEtoLC <- function(time,band,mag,error){
     return(data.frame(time,band,mag,error))
+}
+
+CheckNumberBands <- function(lc){
+    multi <- TRUE
+    if(length(unique(lc[,2]))==1){
+        print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now just the band mean.")
+        multi <- FALSE
+    }
+    return(multi)
 }
