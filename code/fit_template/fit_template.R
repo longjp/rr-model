@@ -66,6 +66,52 @@ ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
 }
 
 
+## make predictions at a set of times (in single band)
+##
+##
+## arguments
+##           times : times to make predictions
+##           omega : frequency
+##          coeffs : coefficients from model fit
+##            band : band to make prediction
+##             tem : input templates
+##
+##
+## value
+##              m  : vector of predicted magnitudes
+PredictSingleBand <- function(times,omega,coeffs,band,tem){
+    t_temp <- (times*omega + coeffs[4]) %% 1.0
+    m <- (coeffs[1] + tem$betas[band] + coeffs[2]*tem$dust[band] +
+          coeffs[3]*tem$template_funcs[[band]](t_temp))
+    return(m)
+}
+
+## make predictions at a set of times (in all bands)
+##
+##
+## arguments
+##           times : times to make predictions
+##           omega : frequency
+##          coeffs : coefficients from model fit
+##             tem : input templates
+##
+##
+## value
+##              m  : matrix of predictions, columns are bands, rows times
+PredictAllBand <- function(times,omega,coeffs,tem){
+    bands <- names(tem$betas)
+    m <- vapply(bands,function(x){PredictSingleBand(times,omega,coeffs,x,tem)},rep(0,length(times)))
+    return(m)
+}
+
+
+
+
+
+##### below this are mostly helper functions that
+##### are unlikely to be useful for direct calling
+
+
 AugmentData <- function(lc,dust,betas,use.errors=FALSE){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
@@ -94,7 +140,7 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
 
 ## computes beta
 ComputeBeta <- function(m,dust,gammaf){
-    X <- cbind(alpha=1,d=dust,a=gammaf)
+    X <- cbind(mu=1,d=dust,a=gammaf)
     B <- t(X)%*%X
     d <- t(X)%*%m
     z <- solve(B,d)
@@ -104,12 +150,12 @@ ComputeBeta <- function(m,dust,gammaf){
 NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     est <- ComputeBeta(m,dust,gammaf)
-    alpha <- est["alpha"]
+    mu <- est["mu"]
     a <- est["a"]
     d <- est["d"]
     if(a > 0){
         gammafd <- ConstructGamma(t,nb,phi,omega,templated_funcs)
-        mp <- m - alpha - d*dust
+        mp <- m - mu - d*dust
         del <- sum(gammafd*(mp-a*gammaf))
         h <- a*sum(gammafd*gammafd)
         phi <- (phi + h^{-1}*del) %% 1
@@ -117,23 +163,23 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs){
         a <- 0
         phi <- runif(1)
     }
-    out <- c(alpha,d,a,phi=phi)
+    out <- c(mu,d,a,phi=phi)
     names(out) <- NULL
     return(out)
 }
 
 
 
-AmpAlphaDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
+AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     est <- ComputeBeta(m,dust,gammaf)
-    alpha <- est["alpha"]
+    mu <- est["mu"]
     a <- est["a"]
     d <- est["d"]
     if(a < 0) {
         a <- 0
     }
-    out <- c(alpha,d,a)
+    out <- c(mu,d,a)
     names(out) <- NULL
     return(out)
 }
@@ -148,7 +194,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
     rss_max <- sum(lm(m~dust)$residuals^2)
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
-        coeffs <- AmpAlphaDustUpdate(phis[ii],omega,m,t,dust,nb,
+        coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
                                      tem$template_funcs)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
