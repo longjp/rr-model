@@ -3,7 +3,7 @@ unlink("*.RData")
 unlink("*.pdf")
 source('../common/funcs.R')
 load("../data/clean/sdss_rrab.RData")
-
+library(RColorBrewer)
 
 ## get light curves with at least 50 observations / band in each band
 bands <- names(tms[[1]])
@@ -111,39 +111,39 @@ for(JJ in 1:5){
 }
 
 ## visualize curves with templates
-## cols <- brewer.pal(10,name="RdBu")
-## decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
-## dec <- findInterval(periods,c(-Inf,decLocations, Inf))
-## yedge <- 2.5
-## del <- phase(lc_grid[,,1])
-## for(JJ in 1:5){
-##     n <- nrow(lc_grid[,,JJ])
-##     dev.new()
-##     par(mfcol=c(2,1))
-##     ylim <- range(lc_grid[,,JJ])
-##     ylim <- c(-yedge,yedge)
-##     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-##     for(ii in 1:length(tms)){
-##         points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
-##     }
-##     ylim <- range(x_new[[JJ]])
-##     ylim <- c(-yedge,yedge)
-##     plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
-##     for(ii in 1:nrow(x_new[[JJ]])){
-##         points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
-##     }
-##     points(t,templates[JJ,],lwd=3,type='l')
-## }
+cols <- brewer.pal(10,name="RdBu")
+decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
+dec <- findInterval(periods,c(-Inf,decLocations, Inf))
+yedge <- 2.5
+del <- phase(lc_grid[,,1])
+for(JJ in 1:5){
+    n <- nrow(lc_grid[,,JJ])
+    dev.new()
+    par(mfcol=c(2,1))
+    ylim <- range(lc_grid[,,JJ])
+    ylim <- c(-yedge,yedge)
+    plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
+    for(ii in 1:length(tms)){
+        points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
+    }
+    ylim <- range(x_new[[JJ]])
+    ylim <- c(-yedge,yedge)
+    plot(0,0,col=0,ylim=ylim,xlim=c(0,1),xlab="",ylab="",xaxs="i")
+    for(ii in 1:nrow(x_new[[JJ]])){
+        points(t,x_new[[JJ]][ii,],type='l',col=cols[dec[ii]])
+    }
+    points(t,templates[JJ,],lwd=3,type='l')
+}
 
-## plot of templates
-## ylim <- range(templates)
-## xlim <- range(t)
-## pdf("templates2.pdf",width=8,height=4)
-## plot(0,0,col=0,ylim=ylim,xlim=xlim)
-## for(ii in 1:5){
-##     points(t,templates[ii,],type='l',lwd=2)
-## }
-## dev.off()
+##plot of templates
+ylim <- range(templates)
+xlim <- range(t)
+pdf("templates2.pdf",width=8,height=4)
+plot(0,0,col=0,ylim=ylim,xlim=xlim)
+for(ii in 1:5){
+    points(t,templates[ii,],type='l',lwd=2)
+}
+dev.off()
 
 
 ## scale templates by amps, don't save amps
