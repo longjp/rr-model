@@ -41,11 +41,8 @@ segments((lc$time %% p_est)/p_est,
          lc$mag+lc$error,
          (lc$time %% p_est)/p_est,
          lc$mag-lc$error)
+ti <- (1:100)/100
+m <- PredictAllBand(ti,1,coeffs,tem)
 for(ii in 1:length(tem$betas)){
-    ti <- (1:100)/100
-    t_temp <- (ti - coeffs[4]) %% 1.0
-    m_temp <- tem$templates[ii,order(t_temp)]
-    y <- (coeffs[1] + tem$betas[ii] + coeffs[2]*tem$dust[ii] +
-          coeffs[3]*m_temp)
-    points(ti,y,type='l',col=colpch[names(tem$betas)[ii]])
+    points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
 }
