@@ -20,7 +20,7 @@ dir.create("figs")
 coes <- matrix(0,nrow=length(tms),ncol=4)
 
 ## plot all bands with best fit parameters, store in figs
-rss.n <- rep(0,length(tms))
+rss.n <- vector("list",length(tms))
 for(ii in 1:length(tms)){
     tm <- tms[[ii]]
     omega <- 1/periods[ii]
@@ -28,7 +28,7 @@ for(ii in 1:length(tms)){
     coes[ii,] <- coeffs
     pdf(paste0("figs/",ii,".pdf"),height=12,width=8)
     par(mar=c(3,4,2,1),mfcol=c(5,1))
-    dev <- rep(0,length(tm))
+    dev <- vector("list",length(tm))
     for(jj in names(tem$dust)){
         pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
             + coeffs[3]*tem$template_funcs[[jj]]((tem$temp_time + coeffs[4]) %% 1))
@@ -43,12 +43,14 @@ for(ii in 1:length(tms)){
             col='grey')
         }
         pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
-            + coeffs[3]*tem$template_funcs[[jj]]((tm[[jj]][,2] + coeffs[4]) %% 1))
-        dev[jj] <- sum(((pred - tm[[jj]][,2]))^2)
+            + coeffs[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coeffs[4]) %% 1))
+        dev[[jj]] <- abs(pred - tm[[jj]][,2])
     }
-    rss.n[ii] <- sum(dev) / sum(vapply(tm,nrow,c(0)))
+    rss.n[[ii]] <- unlist(dev)
     dev.off()
 }
+median(unlist(rss.n))
+hist(unlist(rss.n))
 
 ## make all plots together
 for(ii in 1:length(tms)){
