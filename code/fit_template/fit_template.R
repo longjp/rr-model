@@ -32,16 +32,16 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
     return(rss)
 }
 
-AugmentData <- function(tm,dust,betas,use.errors=FALSE){
-    tm <- tm[order(tm$band),]
-    nb <- table(tm$band)
-    tm$dust <- rep.int(dust,nb)
-    tm$mag <- tm$mag - rep.int(betas,nb)
-    tm$band <- NULL
+AugmentData <- function(lc,dust,betas,use.errors=FALSE){
+    lc <- lc[order(lc$band),]
+    nb <- table(lc$band)
+    lc$dust <- rep.int(dust,nb)
+    lc$mag <- lc$mag - rep.int(betas,nb)
+    lc$band <- NULL
     if(!use.errors){
-        tm$error <- 1
+        lc$error <- 1
     }
-    return(list(tm=tm,nb=nb))
+    return(list(lc=lc,nb=nb))
 }
 
 ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
