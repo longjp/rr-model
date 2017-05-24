@@ -62,8 +62,6 @@ ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
         }
         J <- J + 1
     }
-    ## convert NewtonUpdate "amplitude" to peak-to-peak g band amplitude
-    coeffs[3] <- coeffs[3]*diff(range(tem$templates["g",]))    
     return(coeffs)
 }
 
