@@ -55,19 +55,19 @@ lpmed <- log10(median(periods))
 betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
 names(betas) <- rrmag$bnd
 
-## estimate ebv and mu for each lc
-rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-m_shift <- t(t(m) - betas)
-for(ii in 1:nrow(m)){
-    rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
-}
+## ## estimate ebv and mu for each lc
+## rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
+## m_shift <- t(t(m) - betas)
+## for(ii in 1:nrow(m)){
+##     rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
+## }
 
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 ## construct lc with overall mean, dust, and band effects removed
 for(ii in 1:Nlc){
     for(jj in 1:5){
-        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + rs[ii,jj]
+        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) ## + rs[ii,jj]
     }
 }
 
