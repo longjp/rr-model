@@ -151,6 +151,13 @@ for(ii in 1:length(amps)){
     templates[ii,] <- amps[ii]*templates[ii,]
 }
 
+## make g band peak-to-peak amplitude 1
+gscale <- diff(range(templates["g",]))
+for(ii in 1:length(amps)){
+    templates[ii,] <- templates[ii,] / gscale
+}
+
+
 
 ##plot of templates
 ylim <- range(templates)
