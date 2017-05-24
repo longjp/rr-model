@@ -1,0 +1,1449 @@
+\documentclass[12pt]{beamer}
+
+\usepackage{beamerthemesplit}
+
+
+\usepackage{beamerthemesplit}
+
+\usepackage{beamerStatisticsTAMU} 
+
+\logo{\includegraphics[height=1.5cm]{STAT_Horz-Aggie-Maroon.pdf}\vspace{220pt}}
+
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{bibentry}
+%\usepackage{biblatex}
+%\usepackage{natbib}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage[absolute,overlay]{textpos}
+
+\usefonttheme[onlymath]{serif}
+
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+\newcommand{\w}{1in}
+\newcommand{\h}{1in}
+
+\newcommand{\rightarrowp}{\overset{P}{\to}}
+\newcommand{\rightarrowd}{\overset{d}{\to}}
+
+
+\usepackage{graphicx}
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
+
+
+\newcommand{\att}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny Source: #1}
+      \end{textblock*}}
+
+
+\newcommand{\foot}[1]{\begin{textblock*}{12cm}(0.5cm,9cm) % {block width} (coords)
+  {\tiny #1}
+      \end{textblock*}}
+
+
+\newtheorem{assumptions}{Assumptions}
+
+\setbeamertemplate{headline}[default]
+\setbeamertemplate{footline}[page number]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{bibliography item}[text]
+
+\title{Two Statistical Challenges in Classification of Variable Sources}
+\author{James Long}
+\institute{Texas A\&M University}
+\date{\today}
+\begin{document}
+
+\frame{\titlepage}
+
+%% \begin{frame}{Collaboration}
+
+%% %% astronomers
+%% %%   \begin{textblock*}{12cm}(0cm,1cm) % {block width} (coords)
+%% %% \begin{center}
+%% %% \textbf{Astronomy}
+%% %% \end{center}
+%% %% \end{textblock*}
+%% %%   \begin{textblock*}{3cm}(3.5cm,2cm) % {block width} (coords)
+%% %% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% %% Lucas Macri
+%% %% \end{textblock*}
+%% %%   \begin{textblock*}{3cm}(7cm,2cm) % {block width} (coords)
+%% %% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% %% Wenlong Yuan
+%% %% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(5.2cm,1.35cm) % {block width} (coords)
+%%     \textbf{Astronomers}
+%%   \end{textblock*}
+  
+%%   \begin{textblock*}{3cm}(1.5cm,2cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/Macri.jpg}\\
+%% $\, \, $Lucas Macri
+%% \end{textblock*}
+
+
+%%   \begin{textblock*}{3cm}(5cm,2cm) % {block width} (coords)
+%%  $\, $ \includegraphics[width=\w,height=\h]{figs/marshall.jpg}\\
+%% Jennifer Marshall
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(8.5cm,2cm) % {block width} (coords)
+%%  $\, $\includegraphics[width=\w,height=\h]{figs/stringer.jpg}\\
+%% Katelyn Stringer
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(2.8cm,5.5cm) % {block width} (coords)
+%%     \textbf{Statistician}
+%%   \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(2.7cm,6.25cm) % {block width} (coords)
+%% \includegraphics[width=\w,height=\h]{figs/zhenfeng.jpg}\\
+%% $\, \, $Zhenfeng Lin
+%% \end{textblock*}
+
+%% %%   \begin{textblock*}{3cm}(5cm,6.25cm) % {block width} (coords)
+%% %% \includegraphics[width=\w,height=\h]{figs/long.jpg}\\
+%% %% $\, \, \, $James Long
+%% %% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(6cm,6.7cm) % {block width} (coords)
+%% \includegraphics[scale=.45]{figs/des_logo.png}\\
+%% \end{textblock*}
+
+  
+
+%% \end{frame}
+
+
+\begin{frame}{Outline}
+  \tableofcontents
+  \end{frame}
+
+%\frame{\tableofcontents}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+
+
+%%%%%%%%
+%%%%%%%% TODO: redo first section with more emphasis on multiband, lomb scargle
+%%%%%%%%
+
+
+\section{Background on Automated Variable Star Classification}
+
+\begin{frame}{Overview of Statistical Classification}
+
+\textbf{Key Terms:}
+\begin{itemize}
+\item \textbf{training data:} lightcurves of known class
+\item \textbf{unlabeled data:} lightcurves of unknown class
+\end{itemize}
+
+\vspace{.2in}
+
+\textbf{Steps in Classification:}
+\begin{enumerate}
+\item \textbf{feature extraction:} derive quantities from light curves useful for separating classes, eg period, amplitude, derivatives, etc.
+\item \textbf{classifier construction:} using training data, construct function
+\begin{equation*}
+\widehat{\mathcal{C}}(features) \rightarrow class
+\end{equation*} 
+\item \textbf{apply classifier:} for unlabeled data, compute features and predict class using $\widehat{\mathcal{C}}$
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Classifier Construction using CART}
+\begin{columns}[T] % align columns
+
+\begin{column}{.5\textwidth}
+%% \begin{center}
+%% Training Data
+%% \end{center}
+\includegraphics[height=2.3in,width=2.3in]{figs/sim_features.pdf}
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{itemize}
+\item CART developed by Breiman et al in 1980's %\cite{breiman1984classification}
+\item recursively partitions feature space
+\item partition represented by tree
+\end{itemize}
+\end{column}
+
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_2.pdf}
+\end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_3.pdf}
+\end{frame}
+
+\begin{frame}{Building CART Tree . . .}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_4.pdf}
+\end{frame}
+
+\begin{frame}{Resulting Classifier}
+\includegraphics[height=2.3in,width=4.5in]{figs/tree_5.pdf}
+\end{frame}
+
+\begin{frame}{Apply Classifier to Test Data}
+
+\textbf{Test Data:} Data used to evaluate classifier accuracy. Test data is not used to construct classifier.
+
+\vspace{.1in}
+
+\textbf{Confusion Matrix:} Rows are true class of test data. Columns are predicted class of test data. Entries are counts.
+
+\vspace{.2in}
+
+\begin{center}
+\input{figs/confusion_sim.tex}
+\end{center}
+
+\end{frame}
+
+
+%% \begin{frame}{Notes on CART}
+%% \begin{itemize}
+%% \item Nearly always have $>2$ features.
+%% \item Number of splits in tree is chosen by pruning.
+%% \item CART is moderately good classifier from accuracy perspective.
+%% \item CART is basis for more accurate / sophisticated classifiers such as Random Forest.
+%% \end{itemize}
+%% \end{frame}
+
+
+\section{Methodology: CART Example with OGLE Data}
+
+\begin{frame}{OGLE Classification Example}
+\begin{block}{Classes}
+\begin{itemize}
+\item Mira O--rich
+\item Mira C--rich
+\item Cepheid
+\item RR Lyrae AB
+\item RR Lyrae C
+\end{itemize}
+\end{block}
+
+      \begin{block}{Features}
+\begin{itemize}
+\item period (of best fitting sinusoid)
+\item amplitude = $95^{th}$ percentile mag - $5^{th}$ percentile mag
+\item skew of magnitude measurements
+\item p2p\_scatter (used by Dubath)
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{First 6 Rows of Feature--Class Dataframe}
+
+\begin{center}
+\includegraphics[height=1.75in,width=4in]{figs/feats.png}
+\end{center}
+
+\begin{center}
+\small{500 total rows. 5 classes.}
+\end{center}
+
+\vspace{.1in}
+\textbf{training data:} 400 randomly selected rows\\
+\textbf{test data:} remaining 100 rows
+
+
+\end{frame}
+
+
+\begin{frame}{Feature Distributions}
+
+\includegraphics[height=3.3in,width=4.5in]{figs/pairs.pdf}
+
+\end{frame}
+
+
+
+
+\begin{frame}{CART Model Fit To Training Data}
+
+\includegraphics[height=3.2in,width=5in]{figs/tree.pdf}
+
+\end{frame}
+
+
+\begin{frame}{Confusion Matrix using Test Data}
+
+\begin{center}
+\input{figs/confusion.tex}
+\end{center}
+
+\vspace{.1in}
+
+Conclusion: Develop features to better separate O/C--rich Mira.
+
+\end{frame}
+
+\section{Challenge 1: Feature Extraction, Modeling, and Computation}
+
+\begin{frame}{Modeling Approach to Classification}
+
+  \todo{lay out modeling approach with simple example, discuss David Jones' and Branimir Sesar's work. discuss computational challenges of developing and fitting model for every class. can we find a small set of light curves to fit computationally intensive models (such as Bayes factors) to?}
+  
+\end{frame}
+
+\section{Challenge 2: Post Classification Inference}
+
+\begin{frame}{What are the distances to these objects?}
+
+  \begin{center}
+    \includegraphics[scale=0.5]{figs/des_small.png}\\
+  \end{center}
+  \textbf{Problem:}
+  \begin{equation*}
+    \text{ brightness } \propto \frac{\text{luminosity}}{\text{distance}^2}
+  \end{equation*}
+\begin{center}
+  Only brightness can be directly measured.
+  \end{center}
+
+\foot{Image Source: DES Collaboration}
+\end{frame}
+
+\begin{frame}{Standard Candles}
+  \textbf{Standard Candle:} Class of objects with same luminosity
+  \begin{itemize}
+  \item Know absolute luminosity of standard candle.
+  \item Determine object is standard candle and estimate its brightness.
+  \item Solve for distance.
+  \end{itemize}
+
+  \vspace{.3in}
+  
+  \textbf{RR Lyrae (RRL):} Standard candle variable star
+  \begin{itemize}
+  \item All RR Lyrae have (approximately) same luminosity
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{RR Lyrae are Variable Stars}
+
+\begin{center}
+  RR Lyrae Light Curve\\
+  Unfolded \, \, \,   \, \, \,   \, \, \,   \, \, \,   \, \, \,   \, \, \, Folded
+\includegraphics[scale=.18]{figs/unfolded_13350.pdf}
+\includegraphics[scale=.18]{figs/folded_13350.pdf}
+\end{center}
+
+\begin{center}  
+\textbf{Standard candle:} Distance to this star is proportional to mean magnitude, after accounting for \underline{dust} and \underline{PL relation}.
+\end{center}
+
+\end{frame}
+
+
+\begin{frame}{Sloan Digital Sky Survey (SDSS) III -- Stripe 82}
+\begin{itemize}
+\item Discovered $\approx 60,000$ variable stars
+\item $\approx 250$ brightness measurements / star
+\item Variables belong to different \textbf{classes}
+\end{itemize}
+
+
+  \begin{center}
+    \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+    \end{center}
+
+
+%\underline{Example Light Curve}
+%\vspace{-.1in}
+\begin{center}
+Example Light Curve: Eclipsing Binary (Unfolded and Folded)\\
+\includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
+\includegraphics[scale=.15]{figs/folded_4183016.pdf}
+\end{center}
+
+\att{See Ivezic \cite{ivezic2007sloan}}
+
+\end{frame}
+
+
+
+
+%% \begin{frame}{SDSS--III Stripe 82}
+%% \begin{itemize}
+%% \item Discovered $\approx 60,000$ variables
+%% \item Variables belong to different \textbf{classes}
+%% \item Some periodic, some not
+%% \end{itemize}
+
+%% \underline{Three Examples}
+
+%% \vspace{-.1in}
+
+%% \begin{center}
+%% {\small 1) Eclipsing Binary (Unfolded and Folded)}\\
+%% \includegraphics[scale=.15]{figs/unfolded_4183016.pdf}
+%% \includegraphics[scale=.15]{figs/folded_4183016.pdf}
+%% \end{center}
+
+%% \vspace{-.2in}
+
+%% %% \begin{center}
+%% %% RR Lyrae\\
+%% %% \includegraphics[scale=.15]{figs/unfolded_4099.pdf}
+%% %% \includegraphics[scale=.15]{figs/folded_4099.pdf}
+%% %% \end{center}
+
+
+%% \begin{center}
+%% {\small 2) Quasar (unfolded)} \hspace{9 mm} {\small 3) RR Lyrae (folded)}\\
+%% \includegraphics[scale=.15]{figs/unfolded_7904669.pdf}
+%% \includegraphics[scale=.15]{figs/folded_13350.pdf}
+%% \end{center}
+
+%% \att{See Ivezic \cite{ivezic2007sloan}}
+
+%% \end{frame}
+
+\begin{frame}{Identifying RRL, Mapping MW Halo with SDSS}
+  Sesar 2010:
+  \begin{enumerate}
+  \item Extracted features for $\approx 60,000$ variables (eg period, amplitude)
+  \item Identified $\approx 350$ RR Lyrae
+  \item Estimated distances to RRL
+  \end{enumerate}
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+
+      \vspace{-.22in}
+
+      \begin{center}
+        \underline{Steps 1 and 2}
+        \includegraphics[scale=.2]{figs/sdss_color_period.png}
+      \end{center}
+      \end{column}
+    \begin{column}{0.5\textwidth}
+
+      \vspace{-.55in}
+
+      \begin{center}
+      \underline{Step 3}
+      \end{center}
+      
+      \vspace{-.35in}
+      \begin{center}
+      \includegraphics[scale=.1]{figs/density_true_points.png}\\
+      \includegraphics[scale=.17]{figs/sesar_map.png}
+      \end{center}
+    \end{column}
+\end{columns}
+
+\att{Sesar 2010 \cite{sesar2010light}}
+  
+\end{frame}
+
+%% \begin{frame}{Importance of MW Halo Maps}
+%% \todo{compare cosmological simulations to observed structure}
+%% \end{frame}
+
+%% \begin{frame}{Mapping Milky Way Halo with RRL}
+
+%%   \begin{center}
+%%     \includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+%%     \end{center}
+  
+%% \begin{center}
+%%   \includegraphics[scale=.13]{figs/density_true_points.png}\\
+%%   \includegraphics[scale=.2]{figs/sesar_map.png}
+%% \end{center}
+
+%% %% \begin{itemize}
+%% %% \item Compare maps to cosmological simulations.
+%% %% \item Answer missing satellites problem.
+%% %% \end{itemize}
+
+%% \att{Sesar \cite{sesar2010light}}
+
+%% \end{frame}
+
+
+
+
+%% \begin{frame}{Mapping the Galactic Halo: Statistical Challenges}
+%% \begin{itemize}
+%% \item Classification: Identify RR Lyrae lightcurves.
+%% \item Parametric Inference: Estimate periods, mean magnitudes, distances.
+%% \item Nonparametric Inference: Construct 3--D density map.
+%% \end{itemize}
+%% \end{frame}
+
+%% \begin{frame}{The Dark Energy Survey}
+%% \todo{picture of telescope}
+%% \end{frame}
+
+
+\begin{frame}{Mapping the Galactic Halo with DES}
+
+\textbf{Dark Energy Survey (DES)}
+\begin{itemize}
+\item ongoing survey (started 2013, 5 years of planned observing)
+\item 5000 square degrees ($\approx$ 1/9$^{th}$ entire sky)
+\item depths to 24 mag in $i$
+\item 68 million stars
+\item $\approx$ 10 observations in each filter ($g$,$i$,$r$,$z$,$Y$) over five years
+\end{itemize}
+
+\vspace{.1in}
+\includegraphics[scale=0.2]{figs/des_observing_strategy.png}
+\includegraphics[scale=0.2]{figs/unfolded_des_2.pdf}
+%% see one-class/des for code for des image
+
+\vspace{.1in}
+
+\begin{center}
+  DES is \underline{deeper and wider} but \underline{sparsely sampled}.
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Complicated, Multilevel Inference Process}
+
+  Steps in Inference Process:
+  \begin{enumerate}
+  \item Classify stars as RR Lyrae.
+  \item Estimate distances to stars classified as RR Lyrae.
+  \item Estimate intensity maps of distribution of matter in MW halo.
+  \end{enumerate}
+
+  \begin{center}
+    \textbf{Standard machine learning methods do not provide a way to easily propagate uncertainty through all of these steps.}
+  \end{center}
+
+  \begin{center}
+    \includegraphics[scale=0.3]{figs/chad_article.png}
+    {\small Discusses multistage aspect of several astrostatistics problems.}
+  \end{center}
+  
+\end{frame}
+ 
+%% \section{Modeling and Classifying Variable Stars}
+
+%% \subsection{Fourier Modeling of Light Curves}
+
+%% \begin{frame}{Light Curve Notation}
+
+%%   Data for star is $D=\{\{(t_{jb},m_{jb},\sigma_{jb})\}_{j=1}^{n_b}\}_{b=1}^B$
+%% \begin{itemize}
+%% \item $b=1,\ldots,B$ denotes filter
+%% \item $n_b$ is number of measurements in filter $b$
+%% \item $m_{jb}$ is brightness at time $t_{jb}$ with known uncertainty $\sigma_{jb}$
+%% \end{itemize}
+
+%% \begin{center}
+%% \includegraphics[scale=0.3]{figs/unfolded_7904669.pdf}
+%% \end{center}
+
+%% \begin{center}
+%%   Heteroskedastic error with known variance.
+%% \end{center}
+
+%% \end{frame}
+
+%% \begin{frame}{Fourier Period Estimation and Feature Extraction}
+
+%% \textbf{Method:} $K$ harmonic Fourier expansion in each filter:
+
+%% \begin{equation*}
+%% m_{jb} = \beta_b + \sum_{k=1}^K a_{bk}\sin(k \omega t_{jb} + \phi_{bk}) + \sigma_{jb}\epsilon_{jb}
+%% \end{equation*}
+%% where $\epsilon_{jb} \sim N(0,1)$, independent.
+
+%% \begin{itemize}
+%% \item $(2K + 1)B + 1$ total parameters:
+%%   \begin{itemize}
+%%   \item $KB$ amplitudes ($a_{bk}$)
+%%   \item $KB$ phases ($\phi_{bk}$)
+%%   \item $B$ means ($\beta_b$)
+%%   \item 1 frequency ($\omega$)
+%%     \end{itemize}
+%% \item Maximum likelihood estimation:
+%%   \begin{itemize}
+%% \item Closed form at fixed $\omega$
+%% \item Grid search on $\omega$
+%% \end{itemize}
+%% \end{itemize}
+
+%% \foot{Many names in astronomy: Lomb--Scargle, Generalized Lomb--Scargle, Analysis of Variance, CLEAN. See \cite{mondrik2015multiband,zechmeister2009generalised,lomb1976least,scargle1982studies,schwarzenberg1996fast}}
+
+%% \end{frame}
+
+
+%% \begin{frame}{Example of Maximum Likelihood Fit with $K=2$}
+
+%% \vspace{-.1in}
+
+%% \begin{center}
+%% \includegraphics[scale=.25]{figs/rrlyrae_nomodel_fit.pdf}\\
+%% \includegraphics[scale=.25]{figs/rrlyrae_model_fit.pdf}\\
+%% Total of $26$ parameters, model estimates period well.
+%% \end{center}
+
+%% \end{frame}
+
+%% \begin{frame}{Model Output Used for Classification}
+
+%%   \begin{center}
+%%     Fit $K=2$ model to light curves. RRL separate from non-RRL.
+%%   \end{center}
+  
+%% \begin{center}
+%%   \includegraphics[scale=.2]{figs/sdss_color_period.png}
+%%   \includegraphics[scale=.2]{figs/sdss_gamp_period.png}
+%% \end{center}
+
+
+%% %%% TODO: make scatterplot of two features
+
+%% \end{frame}
+
+
+%% %% \begin{frame}{Challenge: DES Light Curves are Sparsely Sampled}
+
+
+%% %% \begin{center}
+%% %% \includegraphics[scale=.3]{figs/des_2.pdf}
+%% %% \end{center}
+
+%% %% \vspace{-.2in}
+
+%% %% \begin{center}
+%% %% \small{Dark Energy Survey light curve. Period estimation, classification, and distance estimation difficult for this quality data.}
+%% %% \end{center}
+
+%% %% \end{frame}
+
+
+
+
+
+
+%% %% \begin{frame}{Surveys Collecting Sparsely Sampled Light Curves}
+
+%% %% \begin{itemize}
+%% %% \item Dark Energy Survey (DES)
+%% %% \begin{itemize}
+%% %% \item 10 photometric measurements in ($g$,$i$,$r$,$z$,$Y$) over five years
+%% %% \item depths to 24 mag in $i$
+%% %% \item $\approx$ 100 million stars
+%% %% \end{itemize}
+%% %% \item Pan--STARRS
+%% %% \end{itemize}
+%% %% \end{frame}
+
+
+
+%% %%%%%%%%
+%% %%%%%%%% TODO: introduce model, discuss fitting
+%% %%%%%%%%
+
+%% \begin{frame}{Applying Methodology to DES Data}
+%%   DES will collect $\approx$ 50 observations for each star.
+
+%%   \begin{itemize}
+%%     \item \textbf{Strategy 1:} Fourier feature extraction with $K=1$ harmonic (16 parameters). \underline{Problem:} This simple model is misspecified.
+
+%%   \begin{center}
+%%     \includegraphics[scale=.25]{figs/rrlyrae_model_fit_sine.pdf}
+%%   \end{center}
+
+%% \item \textbf{Strategy 2:} Fourier feature extraction with $K>1$ harmonics. $K=2$ model has 26 parameters. \underline{Problem:} Large variance in parameter estimates.
+%%   \end{itemize}
+%%   %% put best sampled star here
+%% \end{frame}
+
+
+%% \begin{frame}{Outline of Methodology}
+
+%% \underline{Fitting Approximate Models with Heteroskedastic Errors}\\
+%% \begin{itemize}
+%% \item What is approximate / misspecified model estimating?
+%% \item With heteroskedasticity, is optimal weighting $\sigma^{-2}$?
+%% %\item Construct adaptive estimator for optimal weight.
+%% \end{itemize}
+
+
+%% \vspace{.2in}
+
+%% \underline{Improved Model for RR Lyrae Stars}
+%% \begin{itemize}
+%% \item Build accurate, parsimonious (few free parameters) RRL model.
+%% \end{itemize}
+
+%% \end{frame}
+
+
+
+
+%% \subsection{Fitting Approximate Models with Heteroskedastic Errors}
+
+%% \begin{frame}{Approximate Models with Heteroskedastic Error}
+
+%%   Sine model MLE for period:
+%%   \begin{equation*}
+%%     \widehat{\omega} = \argmin{\omega} \min_{\V{a},\V{\beta},\V{\phi}} \sum_{b=1}^B \sum_{j=1}^{n_b} \left(\frac{m_{bj} - \beta_{b} - a_b\sin(\omega t_{bj} + \phi_b)}{\sigma_{bj}}\right)^2
+%%   \end{equation*}
+  
+  
+  
+
+%%   \textbf{Question:}
+%%   \begin{itemize}
+%%   \item Is weighting observations by inverse of the variance optimal when model is an approximation?
+%%   \end{itemize}
+  
+%% \end{frame}
+
+%% \begin{frame}{Simple Case: Linear Regression and WLS}
+%% \begin{itemize}
+%% \item Observe $\{(y_i,x_i,\sigma_i)\}_{i=1}^n$ i.i.d. where
+%%   \begin{equation*}
+%%     y_i = f(x_i) + \sigma_i\epsilon_i 
+%%   \end{equation*}
+%%   where $\E[\epsilon_i] = 0$  and $\Var(\epsilon_i) = 1$
+%% \item Weighted least squares (WLS) estimator is
+%%   \begin{equation*}
+%%     \widehat{\beta}(W) = (X^TWX)^{-1}X^TWY
+%%   \end{equation*}
+%%   where
+%%   \begin{itemize}
+%%     \item $W$ is diagonal weight matrix
+%%     \item $Y = (y_1,\ldots,y_n)^T$ is response
+%%     \item $X = (x_1^T,\ldots,x_n^T)^T$ is design
+%%   \end{itemize}
+%% \end{itemize}
+
+%% \begin{center}
+%% \textbf{If $f(x) = x^T\beta$ then $\widehat{\beta}(\Sigma^{-1})$ is best linear unbiased.\\ ($\Sigma$ diagonal, $\Sigma_{ii} = \sigma_i^2$)}
+%% \end{center}
+%% \end{frame}
+
+%% \begin{frame}{What are we estimating?}
+%% Define the ``true'' $\beta$ as the best linear approximation to $f$ i.e.
+%%   \begin{equation*}
+%%   \beta \equiv \argmin{\beta} \E[(f(x) - x^T\beta)^2] = \E[xx^T]^{-1}\E[xf(x)]
+%% \end{equation*}
+%%   %% $\beta^T x$ is optimal MSE predictor among linear functions of $x$:
+%%   %% \begin{equation*}
+%%   %%   \beta = \argmin{\beta} \E[(y - x^T\beta)^2]
+%%   %% \end{equation*}
+
+%% Example:
+
+%% \vspace{-.2in}
+
+%% \begin{center}
+%%         \includegraphics[scale=0.4]{figs/data.pdf}
+%%   \end{center}
+
+%% \vspace{-.2in}
+
+%% See Huber \cite{huber1967behavior} (1967) and White \cite{white1980using,white1981consequences} (1980,1981).
+
+%%   %% \begin{columns}
+%%   %%   \begin{column}{0.5\textwidth}
+%%   %%     \includegraphics[scale=0.3]{figs/data.pdf}
+%%   %%   \end{column}
+%%   %%   \begin{column}{0.5\textwidth}
+%%   %%     \begin{align*}
+%%   %%       &x_i \sim Unif[0,1]\\
+%%   %%       &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
+%%   %%         \begin{array}{lr}
+%%   %%           0.05 \! &:  \! \sigma=0.01,1.0\\ 
+%%   %%           0.9  \! &: \! \sigma=0.1\\
+%%   %%         \end{array} \right.\\
+%%   %%       &y_i = x_i^2 + \epsilon_i
+%%   %%       \end{align*}
+%%   %%   \end{column}
+%%   %% \end{columns}
+%% \end{frame}
+
+%% \begin{frame}{How Should We Weight Observations?}
+
+  
+%%   \begin{assumptions}[Weight Matrix]
+%%   Consider diagonal, positive definite weight matrices $W$ where
+%%   \begin{equation*}
+%%     W_{ii} = w(\sigma_i)
+%%   \end{equation*}
+%%   for $w(\cdot) > 0$ and $\E[w(\sigma)^4] < \infty$.
+%%   \end{assumptions}
+
+%%   \vspace{.2in}
+  
+%%   \textbf{Important Cases:}
+%%   \begin{itemize}
+%%   \item $W_{ii} = w(\sigma_{i}) = 1$ (OLS)
+%%   \item $W_{ii} = w(\sigma_{i}) = \sigma_{i}^{-2}$ (``Standard'' WLS)
+%%   \end{itemize}
+%% \end{frame}
+
+%% \begin{frame}{Asymptotic Variance}
+
+%%   \vspace{-.05in}
+  
+%%   \begin{theorem}
+%%     Under regularity conditions, $x_i \, \indep \, \sigma_i$, and Weight Matrix Assumptions,
+%%   \begin{equation*}
+%%     \sqrt{n}(\widehat{\beta}(W) - \beta) \rightarrowd N(0,\nu(w))
+%%   \end{equation*}
+%% where $g(x) = f(x) - x^T\beta$ and
+%%   \begin{equation*}
+%%     \nu(w) = \frac{\E[w^2]\overbrace{\E[xx^T]^{-1}\E[g^2(x)xx^T]\E[xx^T]^{-1}}^{\equiv A} + \E[\sigma^2w^2]\overbrace{\E[xx^T]^{-1}}^{\equiv B}}{\E[w]^2}.
+%%   \end{equation*}
+%%   \end{theorem}
+
+%%   \vspace{-.05in}
+  
+%%   \textbf{Special Case:}
+%%    If model is linear $g(x)=0$ and
+%%     \begin{equation*}
+%%       \nu(w) = \frac{\E[\sigma^2w^2]\E[xx^T]^{-1}}{\E[w]^2},
+%%     \end{equation*}
+%%    which is minimized by $w^*(\sigma) = \sigma^{-2}$ (ie $\nu(w^*) \preceq \nu(w)$).
+  
+%% \end{frame}
+
+%% \begin{frame}{Optimal Weight Function}
+
+%%   \textbf{General Case:} No weight function $w^*$ such that $\nu(w^*) \preceq \nu(w) \, \forall \, w$.
+
+%%   \vspace{.1in}
+  
+%%   \textbf{Minimize function of asymptotic variance:} Consider linear function
+%%   \begin{equation*}
+%%     \Gamma: \mathbb{R}^p \times \mathbb{R}^p \rightarrow \mathbb{R}
+%%   \end{equation*}
+%%   such that $\Gamma(C) > 0$ for all $C$ positive definite.
+
+%% \vspace{.1in}
+  
+%%   Examples:
+%%   \begin{itemize}
+%%   \item $\Gamma(C) = C_{11} \, \, \,$ ($\Var(\widehat{\beta}_1)$)
+%%   \item $\Gamma(C) = Tr(C) \, \, \,$ ($\sum \Var(\widehat{\beta}_j)$)
+%%   \end{itemize}
+
+  
+%%   \begin{theorem}[Optimal Weighting]
+%%     \begin{equation*}
+%%       w^*(\sigma) = \argmin{w} \Gamma(\nu(w)) = \frac{1}{\sigma^2 + \Gamma(A)\Gamma(B)^{-1}}
+%%     \end{equation*}
+%%   \end{theorem}
+
+%% Note: $\argmin{}$ is set, but $w^*$ is unique up to rescaling by constant.
+  
+%% \end{frame}
+  
+%%   \begin{frame}{Adaptive Estimation of Optimal Weighting}
+%%     \begin{theorem}[Adaptivity]
+%%       Under regularity conditions, there exist estimators $\widehat{A}$ and $\widehat{B}$ and
+%%       \begin{equation*}
+%%         \widehat{W}_{ii} = \frac{1}{\sigma_i^2 + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1}}
+%%       \end{equation*}
+%%       such that
+%%       \begin{equation*}
+%%         \sqrt{n}(\widehat{\beta}(\widehat{W}) - \beta) \rightarrowd N(0,\nu(w^*)).
+%%       \end{equation*}
+%%       \end{theorem}
+%%     \begin{theorem}
+%%       Under regularity conditions
+%%       \begin{equation*}
+%%         \Gamma(\nu(\widehat{\beta}(\widehat{W}))) \leq \min(\Gamma(\nu(\widehat{\beta}(I))),\Gamma(\nu(\widehat{\beta}(\Sigma^{-1}))))
+%%       \end{equation*}
+%%       with strict inequality if $\E[g^2(x)xx^T]\succ 0$ and $P(\sigma=c)\neq 1$ for any $c$.
+%%       \end{theorem}
+
+    
+%%   \end{frame}
+  
+%%   %% \begin{theorem}[Adaptivity]
+%%   %%   Under regularity conditions, 
+%%   %% \end{theorem}
+
+%%   %% \begin{itemize}
+%%   %% \item $\Gamma(A)\Gamma(B)^{-1}$ reduces influence of low variance observations.
+%%   %% \end{itemize}
+
+
+
+%% \begin{frame}{Simulation: Approximate $x^2$ with Linear Function}
+
+%%   \textbf{Simulation Parameters:}
+%%   %%\includegraphics[scale=0.3]{figs/data.pdf}
+%%   \begin{align*}
+%%         &n=100\\
+%%         &x_i \sim Unif[0,1]\\
+%%         &\sigma_i \sim f_{\sigma}(\sigma) = \left\{
+%%           \begin{array}{lr}
+%%             0.05 \! &:  \! \sigma=0.01,1.0\\ 
+%%             0.9  \! &: \! \sigma=0.1\\
+%%           \end{array} \right.\\
+%%         &\epsilon_i \sim N(0,1)\\
+%%         &y_i = x_i^2 + \epsilon_i\sigma_i
+%%   \end{align*}
+
+%%   \textbf{Best Linear Approximation:}
+%%   \begin{equation*}
+%%       \beta = \E[xx^T]^{-1}\E[xf(x)] = -1/6 + x
+%%   \end{equation*}
+
+%%   \textbf{Compare Sampling Distribution of:}
+%%   \begin{equation*}
+%%     \widehat{\beta}(\widehat{W}) = (X^T\widehat{W}X)^{-1}\widehat{W}XY
+%%   \end{equation*}
+%%   for  $\widehat{W}= \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \,$  a)  $\Sigma^{-1}$ \hfill b)   $I$  \hfill c)   $(\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$
+  
+  
+%% \end{frame}
+
+%% \begin{frame}{Simulation: Approximate $x^2$ with Linear Function}
+
+  
+%% \def \tw {.26}
+
+%% \includegraphics[scale=\tw]{figs/pres_estimator_wls.pdf}
+%% \includegraphics[scale=\tw]{figs/pres_estimator_ols.pdf}
+%% \includegraphics[scale=\tw]{figs/pres_estimator_dls.pdf}
+
+%% \begin{center}
+%%   \begin{itemize}
+%%     \item $\Gamma(C) = Trace(C)$
+%%     \item Asymptotic variance for $\widehat{W} = (\Sigma + \Gamma(\widehat{A})\Gamma(\widehat{B})^{-1})^{-1}$ smallest.
+%%   \end{itemize}
+%% \end{center}
+
+%% \end{frame}
+
+
+%% %% \begin{frame}{Back to Variable Stars}
+
+%% %% \end{frame}
+
+%% %% \begin{frame}{Simulated Results on Variable Stars}
+
+%% %% \input{figs/period_est_results_simple}
+  
+%% %% \end{frame}
+
+
+%% \begin{frame}{Application to Variable Star Period Estimation}
+%% \begin{itemize}
+%% \item 238 SDSS Stripe 82 RR Lyrae (g--filter data only)
+%% \item Downsample light curves to 10, 20, 30, and 40 observations.
+
+%% \def \tw {.15}
+  
+%%   %%\begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
+%% %% \begin{center}
+%% %% \includegraphics[scale=\tw]{figs/unfolded_13350.pdf}
+%% %% \includegraphics[scale=\tw]{figs/rightarrow.png}
+%% %% \includegraphics[scale=\tw]{figs/unfolded_13350down.pdf}
+%% %% \end{center}
+
+
+%% %% \begin{figure}[center]
+%% %% \includegraphics[scale=\tw]{figs/unfolded_13350.pdf}
+%% %% \includegraphics[scale=\tw]{figs/rightarrow.png}
+%% %% \includegraphics[scale=\tw]{figs/unfolded_13350down.pdf}
+%% %% \end{figure}
+
+%% \begin{minipage}{6in}
+%%   \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g.pdf}}
+%%   \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/rightarrow.png}}
+%%   \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g_down.pdf}}
+%% \end{minipage}
+
+%% %%\end{textblock*}
+
+
+%% %%  \begin{textblock*}{3cm}(5.5cm,3.5cm) % {block width} (coords)
+
+%% %%\end{textblock*}
+
+%% %%  \begin{textblock*}{3cm}(6.75cm,3.1cm) % {block width} (coords)
+
+%% %%\end{textblock*}
+  
+%% \item Compare
+%%   \begin{equation*}
+%%     \widehat{\omega}(\Sigma^{-1}) = \argmin{\omega} \min_{a,\beta,\phi} \sum_{j=1}^{n} \left(\frac{m_{j} - \beta - a\sin(\omega t_{j} + \phi)}{\sigma_{j}}\right)^2
+%%   \end{equation*}
+
+%%   \begin{equation*}
+%%     \widehat{\omega}(I) = \argmin{\omega} \min_{a,\beta,\phi} \sum_{j=1}^{n} \left(m_{j} - \beta - a\sin(\omega t_{j} + \phi)\right)^2
+%%   \end{equation*}
+
+  
+  
+  
+%% \end{itemize}
+%% \end{frame}
+
+
+%% \begin{frame}{Results}
+
+%% \input{figs/period_est_results_very_simple.tex}
+%% %% \vspace{.1in}
+%% %% \textbf{Conclusion:} Not using the photometric errors is better than using them because the sinusoidal model is misspecified.
+%% \end{frame}
+
+
+%% \begin{frame}{Related Work and Considerations}
+
+%% \begin{itemize}
+%% \item \underline{Huber--white sandwich estimators:} Huber \cite{huber1967behavior}, White \cite{white1980using,white1981consequences}
+%% \item \underline{Partial Linear Model:} Ma \cite{ma2006efficient,ma2013doubly} discovered similar behavior.
+%% \item \underline{Generalizations:} $x, \sigma$ dependent case. Unknown error variance. Results contained in manuscript reference below.
+%% \item \underline{What about building a correct model?} ``All models are wrong, but some are useful.'' -- George Box
+%% \end{itemize}
+
+%% \vspace{.3in}
+
+%% \footnotesize{Reference: ``A Note on Parameter Estimation for Misspecified Regression Models with Heteroskedastic Errors.'' J.P. Long. Major Revision at \textit{Electronic Journal of Statistics}.}
+%% \end{frame}
+
+
+
+
+%% \subsection{Improved Model for RR Lyrae Stars}
+
+%% \begin{frame}{Building a Better Model}
+%% Most RR Lyrae have similar shapes. Two examples:
+
+%% \begin{center}
+%% \includegraphics[scale=0.2]{figs/folded_4099.pdf}\\
+%% \includegraphics[scale=0.2]{figs/folded_13350.pdf}
+%% \end{center}
+
+%% \textbf{What varies?} Distance, dust, amplitude, period, phase.
+%% \end{frame}
+
+%% \begin{frame}{Parsimonious RR Lyrae Model}
+
+
+%% \begin{center}
+%% global parameters fit once for all RR Lyrae\\
+%% \includegraphics[scale=.35]{figs/rr_model.png}\\
+%% individual parameters fit for each RR Lyrae
+%% \end{center}
+
+%% \vspace{.2in}
+
+%% \begin{itemize}
+%% \item $D=\{\{t_{jb},m_{jb},\sigma_{jb}\}_{j=1}^{n_b}\}_{b=1}^B$
+%% \item Model:
+%% \begin{equation*}
+%% m_{jb} = m_b(t_{jb}) + \epsilon_{jb}\sigma_{jb}
+%% \end{equation*}
+%% where $\epsilon_{jb} \sim N(0,1)$ i.i.d.
+%% \end{itemize}
+%% \end{frame}
+
+%% \begin{frame}{$\gamma_b$ Estimated from SDSS Stripe 82 RR Lyrae}
+
+%% \begin{center}
+%% \includegraphics[scale=.3]{figs/templates.pdf}
+%% \end{center}
+
+%% \end{frame}
+
+%% \begin{frame}{Parameter Estimation}
+%% \begin{align*}
+%% &RSS(\omega,\mu,E[B-V],a,\phi) \\
+%%  &\equiv\sum_{b=1}^B \sum_{j=1}^{n_b}\left(m_{jb} - \mu - M_b - E[B-V]R_b - a\gamma_b(\omega t_{jb} + \phi)\right)^2
+%% \end{align*}
+
+
+%% Minimize RSS ($\chi^2$ minimization):
+%% \begin{itemize}
+%% \item Likelihood is highly multimodal in $\omega$, grid search.
+%% \item Model is linear in $\mu$,$E[B-V]$, and $a$, closed form updates.
+%% \item Warm start Newton--Raphson updates for $\phi$.
+%% \end{itemize}
+
+%% \end{frame}
+
+%% \begin{frame}{Example Fits to SDSS Light Curves}
+%% \begin{center}
+%%   \includegraphics[scale=0.3]{figs/1_one.pdf}
+%% \end{center}
+%% \end{frame}
+
+%% \begin{frame}{Example Fits to SDSS Light Curves}
+%% \begin{center}
+%%   \includegraphics[scale=0.3]{figs/2_one.pdf}
+%% \end{center}
+%% \end{frame}
+
+%% \begin{frame}{Example Fits to SDSS Light Curves}
+%% \begin{center}
+%%   \includegraphics[scale=0.3]{figs/3_one.pdf}
+%% \end{center}
+%% \end{frame}
+
+%% \begin{frame}{Example Fits to SDSS Light Curves}
+%% \begin{center}
+%%   \includegraphics[scale=0.3]{figs/4_one.pdf}
+%% \end{center}
+%% \end{frame}
+
+
+
+%% \begin{frame}{Summary of Fitting}
+
+%%   \begin{itemize}
+%%   \item Model has 5 free parameters.
+%%     \begin{itemize}
+%%     \item Fits much better than sinusoid (16 free parameters).
+%%     \item Comparable fit quality to Fourier with $K=2$ harmonics (26 parameters).
+%%     \item Interpretable parameters, eg dust and distance modulus.
+%%     \end{itemize}
+%%   \item Model is still approximate.
+%%     \begin{itemize}
+%%       \item Median residual: $0.034$
+%%       \item Median photometric error: $0.014$
+%%       \item Cautious with weighting RSS.
+%%     \end{itemize}
+
+%%     \end{itemize}
+  
+%% \end{frame}
+
+
+
+%% %% \begin{frame}{Visualization of Warm Start for $\phi$}
+
+%% %% \end{frame}
+
+%% \section{Results on SDSS Stripe 82 and DES}
+
+
+%% \subsection{SDSS Stripe 82}
+
+%% \begin{frame}{Simulate SDSS Stripe 82 to Resemble DES}
+
+%%   \begin{textblock*}{12cm}(.5cm,2cm) % {block width} (coords)
+%% Downsample Stripe 82 variables to 20 observations across all filters:
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(1cm,3.1cm) % {block width} (coords)
+%% \includegraphics[scale=.15]{figs/unfolded_13350.pdf}
+%% \end{textblock*}
+
+
+%%   \begin{textblock*}{3cm}(5.5cm,3.5cm) % {block width} (coords)
+%% \includegraphics[scale=.15]{figs/rightarrow.png}
+%% \end{textblock*}
+
+%%   \begin{textblock*}{3cm}(6.75cm,3.1cm) % {block width} (coords)
+%% \includegraphics[scale=.15]{figs/unfolded_13350down.pdf}
+%% \end{textblock*}
+
+%%   \begin{textblock*}{12cm}(1.75cm,6.1cm) % {block width} (coords)
+%% \begin{itemize}
+%% \item Can we estimate periods correctly for RR Lyrae?
+%% \item Can we estimate distances accurately?
+%% \item Can we reproduce halo maps of Sesar 2010?
+%% \end{itemize}
+%% \end{textblock*}
+
+%% \end{frame}
+
+
+%% \begin{frame}{Results for Period Estimation}
+
+
+
+%% \begin{center}
+%% Comparison of period estimates for 350 RR Lyrae\\
+%% \includegraphics[scale=.4]{figs/period_est_comparison.pdf}
+%% \end{center}
+
+
+%% \end{frame}
+
+
+%% \begin{frame}{Simulation Results for Distance Estimation}
+%% \begin{itemize}
+%% \item Use model to estimate distance modulus ($\mu$) for RR Lyrae.
+%% \item Convert $\mu$ to distance (d) in parsecs: $d = 10^{\mu/5 + 1}$
+%% \end{itemize}
+
+%% \begin{center}
+%% \includegraphics[scale=.35]{figs/distance_comparison.pdf}
+%% \end{center}
+
+
+
+%% \end{frame}
+
+
+%% %% \begin{frame}{Results for Classification}
+
+%% %% \begin{center}
+%% %% Downsampled 1000 Not--RR Lyrae and 350 RR Lyrae
+%% %% \includegraphics[scale=.33]{figs/period_vs_EBV.pdf}
+%% %% \includegraphics[scale=.33]{figs/a_vs_dev_log.pdf}
+%% %% \end{center}
+
+%% %% \begin{itemize}
+%% %% \item Visually good separation with small number of features.
+%% %% \item Potential to use model output as feature input to classifier.
+%% %% %\item Hernitschek \cite{hernitschek2016finding} used structure functions to classify sparsely sampled RR Lyrae in Pan--STARRS.
+%% %% \end{itemize}
+%% %% \end{frame}
+
+
+
+%% %% \begin{frame}{Results for Constructing Milky Way Halo Maps}
+%% %%   \def \tw {.1}
+  
+%% %%   \begin{figure}[t]
+%% %% %\begin{center}
+%% %%   %\centering
+%% %%   \begin{minipage}{0.5\textwidth}
+%% %%  \subfloat[RRL Locations, SDSS Stripe 82]{\label{fig:density_true_points}
+%% %%  \includegraphics[scale=\tw]{figs/density_true_points.png}
+%% %%  %  \rule{4cm}{3cm}`
+%% %%  }\\
+%% %%  \subfloat[Overdensities, SDSS Stripe 82]{\label{fig:density_true}
+%% %%  \includegraphics[scale=.1]{figs/density_true.png}
+%% %%  %  \rule{4cm}{3cm}`
+%% %%  }
+%% %%   \end{minipage}
+
+  
+%% %% %  \hspace{\fill}
+%% %%   \begin{minipage}{0.5\textwidth}
+%% %%  \subfloat[RRL Location, Downsampled SDSS Stripe 82]{\label{fig:density_rr_model_sampled_points}
+%% %%  \includegraphics[scale=.1]{figs/density_rr_model_sampled_points.png}
+%% %% %   \rule{4cm}{3cm}
+%% %%  }\\
+%% %%     \subfloat[Overdensities, Downsampled SDSS Stripe 82]{\label{fig:density_rr_model_sampled}
+%% %%  \includegraphics[scale=.1]{figs/density_rr_model_sampled.png}
+%% %% %   \rule{4cm}{3cm}
+%% %%  }
+%% %%  \end{minipage}
+%% %% \caption{(a) Location of RRL stars in SDSS Stripe 82. The light curves used to make this map were well sampled so the classifications and distance estimates are quite accurate (i.e. all black points are actually RRL and their location on this map is close to their true location) (b) Overdensities (relative to the oblate MW halo model) represented by redder regions.   (c) The same map in (a) but constructed using poorly sampled light curves. Some of the classifications are incorrect (i.e. some black points are not in fact RRL) and distances contain more scatter. (d) The overdensities determined using sparsely sampled light curves.}
+%% %% %\end{center}
+%% %% \end{figure}
+
+
+%% %% \end{frame}
+
+
+
+
+
+%% \begin{frame}{Reproducing Milky Way Halo Maps}
+%% \underline{Select 350 RR Lyrae and 1000 non--RR Lyrae from SDSS Stripe 82.}
+%% \begin{enumerate}
+%%   \item Fit RR Lyrae Model to light curves
+%%   \item Extract features
+%%   \item Build Random Forest Classifier
+%%   \item Classify RRL / not-RRL for out--of--bag data (cross--validation)
+%%   \item Estimate distances to stars classified as RRL
+%%   \item Construct MW Halo map
+%% \end{enumerate}
+%% \end{frame}
+
+
+%% \begin{frame}{Results for Constructing Milky Way Halo Maps}
+%%   \def \tw {.1}
+  
+%%   \begin{columns}
+%%     \begin{column}{0.5\textwidth}
+%%       \begin{center}
+%%         \includegraphics[scale=\tw]{figs/density_true_points.png}\\
+%%         RRL Locations, SDSS\\
+%%         \includegraphics[scale=\tw]{figs/density_true.png}\\
+%%         Overdensities, SDSS
+%%       \end{center}
+%%   \end{column}
+
+%%     \begin{column}{0.5\textwidth}
+%%       \begin{center}
+%%     \includegraphics[scale=\tw]{figs/density_rr_model_sampled_points.png}\\
+%%     RRL Locations, Downsampled\\
+%%     \includegraphics[scale=\tw]{figs/density_rr_model_sampled.png}\\
+%%     Overdensities, Downsampled
+%%     \end{center}
+%%   \end{column}
+
+%% \end{columns}
+%% \end{frame}
+
+
+
+
+%% \subsection{Dark Energy Survey}
+
+%% \begin{frame}{FORNAX Dwarf Spheroid Satellite Galaxy}
+%%   \begin{center}
+%%     \includegraphics[scale=0.04]{figs/Fornax_dwarf_galaxy.jpg}
+%%   \end{center}
+%% \att{Wikipedia: \url{https://upload.wikimedia.org/wikipedia/commons/4/45/Fornax_dwarf_galaxy.jpg}}
+%% \end{frame}
+
+%% \begin{frame}{Data Challenge}
+%%   \begin{itemize}
+%%   \item 3442 light curves from FORNAX region
+%%   \item Correctly identified 232/317 RR Lyrae in sample (blind test)
+%%   \item RRL estimated distances correspond with known distance to FORNAX (130--150 kpc)
+%%   \end{itemize}
+
+  
+%% \begin{minipage}{6in}
+%%   \raisebox{-0.5\height}{\includegraphics[scale=0.2]{figs/unfolded_des_7.pdf}}
+%%   \raisebox{-0.5\height}{\includegraphics[scale=0.3]{figs/fornax_rr_distances.pdf}}
+%%   %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g.pdf}}
+%%   %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/rightarrow.png}}
+%%   %% \raisebox{-0.5\height}{\includegraphics[scale=\tw]{figs/unfolded_4099_g_down.pdf}}
+%% \end{minipage}
+
+%% \begin{center}  
+%%   \textbf{Current Challenge:} Find satellite galaxy of FORNAX.
+%% \end{center}
+
+%% \end{frame}
+
+\begin{frame}[plain]
+
+  \begin{center}
+    {\huge Thank you. Questions?}
+    \end{center}
+
+\end{frame}
+
+
+%% \section{Ongoing and Related Work}
+
+%% \begin{frame}{Related Work}
+
+%% \textbf{Period Estimation Algorithms / Variable Star Models:}
+%% \begin{itemize}
+%% \item Sinusoid Based Methods
+%% \begin{itemize}
+%% \item Lomb Scargle (LS) \cite{lomb1976least,scargle1982studies}
+%% \item Generalized LS (GLS) \cite{zechmeister2009generalised}
+%% \item Multifilter Extensions \cite{vanderplas2015periodograms,long2014estimating}.
+%% \item AoV \cite{schwarzenberg1996fast}
+%% \end{itemize}
+%% \item ``Non--parametric'' methods
+%% \begin{itemize}
+%% \item Phase Dispersion Minimization \cite{stellingwerf1978period}
+%% \item Supersmoother \cite{sesar2010light}
+%% \end{itemize}
+%% \item Template Based Methods
+%% \begin{itemize}
+%% \item RR Lyrae templates by Sesar \cite{sesar2010light}, Kovacs \cite{kovacs2007computation}
+%% \item Cepheid templates by Pejcha \cite{pejcha2012global}, Yoachim \cite{yoachim2009panoply}
+%% \end{itemize}
+%% \end{itemize}
+
+%% \vspace{.1in}
+
+%% \textbf{Finding RR Lyrae in Sparsely Sampled Light Curves:}
+%% \begin{itemize}
+%% \item Hernitschek \cite{hernitschek2016finding} uses structure functions to find RRL / QSO.
+%% \item Sesar \cite{sesar2016machine} mapping MW halo with Pan--STARRS, developed RRL templates.
+%% \end{itemize}
+
+
+%% \end{frame}
+
+%% \begin{frame}{Ongoing and Upcoming Work}
+%% \begin{itemize}
+%% \item Model refinements:
+%% \begin{itemize}
+%% \item $M_b$ dependence on period, metallicity.
+%% \item Filters other than $g,i,u,r,z$
+%% \end{itemize}
+%% \item Milky Way Halo Maps
+%% \begin{itemize}
+%% \item Estimation of halo 
+%% \item Treat as Prediction Problem: Evaluate distance / density estimates using Stripe 82 data or follow--up observations.
+%% \end{itemize}
+%% \end{itemize}
+%% \end{frame}
+
+%% \begin{frame}{Conclusions}
+%% \begin{itemize}
+%% \item Models for specific variable star classes:
+%% \begin{itemize}
+%% \item Pros: better parameter estimates, improved classification
+%% \item Cons: difficult to build, more computation time
+%% \end{itemize}
+%% \item 
+%% \item Survey cadence selection
+%% \end{itemize}
+%% \end{frame}
+
+
+\begin{frame}[allowframebreaks]{Bibliography}
+%  \def\newblock{\hskip .11em plus .33em minus .07em}
+%  \nocite{*}
+%\nocite{*}
+\bibliographystyle{plain} 
+  \tiny{
+  \bibliography{refs}}
+\end{frame}
+
+%% \section*{Additional Results}
+
+%% \begin{frame}{Dependence Assumption}
+%% \todo{write here}
+%% \end{frame}
+
+%% \begin{frame}{Are uncertainties estimated correctly?}
+%% \todo{show example from SDSS suggesting they are.}
+%% \end{frame}
+
+
+%% \begin{frame}{$K=1,2,3$ Misspecified Model Results}
+%% \input{figs/period_est_results.tex}
+%% \end{frame}
+
+
+\end{document}
