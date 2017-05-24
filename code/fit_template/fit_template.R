@@ -71,15 +71,15 @@ ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
 ##
 ## arguments
 ##           times : times to make predictions
+##            band : band to make prediction
 ##           omega : frequency
 ##          coeffs : coefficients from model fit
-##            band : band to make prediction
 ##             tem : input templates
 ##
 ##
 ## value
 ##              m  : vector of predicted magnitudes
-PredictSingleBand <- function(times,omega,coeffs,band,tem){
+PredictSingleBand <- function(times,band,omega,coeffs,tem){
     t_temp <- (times*omega + coeffs[4]) %% 1.0
     m <- (coeffs[1] + tem$betas[band] + coeffs[2]*tem$dust[band] +
           coeffs[3]*tem$template_funcs[[band]](t_temp))
@@ -100,7 +100,30 @@ PredictSingleBand <- function(times,omega,coeffs,band,tem){
 ##              m  : matrix of predictions, columns are bands, rows times
 PredictAllBand <- function(times,omega,coeffs,tem){
     bands <- names(tem$betas)
-    m <- vapply(bands,function(x){PredictSingleBand(times,omega,coeffs,x,tem)},rep(0,length(times)))
+    m <- vapply(bands,function(x){PredictSingleBand(times,x,omega,coeffs,tem)},rep(0,length(times)))
+    return(m)
+}
+
+
+## make predictions at a set of times in particular bands
+##
+##
+## arguments
+##           times : times to make predictions
+##           bands : bands[ii] is band of observation times[ii]
+##           omega : frequency
+##          coeffs : coefficients from model fit
+##             tem : input templates
+##
+##
+## value
+##              m  : vector of predicted magnitudes
+PredictTimeBand <- function(times,bands,omega,coeffs,tem){
+    m <- rep(0,length(times))
+    bands_unique <- unique(bands)
+    for(ii in bands_unique){
+        m[bands==ii] <- PredictSingleBand(times[bands==ii],ii,omega,coeffs,tem)
+    }
     return(m)
 }
 
