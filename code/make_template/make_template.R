@@ -15,14 +15,14 @@ for(ii in 1:length(bands)){
 to_use <- rowSums(nobs > 45) == 5
 tms <- tms[to_use]
 periods <- periods[to_use]
-
+Nlc <- length(tms)
 
 ### smooth lightcurves using supersmoother
 ### place on equally spaced grid
 N <- 100
 t <- (1:N)/N
-lc_grid <- array(0,c(length(tms),N,5),dimnames=list(NULL,NULL,bands))
-for(ii in 1:length(tms)){
+lc_grid <- array(0,c(Nlc,N,5),dimnames=list(NULL,NULL,bands))
+for(ii in 1:Nlc){
     for(jj in 1:length(bands)){
         lc <- tms[[ii]][[bands[jj]]]
         lc[,1] <- (lc[,1] %% periods[ii]) / periods[ii]
@@ -55,7 +55,7 @@ lpmed <- log10(median(periods))
 betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
 names(betas) <- rrmag$bnd
 
-## estimate d and alpha for each lc
+## estimate ebv and mu for each lc
 rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
 m_shift <- t(t(m) - betas)
 for(ii in 1:nrow(m)){
@@ -65,7 +65,7 @@ for(ii in 1:nrow(m)){
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 ## construct lc with overall mean, dust, and band effects removed
-for(ii in 1:length(tms)){
+for(ii in 1:Nlc){
     for(jj in 1:5){
         lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) + rs[ii,jj]
     }
@@ -83,7 +83,7 @@ names(amps) <- bands
 
 ## phase (initial) and amplitude registration
 ## improved phase registration using squared differences next
-for(ii in 1:length(tms)){
+for(ii in 1:Nlc){
     temp <- lc_grid[ii,,1]
     ix <- which.min(temp)
     if(ix > 1.5){
@@ -123,7 +123,7 @@ for(JJ in 1:5){
     ylim <- range(lc_grid[,,JJ])
     ylim <- c(-yedge,yedge)
     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-    for(ii in 1:length(tms)){
+    for(ii in 1:Nlc){
         points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
     }
     ylim <- range(x_new[[JJ]])
