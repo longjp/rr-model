@@ -1,5 +1,4 @@
 ## by James Long
-## date November 21, 2016
 
 fit_template.R 
  - fits RR Lyrae template to light curve
@@ -8,6 +7,9 @@ fit_template.R
 
 template.py
  - python wrapper demonstrating use FitTemplate, ComputeCoeffs functions
+
+template.R
+ - R demonstration of FitTemplate, ComputeCoeffs functions
 
 template.RData
  - light curve shape information use by template functions

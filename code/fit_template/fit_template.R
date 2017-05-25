@@ -1,4 +1,4 @@
-## functions for fitting rr lyrae light curve
+## functions for fitting rr lyrae light curves
 
 ## fits RR Lyrae template
 ##
@@ -129,14 +129,46 @@ PredictTimeBand <- function(times,bands,omega,coeffs,tem){
     return(m)
 }
 
+## grid search across phase at fixed omega. uses
+## 1. optimize parameter fits AFTER selecting frequency
+## 2. test that newton algorithm is finding best parameter fits
+##
+## arguments
+##           lc : light curve, data frame with columns time, band, mag, error
+##        omega : frequency
+##          tem : input templates
+##         phis : grid of phases to try
+##   use.errors : should photometric errors be used, generally not advised
+##
+##
+## value
+##          rss : the residual sum of squares at each phase in grid
+ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
+    multi <- CheckNumberBands(lc)
+    tem <- CheckTemLC(tem,lc)
+    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    nb <- dat[[2]]
+    rss_max <- sum(lm(m~dust)$residuals^2)
+    rss <- rep(0,length(phis))
+    for(ii in 1:length(phis)){
+        coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
+                                     tem$template_funcs,multi)
+        gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
+        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
+    }
+    return(rss)
+}
 
 
 
-
+##### NOTE:
 ##### below this are mostly helper functions that
 ##### are unlikely to be useful for direct calling
 
-
+## puts data in form for model to fit
 AugmentData <- function(lc,dust,betas,use.errors=FALSE){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
@@ -149,6 +181,8 @@ AugmentData <- function(lc,dust,betas,use.errors=FALSE){
     return(list(lc=lc,nb=nb))
 }
 
+## makes \gamma_b(omega*t + \phi) for times t where
+## t is ordered (by band) set of times
 ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
     t <- (t*omega + phi) %% 1
     bix <- c(0,cumsum(nb))
@@ -163,6 +197,7 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
     return(gammaf)
 }
 
+## finds best fitting mu (distance mod) , d (i.e. ebv), a (amplitude)
 ComputeBeta <- function(m,dust,gammaf){
     X <- cbind(mu=1,d=dust,a=gammaf)
     B <- t(X)%*%X
@@ -171,6 +206,8 @@ ComputeBeta <- function(m,dust,gammaf){
     return(z[,1])
 }
 
+## finds best fitting mu (distance mod) ,  a (amplitude)
+## assuming we are using one band so ebv set to 0
 ComputeBetaOne <- function(m,gammaf){
     X <- cbind(mu=1,a=gammaf)
     B <- t(X)%*%X
@@ -179,6 +216,8 @@ ComputeBetaOne <- function(m,gammaf){
     return(z[,1])
 }
 
+
+## computes a newton update for the (mu,a,d,phi) parameter vector
 NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,multi){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(multi){
@@ -210,6 +249,8 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,mu
 
 
 
+## update for the (mu,a,d) parameter vector (closed form because phi fixed)
+## TODO: can NewtonUpdate just call this function?
 AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,multi){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(multi){
@@ -231,24 +272,6 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,multi){
     return(out)
 }
 
-ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
-    multi <- CheckNumberBands(lc)
-    tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
-    m <- dat[[1]]$mag
-    dust <- dat[[1]]$dust
-    t <- dat[[1]]$time
-    nb <- dat[[2]]
-    rss_max <- sum(lm(m~dust)$residuals^2)
-    rss <- rep(0,length(phis))
-    for(ii in 1:length(phis)){
-        coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
-                                     tem$template_funcs,multi)
-        gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
-        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
-    }
-    return(rss)
-}
 
 ## check and make tem and lc consistent
 ## if lc has bands not in tem, stop
@@ -278,6 +301,8 @@ TBMEtoLC <- function(time,band,mag,error){
     return(data.frame(time,band,mag,error))
 }
 
+## if lc has only one band, need to use ComputeBetaOne rather than ComputeBeta
+## this function checks / warns if using single band
 CheckNumberBands <- function(lc){
     multi <- TRUE
     if(length(unique(lc[,2]))==1){
