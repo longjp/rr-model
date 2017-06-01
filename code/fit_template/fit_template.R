@@ -47,7 +47,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
 ##
 ## value
 ##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
-ComputeCoeffs <- function(lc,omega,tem,NN=10,use.errors=FALSE){
+ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE){
     multi <- CheckNumberBands(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
