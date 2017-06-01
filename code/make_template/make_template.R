@@ -103,6 +103,43 @@ for(JJ in 1:5){
 }
 
 
+X <- lc_grid
+for(ii in 1:dim(lc_grid)[1]){
+    for(jj in 1:dim(lc_grid)[3]){
+        X[ii,,jj] <- phase_shift(lc_grid[ii,,jj],del[ii])
+    }
+}
+
+
+## TODO: error check this
+SolveAGamma <- function(X,a=NULL,N=1000){
+    n <- dim(X)[1]
+    ## initialize a as normalized unit vector
+    if(is.null(a)){
+        a <- rep(1,n)
+        a <- a / sqrt(sum(a*a))
+    }
+    ## update a and Y iteratively, N times
+    for(jj in 1:N){
+        Y <- vapply(1:n,function(ix){a[ix]*X[ix,,]},matrix(0,nrow=dim(X)[2],ncol=dim(X)[3]))
+        Y <- apply(Y,1:2,sum)
+        a <- vapply(1:n,function(ix){sum(Y*X[ix,,])},c(0))
+        a <- a / sqrt(sum(a*a))
+    }
+    return(list(a=a,Y=Y))
+}
+out <- SolveAGamma(X)
+
+Y <- out$Y
+
+
+##### LOOKS BEAUTIFUL!
+ylim <- range(Y)
+plot(0,0,xlim=range(t),ylim=ylim,col=0)
+for(ii in 1:dim(Y)[2]){
+    points(t,Y[,ii],type='l')
+}
+
 
 ## TODO: replace next two steps with optimization algorithm
 

@@ -1,0 +1,157 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim, amsmath,amssymb,amsthm,graphicx}
+\usepackage[margin=1in,nohead]{geometry}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{bbm}
+\usepackage{bm}
+
+\sectionfont{\normalsize}
+\subsectionfont{\small}
+
+\title{}
+\date{}
+\author{}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\newcommand{\Remark}[2]{{\color{red}Remark from #1: #2}\xspace}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\newcommand{\minimax}[2]{\argmin{#1}\underset{#2}{\operatorname{max}}}
+\newcommand{\bb}{\textbf{b}}
+
+\newcommand{\Var}{\text{Var }}
+\newcommand{\Cov}{\text{Cov }}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
+
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+\newenvironment{my_enumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}}{\end{enumerate}
+}
+
+
+
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of [yas] elisp error!TeX Unbound'' for suggested values.
+% See pp. 199-200 of Lamport's [yas] elisp error!LaTeX'' book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}% require fuller float pages
+
+% remember to use [htp] or [htpb] for placement
+
+
+
+
+
+\begin{document}
+\noindent
+\textbf{Description of Template Construction}\\
+\textbf{By James Long}\\
+\textbf{\today}
+
+This document describes the reasoning behind the template construction code in \texttt{make\_template.R}.
+
+\section{Model}
+
+Suppose we estimate periods and phase align a set of light curves. Let $t \in [0,1)$ denote phase. Suppose that the temporal sampling of the light curve is high and photometric error is low, so that we can, given the magnitude measurments, infer a continuous function for the light curve shape. The $i^{th}$ light curve in band $b$ is modeled as
+\begin{equation*}
+  m_{ib}(t) = \mu_i + \beta_b + e_id_b + \epsilon_{ib} + a_i\gamma_b(t) + \delta_{ib}(t).
+\end{equation*}
+
+
+\underline{Mean Terms:} The terms $\mu_i + \beta_b + e_id_b + \epsilon_{ib}$ describe the mean in band $b$. These terms are:
+\begin{itemize}
+\item $\mu_i$, the distance modulus
+\item $\beta_b$, the absolute magnitude in band $b$
+\item the amount of dust $e_i$ (i.e. $E[B-V]$) times the extinction per dust in band $b$, $d_b$
+\item $\epsilon_{ib}$, an error term accounting for unmodeled variation / error. This includes, but is not limited to,
+\begin{itemize}
+  \item dependence of absolute magnitude on period, which is currently unmodeled
+  \item instrumental effects (e.g. one filter producing magnitudes biased low or high)
+\end{itemize}
+\end{itemize}
+
+$\beta_b$ and $e_b$ are known. The hope is that the $\epsilon_{ib}$ are approximately mean $0$ random variables with small variance. This implies that the other terms, as written, account for the mean magnitudes well. We discuss this assumption a bit more later.
+
+\underline{Shape Terms:} The terms $a_i\gamma_b(t) + \delta_{ib}(t)$ account for variation in the light curve as a function of phase, $t$. Since they do not account for mean, they are by contruction mean 0, i.e. $\int \delta_{ib}(t) = 0$ and $\int \gamma_b(t) = 0$ for all $i$ and $b$. $\gamma_b$ represents the average shape in band $b$ while $\delta_{ib}$ represents deviations from average and can be thought of as a random function. Thus $\E[\delta_b(t)] = 0$ where the expectation is taken across $i$. The $a_i$ scales the templates to the particular star $i$.
+
+\section{Mean Magnitude Model Checking}
+
+Compute mean across time for each light curve / band, i.e. $\bar{m}_{ib} = \int m_{ib}(t)$. Then
+\begin{equation*}
+  \bar{m}_{ib} = \mu_i + \beta_b + e_id_b + \epsilon_{ib}.
+\end{equation*}
+We can estimate $\mu_i$ and $e_i$ by regressing the $\bar{m}_{ib} - \beta_b$ vector (across $b$) on $d_b$. The intercept parameter is $\mu_i$ and the slope parameter is $e_i$. The residuals are estimates of $\epsilon_{ib}$ and can be used to determine the extent to which they are mean $0$ and low variance.
+
+\todo{a few sentences on how to do this, inability to determine deviations in the direction $1$ or $d_b$. does it make sense to look at sd of columns?}
+
+\section{Estimating $a_i$, $\gamma_i$}
+
+Define
+\begin{equation*}
+m'_{ib}(t) = m_{ib}(t) - \bar{m}_{ib}.
+\end{equation*}
+Then
+\begin{equation*}
+  m'_{ib}(t) = a_i\gamma_b(t) + \delta_{ib}(t)
+\end{equation*}
+We estimate $a_i$ and $\gamma_b(t)$ by minimizing
+\begin{equation*}
+  g(\vec{a},\gamma_b) = \sum_{b,i} \int_t (m'_{ib}(t) - a_i \gamma_b(t))^2
+\end{equation*}
+\todo{show this is a consistent estimator.}
+Suppose the times at which the light curve has been sampled are discretized. Call $m'_{ib}(t) = x_{ibt}$ and $\gamma_{b}(t) = y_{bt}$. Thus we see to find
+\begin{equation*}
+  a,x = \argmin{a,x} \sum_{i,b,t} (x_{ibt} - a_i y_{bt})^2
+\end{equation*}
+where we require $||a||=1$ for identifiability. Taking derivatives and solving we obtain
+\begin{equation*}
+  \widehat{a}_i \propto \sum_{b,t} y_{bt}x_{ibt}
+\end{equation*}
+and
+\begin{equation*}
+  \widehat{y}_{bt} = \sum_i a_ix_{ibt}
+\end{equation*}
+Let $Y$ be the matrix with $b,t$ entry equal to $y_{bt}$, $X_i$ a matrix with $b,t$ entry equal to $x_{ibt}$, and $\circ$ denote elementwise matrix multiplication. Then the updates, using some \texttt{R} notation, are
+\begin{equation*}
+  \widehat{a}_i \propto \texttt{sum}(Y\circ X_i)
+\end{equation*}
+and
+\begin{equation*}
+  \widehat{Y} = \sum_i a_iX_i
+\end{equation*}
+
+
+
+%\bibliographystyle{plainnat}
+%\bibliography{refs}
+
+
+\end{document}
+
