@@ -55,12 +55,12 @@ lpmed <- log10(median(periods))
 betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
 names(betas) <- rrmag$bnd
 
-## ## estimate ebv and mu for each lc
-## rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-## m_shift <- t(t(m) - betas)
-## for(ii in 1:nrow(m)){
-##     rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
-## }
+## estimate ebv and mu for each lc
+rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
+m_shift <- t(t(m) - betas)
+for(ii in 1:nrow(m)){
+    rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
+}
 
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
@@ -81,34 +81,46 @@ pred <- sv$d[1]*sv$u[,1,drop=FALSE]%*%matrix(sv$v[,1],ncol=5)
 amps <- abs(sv$v[,1])
 names(amps) <- bands
 
-## phase (initial) and amplitude registration
-## improved phase registration using squared differences next
+
+### first phase align light curves
+## crude phase aligns, make minimums = phase 0
 for(ii in 1:Nlc){
     temp <- lc_grid[ii,,1]
     ix <- which.min(temp)
     if(ix > 1.5){
         for(jj in 1:5){
             temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- c(temp[ix:N],temp[1:(ix-1)]) / pred[ii,jj]
+            lc_grid[ii,,jj] <- c(temp[ix:N],temp[1:(ix-1)])
         }
-    } else {
-        for(jj in 1:5){
-            temp <- lc_grid[ii,,jj]
-            lc_grid[ii,,jj] <- temp / pred[ii,jj]
-        }
-    }
+    } 
 }
-
-## phase align and compute templates for each band
+## sophisticated phase align, based on FDA book, see phase, phase_shift functions
 del <- phase(lc_grid[,,1])
 x_new <- list()
-templates <- matrix(0,nrow=5,ncol=N)
-rownames(templates) <- bands
 for(JJ in 1:5){
     n <- nrow(lc_grid[,,JJ])
     x_new[[JJ]] <- t(vapply(1:n,function(ii){phase_shift(lc_grid[ii,,JJ],del[ii])},rep(0,N)))
+}
+
+
+
+## TODO: replace next two steps with optimization algorithm
+
+## amplitude align, based on svd
+for(jj in 1:5){
+    for(ii in 1:nrow(pred)){
+        x_new[[jj]][ii,] <- x_new[[jj]][ii,] / pred[ii,jj]
+    }
+}
+## make templates
+templates <- matrix(0,nrow=5,ncol=N)
+rownames(templates) <- bands
+for(JJ in 1:5){
     templates[JJ,] <- apply(x_new[[JJ]],2,median)
 }
+
+
+
 
 ## visualize curves with templates
 cols <- brewer.pal(10,name="RdBu")
