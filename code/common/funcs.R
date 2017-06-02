@@ -67,6 +67,24 @@ phase <- function(x,niter=10){
     return(del_total)
 }
 
+
+## shifts x to minimize sum((y - mu)^2) where y is shifted x
+PhaseGridOne <- function(x,mu){
+    n <- length(x)
+    out <- vapply(2:n,function(ix){c(x[ix:n],x[1:(ix-1)])},rep(0,n))
+    out <- t(cbind(out,x))
+    out_diff <- t(t(out) - mu)
+    ix <- which.min(rowSums(out_diff^2))
+    return(ix)
+}
+## shifts curves to minimize difference with mu, grid search
+## useful to refine estimates from earlier phase alignment algorithms
+PhaseGridAll <- function(X){
+    mu <- colMeans(X)
+    return(apply(X,1,function(x){PhaseGridOne(x,mu)}) %% ncol(X))
+}
+
+
 LCtoTM <- function(lc){
     lc[,1] <- lc[,1] - min(lc[,1])
     levs <- as.character(levels(lc$b))
