@@ -5,6 +5,15 @@ source('../common/funcs.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
 
+## remove photometric measurements with uncertainty greater than scut
+scut <- .2
+for(ii in 1:length(tms)){
+    for(jj in 1:length(tms[[ii]])){
+        temp <- tms[[ii]][[jj]]
+        tms[[ii]][[jj]] <- temp[temp[,3] < scut,]
+    }
+}    
+
 ## get light curves with at least 50 observations / band in each band
 bands <- names(tms[[1]])
 bands <- bands[order(bands)]
@@ -16,9 +25,6 @@ to_use <- rowSums(nobs > 45) == 5
 tms <- tms[to_use]
 periods <- periods[to_use]
 Nlc <- length(tms)
-
-
-## TODO: why are there outliers in some bands, especially 5: look at smoothing
 
 ### smooth lightcurves using supersmoother
 ### place on equally spaced grid
@@ -36,6 +42,35 @@ for(ii in 1:Nlc){
         lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
     }
 }
+
+
+## ## ## TODO: why are there outliers in some bands, especially 5: look at smoothing
+## ## ## which light curves have largest derivative
+## JJ <- 1
+## temp <- lc_grid[,,JJ]
+## p2pamp <- apply(temp,1,function(x){diff(range(x))})
+## dtemp <- abs(cbind(temp[,ncol(temp)],temp[,1:(ncol(temp)-1)]) - temp)
+## dtemp_max <- apply(dtemp,1,sum) / p2pamp
+## ords <- order(dtemp_max,decreasing=TRUE)
+## ii <- 0
+
+## ii <- ii + 1
+## plot(temp[ords[ii],])
+
+
+
+## lc <- tms[[ords[ii]]][[bands[JJ]]]
+## lc[,1] <- (lc[,1] %% periods[ords[ii]]) / periods[ords[ii]]
+## plot(lc[,1],lc[,2])
+## segments(lc[,1],lc[,2]-lc[,3],lc[,1],lc[,2]+lc[,3])
+
+## a
+## lcs <- lapply(tms,function(x){TMtoLC(x)})
+## errors <- unlist(lapply(lcs,function(x){x[,4]}))
+## hist(errors)
+## summary(errors)
+
+
 
 ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
@@ -64,6 +99,8 @@ m_shift <- t(t(m) - betas)
 for(ii in 1:nrow(m)){
     rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
 }
+
+pairs(rs)
 
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
@@ -105,6 +142,8 @@ for(ii in 1:dim(lc_grid)[1]){
 
 ####### check phase alignment
 JJ <- 1
+
+JJ <- JJ + 1
 ylim <- range(lc_grid[,,JJ])
 cols <- brewer.pal(10,name="RdBu")
 decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
