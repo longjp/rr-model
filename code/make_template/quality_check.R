@@ -18,12 +18,12 @@ for(ii in 1:length(med_res)){
 }
 
 
-print("model error:")
+print("total model error:")
 hist(med_res)
 median(med_res) ## .031 seems reasonable for this number
 
 
-## find model error caused by shape
+## find model error caused by shape and fixing amplitude
 med_res <- vector("numeric",length(tms))
 for(ii in 1:length(med_res)){
     temp <- tms[[ii]]
@@ -36,9 +36,33 @@ for(ii in 1:length(med_res)){
     med_res[ii] <- median(abs(preds - lc[,3]))
 }
 
-print("model error, perfect mean:")
+print("model error caused by shape and fixing amplitude ratio:")
 hist(med_res)
 median(med_res) ## perfect mean offers only small advantage over actual model
+
+
+## find model error due to shape by fitting
+## model individually for each band/lc
+## this removes model error caused by mean and fixing amplitude ratio
+med_res <- vector("numeric",length(tms))
+bands <- names(tem$betas)
+for(ii in 1:length(med_res)){
+    lc <- TMtoLC(tms[[ii]])
+    errors <- list()
+    for(jj in 1:length(bands)){
+        temp <- lc[lc$band %in% bands[jj],]
+        temp$band <- as.factor(as.character(temp$band)) ## get rid of unused levels
+        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem)
+        preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
+        errors[[jj]] <- abs(preds - temp[,3])
+    }
+    med_res[ii] <- median(unlist(errors))
+}
+
+print("model error caused only by shape:")
+hist(med_res,main="shape only")
+median(med_res) 
+
 
 
 ## how much error due only to photometry?
@@ -50,17 +74,16 @@ for(ii in 1:length(med_res)){
 
 print("photometric error:")
 hist(med_res)
-median(med_res) ## perfect mean offers only small advantage over actual model
+median(med_res)
 
+
+
+
+
+
+## u band has .044 error, the worst
 
 ## are templates mean 0?
 print("the mean of each template is:")
 rowMeans(tem$templates)
 
-
-
-
-## errors are
-lcs <- lapply(tms,TMtoLC)
-sds <- unlist(lapply(lcs,function(x){x[,4]}))
-summary(sds*.6)

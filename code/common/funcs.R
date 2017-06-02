@@ -85,6 +85,40 @@ PhaseGridAll <- function(X){
 }
 
 
+## solves the optimization problem
+##    argmin_{a,Y} \sum_i ||(X[i,,] - a[i]Y||_F^2
+##  by iterating updates for a and Y where we constrain ||a||_2 = 1
+##  see description.tex for why this is done
+##
+##
+## arguments
+##       X : I x T x B array
+##       a : vector length I (initial guess)
+##       N : number of iterations
+##
+## value
+##     list with elements
+##       a : vector length I
+##       Y : matrix dim T x B
+##
+SolveAGamma <- function(X,a=NULL,N=1000){
+    I <- dim(X)[1]
+    ## initialize a as normalized unit vector
+    if(is.null(a)){
+        a <- rep(1,I)
+    }
+    a <- a / sqrt(sum(a*a))
+    ## update a and Y iteratively, N times
+    for(jj in 1:N){
+        Y <- vapply(1:I,function(ii){a[ii]*X[ii,,]},matrix(0,nrow=dim(X)[2],ncol=dim(X)[3]))
+        Y <- apply(Y,1:2,sum)
+        a <- vapply(1:I,function(ii){sum(Y*X[ii,,])},c(0))
+        a <- a / sqrt(sum(a*a))
+    }
+    return(list(a=a,Y=Y))
+}
+
+
 LCtoTM <- function(lc){
     lc[,1] <- lc[,1] - min(lc[,1])
     levs <- as.character(levels(lc$b))

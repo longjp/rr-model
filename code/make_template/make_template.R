@@ -43,35 +43,6 @@ for(ii in 1:Nlc){
     }
 }
 
-
-## ## ## TODO: why are there outliers in some bands, especially 5: look at smoothing
-## ## ## which light curves have largest derivative
-## JJ <- 1
-## temp <- lc_grid[,,JJ]
-## p2pamp <- apply(temp,1,function(x){diff(range(x))})
-## dtemp <- abs(cbind(temp[,ncol(temp)],temp[,1:(ncol(temp)-1)]) - temp)
-## dtemp_max <- apply(dtemp,1,sum) / p2pamp
-## ords <- order(dtemp_max,decreasing=TRUE)
-## ii <- 0
-
-## ii <- ii + 1
-## plot(temp[ords[ii],])
-
-
-
-## lc <- tms[[ords[ii]]][[bands[JJ]]]
-## lc[,1] <- (lc[,1] %% periods[ords[ii]]) / periods[ords[ii]]
-## plot(lc[,1],lc[,2])
-## segments(lc[,1],lc[,2]-lc[,3],lc[,1],lc[,2]+lc[,3])
-
-## a
-## lcs <- lapply(tms,function(x){TMtoLC(x)})
-## errors <- unlist(lapply(lcs,function(x){x[,4]}))
-## hist(errors)
-## summary(errors)
-
-
-
 ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
 pdf("band_means.pdf")
@@ -100,14 +71,12 @@ for(ii in 1:nrow(m)){
     rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
 }
 
-pairs(rs)
-
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 ## make lc_grid mean 0 for each band, source
 for(ii in 1:Nlc){
     for(jj in 1:5){
-        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj]) ## + rs[ii,jj]
+        lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj])
     }
 }
 
@@ -140,53 +109,20 @@ for(ii in 1:dim(lc_grid)[1]){
 
 
 
-####### check phase alignment
-JJ <- 1
+####### phase aligned light curves look good
+## JJ <- JJ + 1
+## ylim <- range(lc_grid[,,JJ])
+## cols <- brewer.pal(10,name="RdBu")
+## decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
+## dec <- findInterval(periods,c(-Inf,decLocations, Inf))
+## plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
+## for(ii in 1:Nlc){
+##     points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
+## }
+## abline(h=0,col='red',lwd=3)
 
-JJ <- JJ + 1
-ylim <- range(lc_grid[,,JJ])
-cols <- brewer.pal(10,name="RdBu")
-decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
-dec <- findInterval(periods,c(-Inf,decLocations, Inf))
-plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-for(ii in 1:Nlc){
-    points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
-}
-abline(h=0,col='red',lwd=3)
 
-## TODO: error check this
-## solves the optimization problem
-##    argmin_{a,Y} \sum_i ||(X[i,,] - a[i]Y||_F^2
-##  by iterating updates for a and Y where we constrain ||a||_2 = 1
-##  see description.tex for why this is done
-##
-##
-## arguments
-##       X : I x T x B array
-##       a : vector length I (initial guess)
-##       N : number of iterations
-##
-## value
-##     list with elements
-##       a : vector length I
-##       Y : matrix dim T x B
-##
-SolveAGamma <- function(X,a=NULL,N=1000){
-    I <- dim(X)[1]
-    ## initialize a as normalized unit vector
-    if(is.null(a)){
-        a <- rep(1,I)
-    }
-    a <- a / sqrt(sum(a*a))
-    ## update a and Y iteratively, N times
-    for(jj in 1:N){
-        Y <- vapply(1:I,function(ii){a[ii]*X[ii,,]},matrix(0,nrow=dim(X)[2],ncol=dim(X)[3]))
-        Y <- apply(Y,1:2,sum)
-        a <- vapply(1:I,function(ii){sum(Y*X[ii,,])},c(0))
-        a <- a / sqrt(sum(a*a))
-    }
-    return(list(a=a,Y=Y))
-}
+## determine amplitude and templates for sources
 out <- SolveAGamma(lc_grid)
 
 ## reorder output so templates is a B x T matrix
@@ -211,20 +147,21 @@ for(ii in 1:5){
 }
 legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
+
 ## templates with light curves
-cols <- brewer.pal(10,name="RdBu")
-decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
-dec <- findInterval(periods,c(-Inf,decLocations, Inf))
-for(JJ in 1:5){
-    ylim <- range(templates[JJ,])
-    pdf(paste0("template_",JJ,".pdf"),height=8,width=12)
-    plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
-    for(ii in 1:Nlc){
-        points(t,lc_grid[ii,,JJ]/amps[ii],type='l',col=cols[dec[ii]])
-    }
-    points(t,templates[JJ,],lwd=3,type='l')
-    dev.off()
-}
+## cols <- brewer.pal(10,name="RdBu")
+## decLocations <- quantile(periods, probs = seq(0.1,0.9,by=0.1),type=4)
+## dec <- findInterval(periods,c(-Inf,decLocations, Inf))
+## for(JJ in 1:5){
+##     ylim <- range(templates[JJ,])
+##     pdf(paste0("template_",JJ,".pdf"),height=8,width=12)
+##     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
+##     for(ii in 1:Nlc){
+##         points(t,lc_grid[ii,,JJ]/amps[ii],type='l',col=cols[dec[ii]])
+##     }
+##     points(t,templates[JJ,],lwd=3,type='l')
+##     dev.off()
+## }
 
 ComputeDerivative <- function(x,len,gap=2){
     n <- length(x)

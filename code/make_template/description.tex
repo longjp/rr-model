@@ -109,7 +109,6 @@ Compute mean across time for each light curve / band, i.e. $\bar{m}_{ib} = \int 
 \end{equation*}
 We can estimate $\mu_i$ and $e_i$ by regressing the $\bar{m}_{ib} - \beta_b$ vector (across $b$) on $d_b$. The intercept parameter is $\mu_i$ and the slope parameter is $e_i$. The residuals are estimates of $\epsilon_{ib}$ and can be used to determine the extent to which they are mean $0$ and low variance.
 
-\todo{a few sentences on how to do this, inability to determine deviations in the direction $1$ or $d_b$. does it make sense to look at sd of columns?}
 
 \section{Estimating $a_i$, $\gamma_i$}
 
@@ -126,19 +125,19 @@ We estimate $a_i$ and $\gamma_b(t)$ by minimizing
   g(\vec{a},\gamma_b) = \sum_{b,i} \int_t (m'_{ib}(t) - a_i \gamma_b(t))^2
 \end{equation*}
 \todo{show this is a consistent estimator.}
-Suppose the times at which the light curve has been sampled are discretized. Call $m'_{ib}(t) = x_{ibt}$ and $\gamma_{b}(t) = y_{bt}$. Thus we see to find
+Suppose the times at which the light curve has been sampled are discretized. Call $m'_{ib}(t) = x_{ibt}$ and $\gamma_{b}(t) = y_{bt}$. Thus we seek to find
 \begin{equation*}
   a,x = \argmin{a,x} \sum_{i,b,t} (x_{ibt} - a_i y_{bt})^2
 \end{equation*}
 where we require $||a||=1$ for identifiability. Taking derivatives and solving we obtain
 \begin{equation*}
-  \widehat{a}_i \propto \sum_{b,t} y_{bt}x_{ibt}
+  \widehat{a}_i = \sum_{b,t} y_{bt}x_{ibt} / ||\sum_i \sum_{b,t} y_{bt}x_{ibt}||
 \end{equation*}
 and
 \begin{equation*}
-  \widehat{y}_{bt} = \sum_i a_ix_{ibt}
+  \widehat{y}_{bt} = \sum_i a_ix_{ibt}.
 \end{equation*}
-Let $Y$ be the matrix with $b,t$ entry equal to $y_{bt}$, $X_i$ a matrix with $b,t$ entry equal to $x_{ibt}$, and $\circ$ denote elementwise matrix multiplication. Then the updates, using some \texttt{R} notation, are
+Let $Y$ be the matrix with $b,t$ entry equal to $y_{bt}$, $X_i$ be a matrix with $b,t$ entry equal to $x_{ibt}$, and $\circ$ denote elementwise matrix multiplication. Then the updates, using some \texttt{R} notation, are
 \begin{equation*}
   \widehat{a}_i \propto \texttt{sum}(Y\circ X_i)
 \end{equation*}
