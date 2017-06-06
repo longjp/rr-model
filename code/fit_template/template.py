@@ -59,7 +59,7 @@ plt.legend(recs,cols.keys(),loc=4)
 
 ### add template fits
 gamma = r.tem[2]
-gamma = np.resize(a,(5,100))
+gamma = np.resize(gamma,(5,100))
 t=(np.arange(100)/100.)*pest
 ords=np.argsort((t - coeffs[3]*pest) % pest)
 for ii in np.arange(gamma.shape[0]):
