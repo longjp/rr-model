@@ -306,7 +306,7 @@ TBMEtoLC <- function(time,band,mag,error){
 CheckNumberBands <- function(lc){
     multi <- TRUE
     if(length(unique(lc[,2]))==1){
-        print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now just the band mean.")
+        print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now the band mean and has no physical interpretation unless the light curve was already dust corrected.")
         multi <- FALSE
     }
     return(multi)
