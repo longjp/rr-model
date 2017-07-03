@@ -6,7 +6,7 @@ sand/
 PS1_sample_LCs/
 sandbox*
 meeting_notes
-
+todo
 
 ## JPL: copied global .gitignore here b/c shared repo
 # ignore compiled files, log files, ect.
