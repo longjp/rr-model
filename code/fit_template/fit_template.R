@@ -5,15 +5,18 @@
 ## arguments
 ##           lc : light curve, data frame with columns time, band, mag, error
 ##       omegas : vector of frequencies
-##          tem : input templates
-##           NN : number of newton steps a each frequency
+##          tem : input templates, see make_template.R for a description
+##           NN : number of newton steps at each frequency
 ##   use.errors : should photometric errors be used, generally not advised
+##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
 ## value
 ##          rss : the residual sum of squares at each frequency in omegas     
-FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
-    multi <- CheckNumberBands(lc)
+FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
+    if(use.dust){
+        use.dust <- CheckNumberBands(lc)
+    }
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -25,7 +28,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
     rss <- rep(0,length(omegas))
     for(ii in 1:length(omegas)){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs,multi)
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs,use.dust)
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
@@ -43,12 +46,15 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE){
 ##          tem : input templates
 ##           NN : number of newton steps, probably 10+ since no warm start
 ##   use.errors : should photometric errors be used, generally not advised
+##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
 ## value
 ##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
-ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE){
-    multi <- CheckNumberBands(lc)
+ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE,use.dust=TRUE){
+    if(use.dust){
+        use.dust <- CheckNumberBands(lc)
+    }
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -60,7 +66,7 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE){
     ## prevent infinite loops with J
     while(coeffs[3]==0 & J < 10){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs,multi)
+            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs,use.dust)
         }
         J <- J + 1
     }
@@ -139,12 +145,15 @@ PredictTimeBand <- function(times,bands,omega,coeffs,tem){
 ##          tem : input templates
 ##         phis : grid of phases to try
 ##   use.errors : should photometric errors be used, generally not advised
+##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
 ## value
 ##          rss : the residual sum of squares at each phase in grid
-ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
-    multi <- CheckNumberBands(lc)
+ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.dust=TRUE){
+    if(use.dust){
+        use.dust <- CheckNumberBands(lc)
+    }
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
     m <- dat[[1]]$mag
@@ -155,7 +164,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE){
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
         coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
-                                     tem$template_funcs,multi)
+                                     tem$template_funcs,use.dust)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
         rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
     }
@@ -218,9 +227,9 @@ ComputeBetaOne <- function(m,gammaf){
 
 
 ## computes a newton update for the (mu,a,d,phi) parameter vector
-NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,multi){
+NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
-    if(multi){
+    if(use.dust){
         est <- ComputeBeta(m,dust,gammaf)
         mu <- est["mu"]
         a <- est["a"]
@@ -247,13 +256,11 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,mu
     return(out)
 }
 
-
-
 ## update for the (mu,a,d) parameter vector (closed form because phi fixed)
 ## TODO: can NewtonUpdate just call this function?
-AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,multi){
+AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
-    if(multi){
+    if(use.dust){
         est <- ComputeBeta(m,dust,gammaf)
         mu <- est["mu"]
         a <- est["a"]
@@ -271,7 +278,6 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,multi){
     names(out) <- NULL
     return(out)
 }
-
 
 ## check and make tem and lc consistent
 ## if lc has bands not in tem, stop
@@ -304,10 +310,11 @@ TBMEtoLC <- function(time,band,mag,error){
 ## if lc has only one band, need to use ComputeBetaOne rather than ComputeBeta
 ## this function checks / warns if using single band
 CheckNumberBands <- function(lc){
-    multi <- TRUE
     if(length(unique(lc[,2]))==1){
-        print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now the band mean and has no physical interpretation unless the light curve was already dust corrected.")
-        multi <- FALSE
+        print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now the band mean and has no physical interpretation unless the light curve was already dust corrected. set use.dust=FALSE to prevent this warning message from being displayed.")
+        use.dust <- FALSE
+    } else {
+        use.dust <- TRUE
     }
-    return(multi)
+    return(use.dust)
 }
