@@ -56,3 +56,58 @@ for(ii in 1:length(tem$betas)){
 }
 head(m)
 summary(m)
+
+
+
+
+
+##
+## PART 2: refit model, subtracting off dust first
+##         here we test if model works when use.dust=FALSE
+ebv <- coeffs[2]
+## remove dust
+bands <- names(tem$dust)
+for(ii in 1:length(bands)){
+    lc$mag[lc$band==bands[ii]] <- lc$mag[lc$band==bands[ii]] - tem$dust[ii]*ebv
+}
+
+
+
+rss <- FitTemplate(lc,omegas,tem,use.dust=FALSE)
+omega_est <- omegas[which.min(rss)]
+p_est <- 1/omega_est
+coeffs <- ComputeCoeffs(lc,omega_est,tem,use.dust=FALSE)
+names(coeffs) <- c("mu","ebv","amp","phase")
+
+
+
+## view rss
+plot(1/omegas,rss,xlab="period",ylab="rss")
+abline(v=p_est)
+
+## plot folded light curve with best fit
+colpch <- 1:5
+names(colpch) <- names(tem$betas)
+
+lc1 <- lc
+lc1[,1] <- (lc$time %% p_est)/p_est
+lc2 <- lc1
+lc2[,1] <- lc1[,1] + 1
+lc_temp <-rbind(lc1,lc2)
+plot(lc_temp$time,lc_temp$mag,
+     col=colpch[lc_temp$band],pch=colpch[lc_temp$band],
+     ylim=rev(range(lc_temp$mag)),
+     xlab="time",ylab="magnitude",
+     xlim=c(0,2),xaxs='i')
+segments(lc_temp$time,
+         lc_temp$mag+lc_temp$error,
+         lc_temp$time,
+         lc_temp$mag-lc_temp$error)
+ti <- (1:100)/100
+ti <- c(ti,ti+1)
+m <- PredictAllBand(ti,1,coeffs,tem)
+for(ii in 1:length(tem$betas)){
+    points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
+}
+head(m)
+summary(m)
