@@ -194,10 +194,10 @@ AugmentData <- function(lc,tem,use.errors=FALSE){
     lc$dust <- rep.int(tem$dust,nb)
     lc$mag <- lc$mag - rep.int(tem$betas,nb)
     lc$band <- NULL
-    if(!use.errors){
-        lc$error <- 1
-    } else {
+    if(use.errors){
         lc$error <- sqrt(lc$error^2 + rep.int(tem$model_error,nb)^2) ## adds model error to photometric error
+    } else {
+        lc$error <- 1
     }
     return(list(lc=lc,nb=nb))
 }
@@ -316,6 +316,7 @@ CheckTemLC <- function(tem,lc){
     return(tem)
 }
 
+## useful for calling these functions from python, see template.py for example
 TBMEtoLC <- function(time,band,mag,error){
     return(data.frame(time,band,mag,error))
 }
