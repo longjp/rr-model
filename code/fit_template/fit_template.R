@@ -40,7 +40,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
     return(rss)
 }
 
-## for a given omega, return cofficients
+## for a given omega, return coefficients
 ## example usage: run FitTemplate to determine rss as function of omegas,
 ## find omega which minimizes rss, then find coeffs for this omega using ComputeCoeffs
 ##
@@ -69,7 +69,7 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
     J <- 0
-    ## prevent infinite loops with J
+    ## J prevents infinite loops
     while(coeffs[3]==0 & J < 10){
         for(jj in 1:NN){
             coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,weights,nb,
@@ -142,7 +142,8 @@ PredictTimeBand <- function(times,bands,omega,coeffs,tem){
     return(m)
 }
 
-## grid search across phase at fixed omega. uses
+## grid search across phase at fixed omega.
+## possible uses:
 ## 1. optimize parameter fits AFTER selecting frequency
 ## 2. test that newton algorithm is finding best parameter fits
 ##
@@ -218,26 +219,6 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
     return(gammaf)
 }
 
-## finds best fitting mu (distance mod) , d (i.e. ebv), a (amplitude)
-ComputeBeta <- function(m,dust,gammaf){
-    X <- cbind(mu=1,d=dust,a=gammaf)
-    B <- t(X)%*%X
-    d <- t(X)%*%m
-    z <- solve(B,d)
-    return(z[,1])
-}
-
-## finds best fitting mu (distance mod) ,  a (amplitude)
-## assuming we are using one band so ebv set to 0
-ComputeBetaOne <- function(m,gammaf){
-    X <- cbind(mu=1,a=gammaf)
-    B <- t(X)%*%X
-    d <- t(X)%*%m
-    z <- solve(B,d)
-    return(z[,1])
-}
-
-
 ## computes a newton update for the (mu,a,d,phi) parameter vector
 NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
@@ -292,6 +273,25 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,use.err
     return(out)
 }
 
+## finds best fitting mu (distance mod) , d (i.e. ebv), a (amplitude)
+ComputeBeta <- function(m,dust,gammaf){
+    X <- cbind(mu=1,d=dust,a=gammaf)
+    B <- t(X)%*%X
+    d <- t(X)%*%m
+    z <- solve(B,d)
+    return(z[,1])
+}
+
+## finds best fitting mu (distance mod) ,  a (amplitude)
+## assuming we are using one band so ebv set to 0
+ComputeBetaOne <- function(m,gammaf){
+    X <- cbind(mu=1,a=gammaf)
+    B <- t(X)%*%X
+    d <- t(X)%*%m
+    z <- solve(B,d)
+    return(z[,1])
+}
+
 ## check and make tem and lc consistent
 ## if lc has bands not in tem, stop
 ## if lc has fewer bands then tem, get rid
@@ -334,6 +334,7 @@ CheckNumberBands <- function(lc){
     return(use.dust)
 }
 
+## checks that lc has correct column structure
 CheckLC <- function(lc){
     if(sum(names(lc) %in% c("time","band","mag","error")) != 4){
         stop("lc must have columns named: time, band, mag, error")
