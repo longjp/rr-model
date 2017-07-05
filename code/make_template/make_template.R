@@ -192,6 +192,10 @@ for(jj in 1:nrow(tem$templatesd)){
 names(tem$templated_funcs) <- bands
 
 
+## set model error initially to 0, so subsequent code runs
+tem$model_error <- rep(0,length(tem$betas))
+names(tem$model_error) <- names(tem$betas)
+
 
 ##
 ## estimate model error by band
