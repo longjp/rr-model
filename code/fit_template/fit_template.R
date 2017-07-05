@@ -7,7 +7,7 @@
 ##       omegas : vector of frequencies
 ##          tem : input templates, see make_template.R for a description
 ##           NN : number of newton steps at each frequency
-##   use.errors : should photometric errors be used, generally not advised
+##   use.errors : should photometric errors be used
 ##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
@@ -18,7 +18,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
         use.dust <- CheckNumberBands(lc)
     }
     tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -45,7 +45,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
 ##        omega : frequency
 ##          tem : input templates
 ##           NN : number of newton steps, probably 10+ since no warm start
-##   use.errors : should photometric errors be used, generally not advised
+##   use.errors : should photometric errors be used
 ##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
@@ -56,7 +56,7 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE,use.dust=TRUE){
         use.dust <- CheckNumberBands(lc)
     }
     tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -144,7 +144,7 @@ PredictTimeBand <- function(times,bands,omega,coeffs,tem){
 ##        omega : frequency
 ##          tem : input templates
 ##         phis : grid of phases to try
-##   use.errors : should photometric errors be used, generally not advised
+##   use.errors : should photometric errors be used
 ##     use.dust : should dust (E[B-V]) be fit
 ##
 ##
@@ -155,7 +155,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
         use.dust <- CheckNumberBands(lc)
     }
     tem <- CheckTemLC(tem,lc)
-    dat <- AugmentData(lc,tem$dust,tem$betas,use.errors)
+    dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
@@ -177,12 +177,12 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
 ##### below this are mostly helper functions that
 ##### are unlikely to be useful for direct calling
 
-## puts data in form for model to fit
-AugmentData <- function(lc,dust,betas,use.errors=FALSE){
+## coerces lc into form for model to fit
+AugmentData <- function(lc,tem,use.errors=FALSE){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
-    lc$dust <- rep.int(dust,nb)
-    lc$mag <- lc$mag - rep.int(betas,nb)
+    lc$dust <- rep.int(tem$dust,nb)
+    lc$mag <- lc$mag - rep.int(tem$betas,nb)
     lc$band <- NULL
     if(!use.errors){
         lc$error <- 1
@@ -295,6 +295,7 @@ CheckTemLC <- function(tem,lc){
     if(length(bs) < length(tem$dust)){
         tem$betas <- tem$betas[bs]
         tem$dust <- tem$dust[bs]
+        tem$model_error <- tem$model_error[bs]
         tem$templates <- tem$templates[bs,]
         tem$templatesd <- tem$templatesd[bs,]
         tem$template_funcs <- tem$template_funcs[bs]
