@@ -17,7 +17,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
-    ## TODO: write function which checks structure of lc,omegas, and maybe tem
+    CheckLC(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
@@ -314,7 +314,7 @@ TBMEtoLC <- function(time,band,mag,error){
 ## if lc has only one band, need to use ComputeBetaOne rather than ComputeBeta
 ## this function checks / warns if using single band
 CheckNumberBands <- function(lc){
-    if(length(unique(lc[,2]))==1){
+    if(length(unique(lc$band))==1){
         print("warning: light curve has only 1 band, setting E[B-V] = 0 (i.e. assume no dust). the distance modulus is now the band mean and has no physical interpretation unless the light curve was already dust corrected. set use.dust=FALSE to prevent this warning message from being displayed.")
         use.dust <- FALSE
     } else {
@@ -322,3 +322,23 @@ CheckNumberBands <- function(lc){
     }
     return(use.dust)
 }
+
+CheckLC <- function(lc){
+    if(sum(names(lc) %in% c("time","band","mag","error")) != 4){
+        stop("lc must have columns named: time, band, mag, error")
+    }
+    if(typeof(lc$time)!="double"){
+        stop("typeof(lc$time) must be double")
+    }
+    if(typeof(lc$mag)!="double"){
+        stop("typeof(lc$mag) must be double")
+    }
+    if(typeof(lc$error)!="double"){
+        stop("typeof(lc$error) must be double")
+    }
+    if(typeof(lc$band)!="character"){
+        stop("typeof(lc$band) must be character")
+    }
+}
+
+    
