@@ -223,13 +223,13 @@ ConstructGamma <- function(t,nb,phi,omega,temp_funcs){
 NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(use.dust){
-        est <- ComputeBeta(m,dust,gammaf)
+        est <- ComputeBeta(m,dust,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
         d <- est["d"]
     }
     else {
-        est <- ComputeBetaOne(m,gammaf)
+        est <- ComputeBetaOne(m,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
         d <- 0
@@ -254,13 +254,13 @@ NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_
 AmpMuDustUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(use.dust){
-        est <- ComputeBeta(m,dust,gammaf)
+        est <- ComputeBeta(m,dust,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
         d <- est["d"]
     }
     else {
-        est <- ComputeBetaOne(m,gammaf)
+        est <- ComputeBetaOne(m,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
         d <- 0
@@ -274,20 +274,31 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,use.err
 }
 
 ## finds best fitting mu (distance mod) , d (i.e. ebv), a (amplitude)
-ComputeBeta <- function(m,dust,gammaf){
+ComputeBeta <- function(m,dust,gammaf,weights,use.errors){
     X <- cbind(mu=1,d=dust,a=gammaf)
-    B <- t(X)%*%X
-    d <- t(X)%*%m
+    if (use.errors) {
+        B <- t(X)%*%(X*weights)
+        d <- t(X)%*%(m*weights)
+    } else {
+        B <- t(X)%*%X
+        d <- t(X)%*%m
+    }
     z <- solve(B,d)
     return(z[,1])
 }
 
+
 ## finds best fitting mu (distance mod) ,  a (amplitude)
-## assuming we are using one band so ebv set to 0
-ComputeBetaOne <- function(m,gammaf){
+## does not fit dust, so ebv set to 0
+ComputeBetaOne <- function(m,gammaf,weights,use.errors){
     X <- cbind(mu=1,a=gammaf)
-    B <- t(X)%*%X
-    d <- t(X)%*%m
+    if (use.errors) {
+        B <- t(X)%*%(X*weights)
+        d <- t(X)%*%(m*weights)
+    } else {
+        B <- t(X)%*%X
+        d <- t(X)%*%m
+    }
     z <- solve(B,d)
     return(z[,1])
 }
