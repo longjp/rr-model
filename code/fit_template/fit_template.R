@@ -13,7 +13,7 @@
 ##
 ## value
 ##          rss : the residual sum of squares at each frequency in omegas     
-FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
+FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
@@ -55,7 +55,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
 ##
 ## value
 ##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
-ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE,use.dust=TRUE){
+ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
@@ -157,7 +157,7 @@ PredictTimeBand <- function(times,bands,omega,coeffs,tem){
 ##
 ## value
 ##          rss : the residual sum of squares at each phase in grid
-ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.dust=TRUE){
+ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=TRUE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
@@ -173,7 +173,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
         coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,weights,nb,
-                                     tem$template_funcs,use.dust)
+                                  tem$template_funcs,use.errors,use.dust)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
         resid <- m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
         rss[ii] <- min(sum(weights*resid^2),rss_max)
@@ -188,7 +188,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
 ##### are unlikely to be useful for direct calling
 
 ## coerces lc into form for model to fit
-AugmentData <- function(lc,tem,use.errors=FALSE){
+AugmentData <- function(lc,tem,use.errors){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
     lc$dust <- rep.int(tem$dust,nb)
@@ -270,7 +270,7 @@ NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_
 
 ## update for the (mu,a,d) parameter vector (closed form because phi fixed)
 ## TODO: can NewtonUpdate just call this function?
-AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,use.errors,use.dust){
+AmpMuDustUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(use.dust){
         est <- ComputeBeta(m,dust,gammaf)
@@ -279,9 +279,10 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,use.errors,use.
         d <- est["d"]
     }
     else {
-        est <- ComputeBeta(m,gammaf)
+        est <- ComputeBetaOne(m,gammaf)
         mu <- est["mu"]
         a <- est["a"]
+        d <- 0
     }        
     if(a < 0) {
         a <- 0
