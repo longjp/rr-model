@@ -9,6 +9,7 @@ ToLC <- function(x){
     names(x) <- rep(c("time","mag","error"),5)
     x <- rbind(x[,1:3],x[,4:6],x[,7:9],x[,10:12],x[,13:15])
     x <- data.frame(time=x[,1],band=band,mag=x[,2],error=x[,3])
+    x[,2] <- as.character(x[,2])
     return(x[x[,3] > -90,])
 }
 
@@ -81,7 +82,7 @@ cl <- c(rep("rr",length(lcsRR)),rep("not",Nnot))
 ## load light curves
 lcsNOT <- vector("list",length(fnot))
 for(ii in 1:length(fnot)){
-    lcsNOT[[ii]] <- read.table(paste(folder,fnot[ii],sep="/"))
+    lcsNOT[[ii]] <- read.table(paste(folder,fnot[ii],sep="/"),stringsAsFactors=FALSE)
 }
 for(ii in 1:length(lcsNOT)) names(lcsNOT[[ii]]) <- c("time","band","mag","error")
 names(lcsNOT) <- fnot

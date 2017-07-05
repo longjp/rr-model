@@ -51,7 +51,6 @@ for(ii in 1:length(med_res)){
     errors <- list()
     for(jj in 1:length(bands)){
         temp <- lc[lc$band %in% bands[jj],]
-        temp$band <- as.factor(as.character(temp$band)) ## get rid of unused levels
         coeffs <- ComputeCoeffs(temp,1/periods[ii],tem)
         preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
         errors[[jj]] <- abs(preds - temp[,3])

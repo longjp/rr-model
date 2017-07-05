@@ -9,7 +9,7 @@ periods <- cat[,2]
 lcs <- vector("list",length(fs))
 for(ii in 1:length(fs)){
     lc <- read.table(paste0("raw/PS1_sample_LCs/",fs[ii]),
-                     header=TRUE)
+                     header=TRUE,stringsAsFactors=FALSE)
     lc <- lc[,c(3,2,4,1)]
     names(lc) <- c("time","band","mag","error")
     lc$band[lc$band=="y"] <- "z"

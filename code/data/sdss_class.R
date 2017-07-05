@@ -28,7 +28,7 @@ cl <- c(rep("rr",nrow(rrlyrae)),rep("not",Nnot))
 ## load light curves
 lcs <- vector("list",length(fnames))
 for(ii in 1:length(fnames)){
-    lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
+    lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"),stringsAsFactors=FALSE)
 }
 for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","error")
 tms <- lapply(lcs,LCtoTM)
