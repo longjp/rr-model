@@ -17,6 +17,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
+    ## TODO: write function which checks structure of lc,omegas, and maybe tem
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
@@ -174,7 +175,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
 
 
 ##### NOTE:
-##### below this are mostly helper functions that
+##### below are mostly helper functions that
 ##### are unlikely to be useful for direct calling
 
 ## coerces lc into form for model to fit
@@ -186,6 +187,8 @@ AugmentData <- function(lc,tem,use.errors=FALSE){
     lc$band <- NULL
     if(!use.errors){
         lc$error <- 1
+    } else {
+        lc$error <- sqrt(lc$error^2 + rep.int(tem$model_error,nb)^2) ## adds model error to photometric error
     }
     return(list(lc=lc,nb=nb))
 }
