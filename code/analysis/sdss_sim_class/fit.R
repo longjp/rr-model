@@ -27,8 +27,6 @@ period_est_FULL <- mclapply(1:N,FitTemplateParallel,
 period_est_FULL <- matrix(unlist(period_est_FULL),ncol=topN,byrow=TRUE)
 
 
-
-
 period_est_lomb <- mclapply(1:N,FitLombParallel,
                             tms=tms,omegas=omegas,topN=topN,
                             mc.cores=mc.cores)
