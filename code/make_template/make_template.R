@@ -203,7 +203,7 @@ names(tem$model_error) <- names(tem$betas)
 med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
 for(ii in 1:nrow(med_res)){
     lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
     preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
     a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=median)
     med_res[ii,] <- a
