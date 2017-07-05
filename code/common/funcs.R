@@ -121,11 +121,11 @@ SolveAGamma <- function(X,a=NULL,N=1000){
 
 LCtoTM <- function(lc){
     lc[,1] <- lc[,1] - min(lc[,1])
-    levs <- as.character(levels(lc$b))
+    levs <- unique(lc$band)
     levs <- levs[order(levs)]
     tm <- list()
     for(ii in 1:length(levs)){
-        tm[[ii]] <- lc[lc$b == levs[ii],c("time","mag","error")]
+        tm[[ii]] <- lc[lc$band == levs[ii],c("time","mag","error")]
         names(tm[[ii]]) <- c("time","mag","error")
     }
     names(tm) <- levs
@@ -139,6 +139,7 @@ TMtoLC <- function(tm){
     bs <- rep.int(names(tm),nb)
     lc <- do.call(rbind,tm)
     lc <- data.frame(time=lc[,1],band=bs,mag=lc[,2],error=lc[,3])
+    lc[,2] <- as.character(lc[,2])
     return(lc)
 }
 
