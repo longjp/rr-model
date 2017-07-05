@@ -23,16 +23,19 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=FALSE,use.dust=TRUE){
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
+    weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
-    rss_max <- sum(lm(m~dust)$residuals^2)
+    rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
     rss <- rep(0,length(omegas))
     for(ii in 1:length(omegas)){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,nb,tem$template_funcs,tem$templated_funcs,use.dust)
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,weights,nb,
+                                   tem$template_funcs,tem$templated_funcs,use.errors,use.dust)
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
-        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
+        resid <- m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
+        rss[ii] <- min(sum(weights*resid^2),rss_max)
     }
     return(rss)
 }
@@ -56,18 +59,21 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=FALSE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
+    CheckLC(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
+    weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
     J <- 0
     ## prevent infinite loops with J
     while(coeffs[3]==0 & J < 10){
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,nb,tem$template_funcs,tem$templated_funcs,use.dust)
+            coeffs <- NewtonUpdate(coeffs[4],omega,m,t,dust,weights,nb,
+                                   tem$template_funcs,tem$templated_funcs,use.errors,use.dust)
         }
         J <- J + 1
     }
@@ -155,19 +161,22 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=FALSE,use.d
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
+    CheckLC(lc)
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
     dust <- dat[[1]]$dust
     t <- dat[[1]]$time
+    weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
-    rss_max <- sum(lm(m~dust)$residuals^2)
+    rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
-        coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,nb,
+        coeffs <- AmpMuDustUpdate(phis[ii],omega,m,t,dust,weights,nb,
                                      tem$template_funcs,use.dust)
         gammaf <- ConstructGamma(t,nb,phis[ii],omega,tem$template_funcs)
-        rss[ii] <- min(sum((m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf)^2),rss_max)
+        resid <- m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
+        rss[ii] <- min(sum(weights*resid^2),rss_max)
     }
     return(rss)
 }
@@ -230,7 +239,7 @@ ComputeBetaOne <- function(m,gammaf){
 
 
 ## computes a newton update for the (mu,a,d,phi) parameter vector
-NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,use.dust){
+NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(use.dust){
         est <- ComputeBeta(m,dust,gammaf)
@@ -261,7 +270,7 @@ NewtonUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,templated_funcs,us
 
 ## update for the (mu,a,d) parameter vector (closed form because phi fixed)
 ## TODO: can NewtonUpdate just call this function?
-AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,use.dust){
+AmpMuDustUpdate <- function(phi,omega,m,t,dust,nb,template_funcs,use.errors,use.dust){
     gammaf <- ConstructGamma(t,nb,phi,omega,template_funcs)
     if(use.dust){
         est <- ComputeBeta(m,dust,gammaf)
