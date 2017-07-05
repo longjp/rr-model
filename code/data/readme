@@ -1,12 +1,16 @@
+======= usage
+## downloads all data to raw/
+Rscript download.R
+## takes files in raw/, cleans them, moves to clean/
+any_R_file_other_than_download.R
+
 ======= description of files
 == raw/ contains raw data
    - automatically downloaded by running download.R
    - see below for locations it was acquired from
 == clean/ data after cleaning, generally .RData files with tms for
    lightcurves and periods
-== funcs.R functions used for processing raw data
-== download.R downloads all raw data not in repo already
-== other files process a particular raw data set into R data file
+== ../common/funcs.R functions used for processing raw data
 
 
 ======= files in raw/ folder, after running download.R
