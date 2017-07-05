@@ -23,7 +23,7 @@ dir.create(fig.dir)
 
 period_est <- period_est[,1] ## just use best fit period
 
-sigs <- unlist(lapply(tms,function(tm){lapply(tm,function(x){x$sigma})}))
+sigs <- unlist(lapply(tms,function(tm){lapply(tm,function(x){x$error})}))
 hist(sigs[sigs<.1])
 
 rss.n <- rep(0,N)

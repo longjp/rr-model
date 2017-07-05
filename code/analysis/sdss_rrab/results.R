@@ -38,8 +38,8 @@ for(ii in 1:length(tms)){
          xlim=xlim,main=paste0(jj," band"))
         if(!is.null(tm[[jj]])){
             points((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag)
-            segments((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag+tm[[jj]]$sigma,
-            (tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag-tm[[jj]]$sigma,
+            segments((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag+tm[[jj]]$error,
+            (tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag-tm[[jj]]$error,
             col='grey')
         }
         pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
@@ -74,8 +74,8 @@ for(ii in 1:length(tms)){
         temp <- lc[lc$band==bands[jj],]
         if(nrow(temp) > 0.5){
             points((temp$time %% (1/omega)) * omega,temp$mag,col=jj,pch=jj,cex=1.5)
-            segments((temp$time %% (1/omega)) * omega,temp$mag+temp$sigma,
-                     (temp$time %% (1/omega)) * omega,temp$mag-temp$sigma,
+            segments((temp$time %% (1/omega)) * omega,temp$mag+temp$error,
+                     (temp$time %% (1/omega)) * omega,temp$mag-temp$error,
                      col='grey')
         }
         points(tem$temp_time,preds[[jj]],type='l',col=jj,lwd=3,lty=jj)
@@ -154,8 +154,8 @@ for(jj in 1:length(bands)){
         points((temp$time %% (1/omega)) * omega,temp$mag,col=jj,pch=jj,cex=1.5)
     }
     points(tem$temp_time,preds[[jj]],type='l',col=jj,lwd=3,lty=jj)
-    segments((temp$time %% (1/omega)) * omega,temp$mag + 2*temp$sigma,
-    (temp$time %% (1/omega)) * omega,temp$mag - 2*temp$sigma,col='grey')
+    segments((temp$time %% (1/omega)) * omega,temp$mag + 2*temp$error,
+    (temp$time %% (1/omega)) * omega,temp$mag - 2*temp$error,col='grey')
 }
 legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=3,cex=1.5)
 

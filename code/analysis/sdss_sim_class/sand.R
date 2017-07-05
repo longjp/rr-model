@@ -65,8 +65,8 @@ hist(all_res[all_res < ct],xlab="Absolute Residual ie |actual mag - model predic
 dev.off()
 ## median residual is 0.03318
 ##
-sigmas <- lapply(lcs,function(x){x$sigma})
-median(abs(rnorm(100000)))*median(unlist(sigmas))
+error <- lapply(lcs,function(x){x$error})
+median(abs(rnorm(100000)))*median(unlist(error))
 median(all_res)
 
 

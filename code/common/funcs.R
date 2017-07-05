@@ -125,8 +125,8 @@ LCtoTM <- function(lc){
     levs <- levs[order(levs)]
     tm <- list()
     for(ii in 1:length(levs)){
-        tm[[ii]] <- lc[lc$b == levs[ii],c("time","mag","sigma")]
-        names(tm[[ii]]) <- c("time","mag","sigma")
+        tm[[ii]] <- lc[lc$b == levs[ii],c("time","mag","error")]
+        names(tm[[ii]]) <- c("time","mag","error")
     }
     names(tm) <- levs
     nb <- vapply(tm,nrow,c(0))
@@ -138,7 +138,7 @@ TMtoLC <- function(tm){
     nb <- vapply(tm,nrow,c(0))
     bs <- rep.int(names(tm),nb)
     lc <- do.call(rbind,tm)
-    lc <- data.frame(time=lc[,1],band=bs,mag=lc[,2],sigma=lc[,3])
+    lc <- data.frame(time=lc[,1],band=bs,mag=lc[,2],error=lc[,3])
     return(lc)
 }
 

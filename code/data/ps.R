@@ -11,7 +11,7 @@ for(ii in 1:length(fs)){
     lc <- read.table(paste0("raw/PS1_sample_LCs/",fs[ii]),
                      header=TRUE)
     lc <- lc[,c(3,2,4,1)]
-    names(lc) <- c("time","band","mag","sigma")
+    names(lc) <- c("time","band","mag","error")
     lc$band[lc$band=="y"] <- "z"
     lcs[[ii]] <- lc
 }

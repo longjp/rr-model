@@ -6,9 +6,9 @@ source('../common/funcs.R')
 ####### get RRL light curves from table 1 provided by sesar
 ToLC <- function(x){
     band <- rep(c("u","g","r","i","z"),each=nrow(x))
-    names(x) <- rep(c("time","mag","sigma"),5)
+    names(x) <- rep(c("time","mag","error"),5)
     x <- rbind(x[,1:3],x[,4:6],x[,7:9],x[,10:12],x[,13:15])
-    x <- data.frame(time=x[,1],band=band,mag=x[,2],sigma=x[,3])
+    x <- data.frame(time=x[,1],band=band,mag=x[,2],error=x[,3])
     return(x[x[,3] > -90,])
 }
 
@@ -83,7 +83,7 @@ lcsNOT <- vector("list",length(fnot))
 for(ii in 1:length(fnot)){
     lcsNOT[[ii]] <- read.table(paste(folder,fnot[ii],sep="/"))
 }
-for(ii in 1:length(lcsNOT)) names(lcsNOT[[ii]]) <- c("time","band","mag","sigma")
+for(ii in 1:length(lcsNOT)) names(lcsNOT[[ii]]) <- c("time","band","mag","error")
 names(lcsNOT) <- fnot
 
 

@@ -21,7 +21,7 @@ lcs <- list()
 for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }
-for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
+for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","error")
 
 ## downsampled to total of Nobs observations
 Nobs <- 50

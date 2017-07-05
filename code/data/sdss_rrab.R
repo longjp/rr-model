@@ -21,7 +21,7 @@ lcs <- vector("list",length(fnames))
 for(ii in 1:length(fnames)){
     lcs[[ii]] <- read.table(paste(folder,fnames[ii],sep="/"))
 }
-for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","sigma")
+for(ii in 1:length(lcs)) names(lcs[[ii]]) <- c("time","band","mag","error")
 tms <- lapply(lcs,LCtoTM)
 names(tms) <- rrlyrae[,1]
 
