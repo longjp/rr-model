@@ -6,10 +6,8 @@ load("template.RData")
 
 ## read in data and plot
 fname <- "LC_4099.dat"
-lc <- read.table(fname)
+lc <- read.table(fname,stringsAsFactors=FALSE)
 names(lc) <- c("time","band","mag","error")
-lc$band <- as.character(lc$band)
-lc$time <- lc$time - min(lc$time)
 ## plot raw light curve
 colpch <- 1:5
 names(colpch) <- unique(lc$band)
@@ -61,19 +59,18 @@ coeffs <- ComputeCoeffs(lc,omega_est,tem)
 names(coeffs) <- c("mu","ebv","amp","phase")
 ## correct values near:
 ## coeffs
-##         mu        ebv        amp      phase 
-## 16.0912560  0.1059577  0.5452862  0.2039973 
-## algorithm has some random number generation, so don't expect exact
-
+##[1] 16.0914314  0.1071064  0.5444982  0.3935931
 ## view rss
+
 plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
 
 ## plot folded light curve with best fit
 plotLC(lc,p_est,coeffs,tem)
 
-## check that phase determine by NewtonUpdate is close to best phase
-## by performing a grid search
+## check that phase determined by NewtonUpdate is close to best phase
+## by performing a grid search on phase, comparing min of grid
+## search to min found by newton
 phis <- (1:100)/100
 rss_phi <- ComputeRSSPhase(lc,omega_est,tem,phis=phis)
 plot(phis,rss_phi)
