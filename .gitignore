@@ -1,5 +1,6 @@
 ## specific files to ignore
 apj326724t2_mrt.txt
+*.Rout
 *.zip
 apj326724t3_mrt.txt
 sand/
