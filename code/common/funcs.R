@@ -120,7 +120,6 @@ SolveAGamma <- function(X,a=NULL,N=1000){
 
 
 LCtoTM <- function(lc){
-    lc[,1] <- lc[,1] - min(lc[,1])
     levs <- unique(lc$band)
     levs <- levs[order(levs)]
     tm <- list()
