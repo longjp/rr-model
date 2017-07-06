@@ -81,6 +81,38 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
 }
 
 
+## for a given omega, phi return coefficients mu, dust, amp
+## example usage: run FitTemplate to determine rss as function of omegas,
+## find omega which minimizes rss, then find coeffs for this omega using ComputeCoeffs
+##
+## arguments
+##           lc : light curve, data frame with columns time, band, mag, error
+##        omega : frequency
+##          phi : phase
+##          tem : input templates
+##   use.errors : should photometric errors be used
+##     use.dust : should dust (E[B-V]) be fit
+##
+##
+## value
+##       coeffs : vector of [distance mod,ebv,peak-to-peak g amp,phase]
+ComputeCoeffsPhase <- function(lc,omega,phi,tem,use.errors=TRUE,use.dust=TRUE){
+    if(use.dust){
+        use.dust <- CheckNumberBands(lc)
+    }
+    CheckLC(lc)
+    tem <- CheckTemLC(tem,lc)
+    dat <- AugmentData(lc,tem,use.errors)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    weights <- 1 / dat[[1]]$error^2
+    nb <- dat[[2]]
+    coeffs <- AmpMuDustUpdate(phi,omega,m,t,dust,weights,nb,tem$template_funcs,use.errors,use.dust)
+    return(c(coeffs,phi))
+}
+
+
 ## make predictions at a set of times (in single band)
 ##
 ##
