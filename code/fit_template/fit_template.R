@@ -18,6 +18,8 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
         use.dust <- CheckNumberBands(lc)
     }
     CheckLC(lc)
+    ## center times at 0, makes phi a smoother function of omega
+    lc[,1] <- lc[,1] - mean(lc[,1])
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
@@ -60,6 +62,9 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
         use.dust <- CheckNumberBands(lc)
     }
     CheckLC(lc)
+    ## center times at 0, makes phi a smoother function of omega
+    mean_time <- mean(lc[,1])
+    lc[,1] <- lc[,1] - mean_time
     tem <- CheckTemLC(tem,lc)
     dat <- AugmentData(lc,tem,use.errors)
     m <- dat[[1]]$mag
@@ -77,6 +82,8 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
         }
         J <- J + 1
     }
+    ## shift phase back to original scale
+    coeffs[4] <- (coeffs[4] - omega*mean_time) %% 1
     return(coeffs)
 }
 
