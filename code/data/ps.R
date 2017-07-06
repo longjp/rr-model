@@ -16,18 +16,10 @@ for(ii in 1:length(fs)){
     lcs[[ii]] <- lc
 }
 
-
 tms <- lapply(lcs,LCtoTM)
-
-### checking if TMtoLC and LCtoTM are inverses, issues with ordering
-### of measurements. verify that these are inverses
-## lcs2 <- lapply(tms,TMtoLC)
-## identical(lcs,lcs2)
-## lcs[[1]]
-## lcs2[[1]]
-## lcs[[1]][,2]==lcs2[[1]][,2]
-## lcs[[1]][,2]
-## lcs2[[1]][,2]
 
 ## output lightcurves and periods
 save(tms,periods,file="clean/ps.RData")
+
+
+
