@@ -2,6 +2,7 @@
 ### used to check that templates are working well, compare minor
 ### implementation differences
 rm(list=ls())
+library(zoo)
 source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
@@ -41,17 +42,18 @@ hist(med_res)
 median(med_res) ## perfect mean offers only small advantage over actual model
 
 
+######### TODO: fix this
 ## find model error due to shape by fitting
 ## model individually for each band/lc
 ## this removes model error caused by mean and fixing amplitude ratio
 med_res <- vector("numeric",length(tms))
-bands <- names(tem$betas)
 for(ii in 1:length(med_res)){
     lc <- TMtoLC(tms[[ii]])
+    bands <- unique(lc$band)
     errors <- list()
     for(jj in 1:length(bands)){
         temp <- lc[lc$band %in% bands[jj],]
-        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem)
+        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem,use.dust=FALSE)
         preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
         errors[[jj]] <- abs(preds - temp[,3])
     }
@@ -61,7 +63,6 @@ for(ii in 1:length(med_res)){
 print("model error caused only by shape:")
 hist(med_res,main="shape only")
 median(med_res) 
-
 
 
 ## how much error due only to photometry?
@@ -85,4 +86,54 @@ median(med_res)
 ## are templates mean 0?
 print("the mean of each template is:")
 rowMeans(tem$templates)
+
+
+######### analyze residuals as a function of phase (should be mean 0)
+
+## compute residuals
+lcs <- lapply(tms,TMtoLC)
+coeffs <- matrix(0,nrow=length(tms),ncol=4)
+colnames(coeffs) <- c("mu","ebv","amp","phase")
+for(ii in 1:length(tms)){
+    p_est <- periods[ii]
+    omega_est <- 1/p_est
+    coeffs[ii,] <- ComputeCoeffs(lcs[[ii]],omega_est,tem)
+}
+
+
+lcs_resid <- lcs
+for(ii in 1:length(lcs)){
+    omega_est <- 1/periods[ii]
+    lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
+    lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem)
+}
+
+
+
+lcs_resid2 <- do.call(rbind,lcs_resid)
+
+
+#### TODO: some issues with edge effects where model is more
+#### wrong near phase = 0, possible due to complex shape there
+lcs_resid <- lcs_resid2[lcs_resid2$band=="g",]
+plot(0,0,ylim=c(.3,-.3),
+     xlab="phase",ylab="magnitude",
+     xlim=c(0,2),xaxs='i',col=0)
+lc1 <- lcs_resid
+lc1 <- lc1[order(lc1[,1]),]
+lc2 <- lc1
+lc2[,1] <- lc1[,1] + 1
+lc_temp <-rbind(lc1,lc2)
+points(lc_temp$time,lc_temp$mag,
+       col="#00000030")
+
+out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+abline(h=0,lwd=2)
+points(lc_temp[,1],out,type='l',col='red',lwd=2)
+
+
+## segments(lc_temp$time,
+    ##          lc_temp$mag+lc_temp$error,
+    ##          lc_temp$time,
+    ##          lc_temp$mag-lc_temp$error)
 
