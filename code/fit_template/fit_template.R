@@ -391,8 +391,11 @@ CheckNumberBands <- function(lc){
     return(use.dust)
 }
 
-## checks that lc has correct column structure
+## checks that lc has correct column structure / sufficient rows
 CheckLC <- function(lc){
+    if(nrow(lc)<5){
+        stop("lc must have at least 5 rows (observations)")
+    }
     if(sum(names(lc) %in% c("time","band","mag","error")) != 4){
         stop("lc must have columns named: time, band, mag, error")
     }
