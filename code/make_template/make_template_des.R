@@ -4,6 +4,41 @@ load("../fit_template/template.RData")
 source("../fit_template/fit_template.R")
 source("../common/funcs.R")
 
+##### make plot with sloan data in grey or very light, des darker
+##### print out every one of these light curves, sanity check
+##### estimate Y offset and shape, compare to z
+
+## makes nice plot
+plotLC <- function(lc,p_est,tem,coeffs=NULL,add=FALSE){
+    colpch <- 1:length(tem$betas)
+    names(colpch) <- names(tem$betas)
+    lc1 <- lc
+    lc1[,1] <- (lc$time %% p_est)/p_est
+    lc2 <- lc1
+    lc2[,1] <- lc1[,1] + 1
+    lc_temp <-rbind(lc1,lc2)
+    if(add==FALSE){
+        plot(0,0,ylim=rev(range(lc_temp$mag)),
+             xlab="time",ylab="magnitude",
+             xlim=c(0,2),xaxs='i',col=0)
+    }
+    points(lc_temp$time,lc_temp$mag,
+         col=colpch[lc_temp$band],pch=colpch[lc_temp$band])
+    segments(lc_temp$time,
+             lc_temp$mag+lc_temp$error,
+             lc_temp$time,
+             lc_temp$mag-lc_temp$error)
+    if(!is.null(coeffs)){
+        ti <- (1:100)/100
+        ti <- c(ti,ti+1)
+        m <- PredictAllBand(ti,1,coeffs,tem)
+        for(ii in 1:length(tem$betas)){
+            points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
+        }
+    }
+}
+
+
 ## remove photometric measurements with uncertainty greater than scut
 scut <- .2
 for(ii in 1:length(tms)){
@@ -68,51 +103,29 @@ plotLC(lc_des,p_est,tem,add=TRUE)
 
 
 
-##plotLC(lc_des,p_est,tem,add=TRUE)
-lc_des <- lcs[[ii]]
-lc1 <- lc_des
-lc1[,1] <- (lc_des$time %% p_est)/p_est
-lc2 <- lc1
-lc2[,1] <- lc1[,1] + 1
-lc_temp <-rbind(lc1,lc2)
-points(lc_temp$time,lc_temp$mag,
-       col="black",pch=19)
-## segments(lc_temp$time,
-##          lc_temp$mag+lc_temp$error,
-##          lc_temp$time,
-##          lc_temp$mag-lc_temp$error)
 
 
-##### make plot with sloan data in grey or very light, des darker
-##### print out every one of these light curves, sanity check
-##### estimate Y offset and shape, compare to z
 
-## makes nice plot
-plotLC <- function(lc,p_est,tem,coeffs=NULL,add=FALSE){
-    colpch <- 1:length(tem$betas)
-    names(colpch) <- names(tem$betas)
-    lc1 <- lc
-    lc1[,1] <- (lc$time %% p_est)/p_est
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    if(add==FALSE){
-        plot(0,0,ylim=rev(range(lc_temp$mag)),
-             xlab="time",ylab="magnitude",
-             xlim=c(0,2),xaxs='i',col=0)
-    }
-    points(lc_temp$time,lc_temp$mag,
-         col=colpch[lc_temp$band],pch=colpch[lc_temp$band])
-    segments(lc_temp$time,
-             lc_temp$mag+lc_temp$error,
-             lc_temp$time,
-             lc_temp$mag-lc_temp$error)
-    if(!is.null(coeffs)){
-        ti <- (1:100)/100
-        ti <- c(ti,ti+1)
-        m <- PredictAllBand(ti,1,coeffs,tem)
-        for(ii in 1:length(tem$betas)){
-            points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
-        }
-    }
+## compute median dust
+coeffs <- matrix(0,nrow=length(tms),ncol=4)
+colnames(coeffs) <- c("mu","ebv","amp","phase")
+for(ii in 1:length(tms)){
+    lc <- TMtoLC(tms[[ii]])
+    p_est <- periods[ii]
+    omega_est <- 1/p_est
+    coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem)
 }
+
+hist(coeffs[,2])
+summary(coeffs[,2])
+
+
+## set dust to new values
+extc <- read.table("extc.dat",stringsAsFactors=FALSE)
+extc <- extc[extc[,1]=="DES",c(2,3)]
+tem$dust[extc$V2] <- extc$V3
+
+
+
+### TODO: at minimum DES templates should use DES dust from extc
+###       changes to shape of templates may make sense as well
