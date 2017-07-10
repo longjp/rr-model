@@ -8,39 +8,43 @@ load("template.RData")
 fname <- "LC_4099.dat"
 lc <- read.table(fname,stringsAsFactors=FALSE)
 names(lc) <- c("time","band","mag","error")
+
+## colors for plotting
+bandpch <- 1:6
+names(bandpch) <- c("u","g","r","i","z","Y")
+bandcol <- c("dodgerblue3","green","red",
+             "mediumorchid1","black","peachpuff4")
+names(bandcol) <- c("u","g","r","i","z","Y")
+
 ## plot raw light curve
-colpch <- 1:5
-names(colpch) <- unique(lc$band)
-plot(lc$time,lc$mag,col=colpch[lc$band],pch=colpch[lc$band],
+plot(lc$time,lc$mag,col=bandcol[lc$band],pch=bandpch[lc$band],
      ylim=rev(range(lc$mag)),
      xlab="time",ylab="magnitude")
-segments(lc$time,lc$mag+lc$error,lc$time,lc$mag-lc$error)
+segments(lc$time,lc$mag+lc$error,lc$time,lc$mag-lc$error,col='grey')
 
 ## true period of source is 0.6417558
 
 ## makes nice plot
 plotLC <- function(lc,p_est,coeffs,tem){
-    colpch <- 1:5
-    names(colpch) <- names(tem$betas)
     lc1 <- lc
     lc1[,1] <- (lc$time %% p_est)/p_est
     lc2 <- lc1
     lc2[,1] <- lc1[,1] + 1
     lc_temp <-rbind(lc1,lc2)
     plot(lc_temp$time,lc_temp$mag,
-         col=colpch[lc_temp$band],pch=colpch[lc_temp$band],
+         col=bandcol[lc_temp$band],pch=bandpch[lc_temp$band],
          ylim=rev(range(lc_temp$mag)),
-         xlab="time",ylab="magnitude",
+         xlab="phase",ylab="magnitude",
          xlim=c(0,2),xaxs='i')
     segments(lc_temp$time,
              lc_temp$mag+lc_temp$error,
              lc_temp$time,
-             lc_temp$mag-lc_temp$error)
+             lc_temp$mag-lc_temp$error,col='grey')
     ti <- (1:100)/100
     ti <- c(ti,ti+1)
     m <- PredictAllBand(ti,1,coeffs,tem)
-    for(ii in 1:length(tem$betas)){
-        points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
+    for(ii in 1:ncol(m)){
+        points(ti,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
     }
 }
 
