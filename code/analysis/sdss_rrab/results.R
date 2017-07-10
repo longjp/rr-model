@@ -8,7 +8,7 @@ load("../../fit_template/template.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")
-
+source("../plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_rrab.RData")
@@ -18,6 +18,14 @@ unlink("figs",recursive=TRUE)
 dir.create("figs")
 
 coes <- matrix(0,nrow=length(tms),ncol=4)
+
+## ## colors for plotting
+## bandpch <- 1:6
+## names(bandpch) <- c("u","g","r","i","z","Y")
+## bandcol <- c("dodgerblue3","green","red",
+##              "mediumorchid1","black","peachpuff4")
+## names(bandcol) <- c("u","g","r","i","z","Y")
+
 
 ## plot all bands with best fit parameters, store in figs
 rss.n <- vector("list",length(tms))
@@ -49,40 +57,21 @@ for(ii in 1:length(tms)){
     rss.n[[ii]] <- unlist(dev)
     dev.off()
 }
-median(unlist(rss.n))
-hist(unlist(rss.n))
+
 
 ## make all plots together
 for(ii in 1:length(tms)){
-    bands <- names(tem$dust)
-    bands <- sort(bands)
-    omega <- 1/periods[ii]
-    tm <- tms[[ii]]
-    lc <- TMtoLC(tm)
+    print(ii)
+    p_est <- periods[ii]
+    omega <- 1 / p_est
+    lc <- TMtoLC(tms[[ii]])
     coeffs <- ComputeCoeffs(lc,omega,tem)
-    preds <- list()
-    for(jj in 1:length(bands)){
-        preds[[jj]] <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
-            + coeffs[3]*tem$template_funcs[[jj]]((tem$temp_time + coeffs[4]) %% 1))
-    }
-    ylim <- range(range(preds),range(lc$mag))
-    xlim <- range((lc$time %% (1/omega))*omega)
     pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=12)
-    par(mar=c(5,5,1,1))
-    plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab="Magnitude",cex.lab=1.5,xaxs='i')
-    for(jj in 1:length(bands)){
-        temp <- lc[lc$band==bands[jj],]
-        if(nrow(temp) > 0.5){
-            points((temp$time %% (1/omega)) * omega,temp$mag,col=jj,pch=jj,cex=1.5)
-            segments((temp$time %% (1/omega)) * omega,temp$mag+temp$error,
-                     (temp$time %% (1/omega)) * omega,temp$mag-temp$error,
-                     col='grey')
-        }
-        points(tem$temp_time,preds[[jj]],type='l',col=jj,lwd=3,lty=jj)
-    }
-    legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=3,cex=1.5)
+    plotLC(lc,p_est,coeffs,tem)
     dev.off()
 }
+
+
 
 
 
