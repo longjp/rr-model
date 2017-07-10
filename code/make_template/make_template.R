@@ -217,35 +217,37 @@ tem$model_error <- model_error
 ### add Y band template that is identical to z
 ### this will be updated in make_template_des.R
 # absolute mags
-tem$betas['Y'] <- tem$betas['z']
-tem$betas <- tem$betas[order(names(tem$betas))]
-## dust
-tem$dust['Y'] <- tem$dust['z']
-tem$dust <- tem$dust[order(names(tem$dust))]
-## model error
-tem$model_error['Y'] <- tem$model_error['z']
-tem$model_error <- tem$model_error[order(names(tem$model_error))]
-## templates
-te <- matrix(0,nrow=nrow(tem$templates)+1,ncol=ncol(tem$templates))
-rownames(te) <- c(rownames(tem$templates),"Y")
-te[1:nrow(tem$templates),] <- tem$templates
-te["Y",] <- te["z",]
-te <- te[order(rownames(te)),]
-tem$templates <- te
-## templatesd
-te <- matrix(0,nrow=nrow(tem$templatesd)+1,ncol=ncol(tem$templatesd))
-rownames(te) <- c(rownames(tem$templatesd),"Y")
-te[1:nrow(tem$templatesd),] <- tem$templatesd
-te["Y",] <- te["z",]
-te <- te[order(rownames(te)),]
-tem$templatesd <- te
-## tempalate_funcs
-tem$template_funcs["Y"] <- tem$template_funcs["z"]
-tem$template_funcs <- tem$template_funcs[order(names(tem$template_funcs))]
-## tempalated_funcs
-tem$templated_funcs["Y"] <- tem$templated_funcs["z"]
-tem$templated_funcs <- tem$templated_funcs[order(names(tem$templated_funcs))]
-
+createY <- FALSE
+if(createY){
+    tem$betas['Y'] <- tem$betas['z']
+    tem$betas <- tem$betas[order(names(tem$betas))]
+    ## dust
+    tem$dust['Y'] <- tem$dust['z']
+    tem$dust <- tem$dust[order(names(tem$dust))]
+    ## model error
+    tem$model_error['Y'] <- tem$model_error['z']
+    tem$model_error <- tem$model_error[order(names(tem$model_error))]
+    ## templates
+    te <- matrix(0,nrow=nrow(tem$templates)+1,ncol=ncol(tem$templates))
+    rownames(te) <- c(rownames(tem$templates),"Y")
+    te[1:nrow(tem$templates),] <- tem$templates
+    te["Y",] <- te["z",]
+    te <- te[order(rownames(te)),]
+    tem$templates <- te
+    ## templatesd
+    te <- matrix(0,nrow=nrow(tem$templatesd)+1,ncol=ncol(tem$templatesd))
+    rownames(te) <- c(rownames(tem$templatesd),"Y")
+    te[1:nrow(tem$templatesd),] <- tem$templatesd
+    te["Y",] <- te["z",]
+    te <- te[order(rownames(te)),]
+    tem$templatesd <- te
+    ## tempalate_funcs
+    tem$template_funcs["Y"] <- tem$template_funcs["z"]
+    tem$template_funcs <- tem$template_funcs[order(names(tem$template_funcs))]
+    ## tempalated_funcs
+    tem$templated_funcs["Y"] <- tem$templated_funcs["z"]
+    tem$templated_funcs <- tem$templated_funcs[order(names(tem$templated_funcs))]
+}
 
 ## save template
 save(tem,file="../fit_template/template.RData")
