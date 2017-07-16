@@ -142,11 +142,9 @@ dev.off()
 
 load("../../fit_template/template.RData")
 
-ampg <- diff(range(tem$templates['g',]))/2
-
 pdf("features_template_downsampled.pdf",height=5,width=6)
 par(mar=c(5,5,1,1))
-plot(features[,'a']*ampg,period_est,col=cl.plot,pch=cl.plot,
+plot(features[,'a'],period_est,col=cl.plot,pch=cl.plot,
      xlab="g amplitude",ylab="period (days)",cex.lab=1.3,
      log='x',xlim=c(.01,5),ylim=c(.2,1))
 legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
@@ -191,3 +189,10 @@ lines(0:120,(1-error_budget)*(0:120),lty=2,lwd=2)
 lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
 legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
 dev.off()
+
+## rr lyrae misclassified as non-rr lyrae tended to be further away, as expected
+cl_pred <- predict(rf.fit)
+cl_pred <- cl_pred[cl=="rr" & to_use]
+hist(x[cl_pred=="rr"])
+dev.new()
+hist(x[cl_pred!="rr"])
