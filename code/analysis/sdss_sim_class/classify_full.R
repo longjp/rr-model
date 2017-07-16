@@ -54,6 +54,19 @@ plotLC <- function(lc,p_est,coeffs,tem,main=""){
 
 
 
+## compute fisher von mises MLE
+## X is n x p matrix
+mlefvonmises_simple_k <- function(t){
+    X <- cbind(cos(2*pi*t),sin(2*pi*t))
+    x_sum <- colSums(X)
+    x_sum_norm <- sqrt(sum(x_sum*x_sum))
+    Rbar <- x_sum_norm / nrow(X)
+    k_hat <- (Rbar*(2-Rbar^2)) / (1-Rbar^2)
+    return(k_hat)
+}
+        
+
+
 
 
 ps <- period_est_FULL[,1] ## just use best fit period
@@ -61,6 +74,7 @@ ps <- period_est_FULL[,1] ## just use best fit period
 
 coeffs <- matrix(0,nrow=length(ps),ncol=4)
 rss <- rep(0,length(ps))
+kappa_feat <- rep(0,length(ps))
 phis <- (1:100)/100
 for(ii in 1:nrow(coeffs)){
     omega <- 1/ps[ii]
@@ -70,16 +84,18 @@ for(ii in 1:nrow(coeffs)){
     coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
     pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
     rss[ii] <- median(abs(lc[,3] - pred))
+    kappa_feat[ii] <- mlefvonmises_simple_k((lc[,1] %% ps[ii])/ps[ii])
     ##rss[ii] <- median(abs(lc[,3] - pred) / sqrt(lc[,4]^2 + 0.03^2))
 }
-coeffs <- cbind(coeffs,rss)
-colnames(coeffs) <- c("mu","ebv","p2p-gband","phase","rss")
+coeffs <- cbind(coeffs,rss,kappa_feat)
+colnames(coeffs) <- c("mu","ebv","p2p-gband","phase","rss","kappa")
 
 to_use <- cl=="rr"
 summary(rss[to_use])
 summary(rss)
 
 
+plot(ps,kappa_feat)
 
 
 
@@ -134,7 +150,7 @@ table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
 
 
 
-feats <- cbind(ps,coeffs[,c(3,5)])
+feats <- cbind(ps,coeffs[,c(3,5,6)])
 rf.fit <- randomForest(feats,as.factor(cl))
 rf.fit
 
