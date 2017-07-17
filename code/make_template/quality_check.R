@@ -87,6 +87,10 @@ print("the mean of each template is:")
 rowMeans(tem$templates)
 
 
+
+
+
+### TODO: clean below here
 ######### analyze residuals as a function of phase (should be mean 0)
 
 ## compute residuals
