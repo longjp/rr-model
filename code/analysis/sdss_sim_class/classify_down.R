@@ -1,0 +1,253 @@
+## develop a classifier on well sampled light curves
+## which has very good performance
+## derive features other than model outputs
+
+
+rm(list=ls())
+set.seed(1234)
+
+## load necessary libraries
+library('parallel')
+library('multiband')
+library('randomForest')
+load("../../fit_template/template.RData")
+source("../../fit_template/fit_template.R")
+source("../../common/funcs.R")
+source("../funcs.R")
+
+
+## data source
+load("../../data/clean/sdss_sim_class.RData")
+load("results.RData")
+source("../params.R")
+
+
+
+
+
+## makes nice plot
+plotLC <- function(lc,p_est,coeffs,tem,main="",ylim=NULL){
+    colpch <- 1:5
+    names(colpch) <- names(tem$betas)
+    lc1 <- lc
+    lc1[,1] <- (lc$time %% p_est)/p_est
+    lc2 <- lc1
+    lc2[,1] <- lc1[,1] + 1
+    lc_temp <-rbind(lc1,lc2)
+    if(is.null(ylim)){
+        ylim <- rev(range(lc_temp$mag))
+    }
+    plot(lc_temp$time,lc_temp$mag,
+         col=colpch[lc_temp$band],pch=colpch[lc_temp$band],
+         ylim=ylim,
+         xlab="time",ylab="magnitude",
+         xlim=c(0,2),xaxs='i',main=main)
+    segments(lc_temp$time,
+             lc_temp$mag+lc_temp$error,
+             lc_temp$time,
+             lc_temp$mag-lc_temp$error)
+    ti <- (1:100)/100
+    ti <- c(ti,ti+1)
+    m <- PredictAllBand(ti,1,coeffs,tem)
+    for(ii in 1:length(tem$betas)){
+        points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
+    }
+}
+
+
+
+
+## compute fisher von mises MLE
+## X is n x p matrix
+mlefvonmises_simple_k <- function(t){
+    X <- cbind(cos(2*pi*t),sin(2*pi*t))
+    x_sum <- colSums(X)
+    x_sum_norm <- sqrt(sum(x_sum*x_sum))
+    Rbar <- x_sum_norm / nrow(X)
+    k_hat <- (Rbar*(2-Rbar^2)) / (1-Rbar^2)
+    return(k_hat)
+}
+        
+
+
+
+
+ps <- period_est[,1] ## just use best fit period
+
+
+coeffs <- matrix(0,nrow=length(ps),ncol=4)
+rss <- rep(0,length(ps))
+kappa_feat <- rep(0,length(ps))
+phis <- (1:100)/100
+for(ii in 1:nrow(coeffs)){
+    omega <- 1/ps[ii]
+    lc <- TMtoLC(tms[[ii]])
+    rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis)
+    phi <- phis[which.min(rss_phase)]
+    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
+    pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
+    rss[ii] <- median(abs(lc[,3] - pred))
+    ##rss[ii] <- median((lc[,3] - pred)^2 / (tem$model_error[lc$band]^2 + lc[,4]^2))
+    kappa_feat[ii] <- mlefvonmises_simple_k((lc[,1] %% ps[ii])/ps[ii])
+    ##rss[ii] <- median(abs(lc[,3] - pred) / sqrt(lc[,4]^2 + 0.03^2))
+}
+coeffs <- cbind(coeffs,rss,kappa_feat)
+colnames(coeffs) <- c("mu","ebv","p2p-gband","phase","rss","kappa")
+
+
+to_use <- cl=="rr"
+summary(rss[to_use])
+summary(rss)
+
+
+plot(ps,kappa_feat)
+
+
+
+
+## sort RR Lyrae by RSS, look for any especially bad fits
+## looking for cases where the model is failing
+rss_mod <- rss
+rss_mod[cl!="rr"] <- 0 ## artificially make rss of non-rr 0
+ords <- order(rss_mod,decreasing=TRUE)
+ii <- 0
+
+ii <- ii + 1
+p_est <- ps[ords[ii]]
+omega <- 1/p_est
+lc <- TMtoLC(tms[[ords[ii]]])
+ce2 <- ComputeCoeffs(lc,omega,tem,NN=20)
+coeffs[ords[ii],]
+plotLC(lc,p_est,coeffs[ords[ii],1:4],tem)
+ii
+## phase shift issues account for a decent number of actual RR Lyrae with high RSS
+## problem is that ComputeCoeffs outputs poor phase estimate, creating large RSS
+## possible solution: do grid search on phase after finding period (about 5x longer than current method)
+hist(coeffs[ords[1:30],4])
+
+
+
+par(mfcol=c(1,3))
+plot(ps[to_use],coeffs[to_use,3],ylim=c(0,2))
+plot(ps[to_use],coeffs[to_use,5],ylim=c(0,.1))
+plot(periods[to_use],ps[to_use],ylim=c(.2,1),xlim=c(.2,1))
+abline(a=0,b=1)
+
+
+## we get 90% of period estimates correct on full light curves, doesn't seem so good
+e <- 20 / (60*60*24)
+table(abs(ps[to_use]-periods[to_use]) < e)
+table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
+
+
+## get RSS measures, fit RF, get classifier accuracy, example lcs which are misclassified
+## possible reasons for missclassification
+##   1. rrl with incorrect parameter estimates
+##   2. lcs labeled as non-rrl are actually rrl (or look a lot like them)
+##   3. need more features
+
+
+### TODOs
+
+## possible reasons: 1) error distribution of l.c.s with wrong periods has a few wild outliers
+##                   2) l.c.s. are poorly sampled
+##                   3) code note finding model global min
+
+
+feats <- cbind(ps,coeffs[,c(2,3,5,6)])
+rf.fit <- randomForest(feats,as.factor(cl))
+rf.fit
+
+preds <- predict(rf.fit,type='prob')[,2]
+preds_cl <- predict(rf.fit)
+
+
+
+ds <- lapply(unique(cl),function(x){density(preds[cl==x])})
+names(ds) <- unique(cl)
+xlim <- range(unlist(lapply(ds,function(d){d$x})))
+ylim <- range(unlist(lapply(ds,function(d){d$y})))
+plot(0,0,xlim=c(.5,1.1),ylim=ylim,col=0)
+points(ds[[1]]$x,ds[[1]]$y,type='l',col=1)
+points(ds[[2]]$x,ds[[2]]$y*120,type='l',col=2)
+
+
+
+## order non--rrlyrae from most likely to be rr to least likely
+## then plot
+##tms_not <- tms_FULL[cl!="rr"]
+tms_FULL_not <- tms_FULL[cl!="rr"]
+tms_not <- tms[cl!="rr"]
+preds_not <- preds[cl!="rr"]
+ps_not <- ps[cl!="rr"]
+coeffs_not <- coeffs[cl!="rr",]
+ords <- order(preds_not,decreasing=TRUE)
+
+
+head(preds_not[ords])
+ii <- 0
+
+
+
+ii <- ii + 1
+tm <- tms_not[[ords[ii]]]
+tm2 <- tms_FULL_not[[ords[ii]]]
+lc <- TMtoLC(tm)
+lc2 <- TMtoLC(tm2)
+names(lc)[4] <- "error"
+p_est <- ps_not[ords[ii]]
+par(mfcol=c(1,2))
+plotLC(lc,p_est,coeffs_not[ords[ii],1:4],tem,
+       main=paste0("prob RR=",round(preds_not[ords[ii]],3),"  period=",round(p_est,3)))
+plotLC(lc2,p_est,coeffs_not[ords[ii],1:4],tem,
+       main=paste0("prob RR=",round(preds_not[ords[ii]],3),"  period=",round(p_est,3)))
+ii
+
+### summary of non--rrlyrae classified as RR Lyrae
+## 3 likely rr lyrae misclassified as not RR
+## several (maybe 10) with aliasing at .5 or .333 days
+## a few periodic variables that are not RRab (maybe c, or other classes)
+## few ambiguous cases
+
+##### conclusion: find method for addressing aliasing, mostly occurs at .5 and .333, but some at 1, .25
+
+##### aliasing occurs because of observing star at the same time on every night
+### - if there is some other pattern of observing, will have different aliasing
+### - check if DES is same time each night, how can we address this
+
+
+
+
+
+
+
+### examine RRL classified as not
+## order non--rrlyrae from most likely to be rr to least likely
+## then plot
+tms_rr <- tms[cl=="rr"]
+preds_rr <- preds[cl=="rr"]
+ps_rr <- ps[cl=="rr"]
+coeffs_rr <- coeffs[cl=="rr",]
+ords <- order(preds_rr)
+
+
+ii <- 0
+
+
+
+ii <- ii + 1
+tm <- tms_rr[[ords[ii]]]
+lc <- TMtoLC(tm)
+names(lc)[4] <- "error"
+p_est <- ps_rr[ords[ii]]
+plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
+       main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)))
+
+
+
+
+
+plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
+       main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)),
+       ylim=c(25,19))
+
