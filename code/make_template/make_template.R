@@ -5,7 +5,6 @@ source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
-library(abind)
 
 ## remove photometric measurements with uncertainty greater than scut
 scut <- .2
