@@ -5,6 +5,7 @@ source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
+library(abind)
 
 ## remove photometric measurements with uncertainty greater than scut
 scut <- .2
@@ -27,8 +28,25 @@ tms <- tms[to_use]
 periods <- periods[to_use]
 Nlc <- length(tms)
 
-### smooth lightcurves using supersmoother
-### place on equally spaced grid
+## ### smooth lightcurves using supersmoother
+## ### place on equally spaced grid
+## N <- 100
+## t <- (1:N)/N
+## lc_grid <- array(0,c(Nlc,N,5),dimnames=list(NULL,NULL,bands))
+## for(ii in 1:Nlc){
+##     for(jj in 1:length(bands)){
+##         lc <- tms[[ii]][[bands[jj]]]
+##         lc[,1] <- (lc[,1] %% periods[ii]) / periods[ii]
+##         ##temp <- supsmu(lc[,1],lc[,2],periodic=TRUE)
+##         temp <- supsmu(lc[,1],lc[,2],span=.05,bass=0,periodic=TRUE)
+##         ymean <- mean(c(temp$y[1],temp$y[length(temp$y)]))
+##         temp$y <- c(ymean,temp$y,ymean)
+##         temp$x <- c(0,temp$x,1)
+##         lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
+##     }
+## }
+
+## test supersmoother
 N <- 100
 t <- (1:N)/N
 lc_grid <- array(0,c(Nlc,N,5),dimnames=list(NULL,NULL,bands))
@@ -36,13 +54,21 @@ for(ii in 1:Nlc){
     for(jj in 1:length(bands)){
         lc <- tms[[ii]][[bands[jj]]]
         lc[,1] <- (lc[,1] %% periods[ii]) / periods[ii]
-        temp <- supsmu(lc[,1],lc[,2],periodic=TRUE)
-        ymean <- mean(c(temp$y[1],temp$y[length(temp$y)]))
-        temp$y <- c(ymean,temp$y,ymean)
-        temp$x <- c(0,temp$x,1)
-        lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
+        ords <- order(lc[,1])
+        x <- lc[ords,1]
+        y <- lc[ords,2]
+        ymean <- mean(c(y[1],y[length(y)]))
+        y <- c(ymean,y,ymean)
+        x <- c(0,x,1)
+        y_approx <- approx(x,y,xout=t,rule=2)$y
+        lc_grid[ii,,jj] <- y_approx
     }
 }
+
+## points(lc[,1],lc[,2],col='red')
+
+
+
 
 ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
@@ -111,6 +137,8 @@ for(ii in 1:dim(lc_grid)[1]){
 
 
 ####### phase aligned light curves look good
+## JJ <- 0
+
 ## JJ <- JJ + 1
 ## ylim <- range(lc_grid[,,JJ])
 ## cols <- brewer.pal(10,name="RdBu")
@@ -121,6 +149,13 @@ for(ii in 1:dim(lc_grid)[1]){
 ##     points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
 ## }
 ## abline(h=0,col='red',lwd=3)
+
+
+## ### phase shift lightcurves by 1/2, see if local of model error moves
+## lc_grid1 <- lc_grid[,1:50,]
+## lc_grid2 <- lc_grid[,51:100,]
+## lc_grid <- abind(lc_grid2,lc_grid1,along=2)
+
 
 
 ## determine amplitude and templates for sources
@@ -172,6 +207,22 @@ ComputeDerivative <- function(x,len,gap=2){
 
 len <- t[2] - t[1]
 templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
+
+## VISUALIZE TEMPLATE DERIVATIVES
+ylim <- range(templatesd)
+xlim <- range(t)
+pdf("templatesd.pdf",height=8,width=12)
+par(mar=c(5,5,1,1))
+plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Derivative Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
+for(ii in 1:5){
+    points(t,templatesd[ii,],type='l',lwd=4,col=ii,lty=ii)
+}
+legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
+dev.off()
+
+
+
+
 
 tem <- list(betas=betas,dust=dust,
             templates=templates,templatesd=templatesd)
@@ -251,3 +302,6 @@ if(createY){
 
 ## save template
 save(tem,file="../fit_template/template.RData")
+
+
+
