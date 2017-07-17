@@ -26,7 +26,7 @@ source("../params.R")
 
 
 ## makes nice plot
-plotLC <- function(lc,p_est,coeffs,tem,main=""){
+plotLC <- function(lc,p_est,coeffs,tem,main="",ylim=NULL){
     colpch <- 1:5
     names(colpch) <- names(tem$betas)
     lc1 <- lc
@@ -34,9 +34,12 @@ plotLC <- function(lc,p_est,coeffs,tem,main=""){
     lc2 <- lc1
     lc2[,1] <- lc1[,1] + 1
     lc_temp <-rbind(lc1,lc2)
+    if(is.null(ylim)){
+        ylim <- rev(range(lc_temp$mag))
+    }
     plot(lc_temp$time,lc_temp$mag,
          col=colpch[lc_temp$band],pch=colpch[lc_temp$band],
-         ylim=rev(range(lc_temp$mag)),
+         ylim=ylim,
          xlab="time",ylab="magnitude",
          xlim=c(0,2),xaxs='i',main=main)
     segments(lc_temp$time,
@@ -84,6 +87,7 @@ for(ii in 1:nrow(coeffs)){
     coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
     pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
     rss[ii] <- median(abs(lc[,3] - pred))
+    ##rss[ii] <- median((lc[,3] - pred)^2 / (tem$model_error[lc$band]^2 + lc[,4]^2))
     kappa_feat[ii] <- mlefvonmises_simple_k((lc[,1] %% ps[ii])/ps[ii])
     ##rss[ii] <- median(abs(lc[,3] - pred) / sqrt(lc[,4]^2 + 0.03^2))
 }
@@ -236,4 +240,8 @@ plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
 
 
 
+
+plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
+       main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)),
+       ylim=c(25,19))
 
