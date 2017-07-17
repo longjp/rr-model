@@ -9,8 +9,11 @@ source("../common/funcs.R")
 ##### estimate Y offset and shape, compare to z
 
 ## makes nice plot
-plotLC <- function(lc,p_est,tem,coeffs=NULL,add=FALSE){
+plotLC <- function(lc,p_est,tem,coeffs=NULL,add=FALSE,pch=TRUE){
     colpch <- 1:length(tem$betas)
+    if(!pch){
+        colpch <- rep(length(tem$betas)+1,length(tem$betas))
+    }
     names(colpch) <- names(tem$betas)
     lc1 <- lc
     lc1[,1] <- (lc$time %% p_est)/p_est
@@ -74,15 +77,16 @@ Nlc <- sum(to_use)
 sdss_id <- sdss_id[to_use]
 periods <- periods[to_use]
 tms <- tms[to_use]
+lcs_sdss <- lapply(tms,TMtoLC)
 
 
-lcs <- vector("list",length(tms))
-for(ii in 1:length(lcs)){
+lcs_des <- vector("list",length(tms))
+for(ii in 1:length(lcs_des)){
     fname <- gsub("./","",cat$filename[cat$ID==sdss_id[ii]],fixed=TRUE)
     lc <- read.table(paste0("known_rr_lcs/",fname),header=TRUE,stringsAsFactors=FALSE)
     lc <- lc[,c(1,4,2,3)]
     names(lc) <- c("time","band","mag","error")
-    lcs[[ii]] <- lc
+    lcs_des[[ii]] <- lc
 }
 
 
@@ -90,19 +94,17 @@ for(ii in 1:length(lcs)){
 
 ## estimate coefficients using sdss data + known periods
 ii <- 1
-lc <- TMtoLC(tms[[ii]])
+lc_sdss <- lcs_sdss[[ii]]
+lc_des <- lcs_des[[ii]]
 p_est <- periods[ii]
 omega_est <- 1/p_est
-coeffs <- ComputeCoeffs(lc,omega_est,tem)
+coeffs <- ComputeCoeffs(lc_sdss,omega_est,tem)
 names(coeffs) <- c("mu","ebv","amp","phase")
 
 ## plot folded light curve
-plotLC(lc,p_est,tem,coeffs)
+plotLC(lc_sdss,p_est,tem,coeffs)
 
-plotLC(lc_des,p_est,tem,add=TRUE)
-
-
-
+plotLC(lc_des,p_est,tem,add=TRUE,pch=FALSE)
 
 
 
@@ -129,3 +131,27 @@ tem$dust[extc$V2] <- extc$V3
 
 ### TODO: at minimum DES templates should use DES dust from extc
 ###       changes to shape of templates may make sense as well
+
+
+
+### how much of a problem is aliasing
+times <- vector("list",length(lcs_des))
+for(ii in 1:length(times)){
+    temp <- sort(lcs_des[[ii]][,1])
+    n <- length(temp)
+    times[[ii]] <- temp[2:n] - temp[1:(n-1)]
+}
+times <- unlist(times)
+hist(times %% 1,main="des",breaks=seq(0,1,.025))
+
+
+times <- vector("list",length(lcs_des))
+for(ii in 1:length(times)){
+    temp <- sort(lcs_sdss[[ii]][,1])
+    n <- length(temp)
+    times[[ii]] <- temp[2:n] - temp[1:(n-1)]
+}
+times <- unlist(times)
+dev.new()
+hist(times %% 1,main="sdss",breaks=seq(0,1,.025))
+### conclusion: aliasing will be problem with des, but not as much as with sdss
