@@ -28,25 +28,7 @@ tms <- tms[to_use]
 periods <- periods[to_use]
 Nlc <- length(tms)
 
-## ### smooth lightcurves using supersmoother
-## ### place on equally spaced grid
-## N <- 100
-## t <- (1:N)/N
-## lc_grid <- array(0,c(Nlc,N,5),dimnames=list(NULL,NULL,bands))
-## for(ii in 1:Nlc){
-##     for(jj in 1:length(bands)){
-##         lc <- tms[[ii]][[bands[jj]]]
-##         lc[,1] <- (lc[,1] %% periods[ii]) / periods[ii]
-##         ##temp <- supsmu(lc[,1],lc[,2],periodic=TRUE)
-##         temp <- supsmu(lc[,1],lc[,2],span=.05,bass=0,periodic=TRUE)
-##         ymean <- mean(c(temp$y[1],temp$y[length(temp$y)]))
-##         temp$y <- c(ymean,temp$y,ymean)
-##         temp$x <- c(0,temp$x,1)
-##         lc_grid[ii,,jj] <- approx(temp$x,temp$y,xout=t,rule=2)$y
-##     }
-## }
-
-## test supersmoother
+## interpolate light curves on a grid
 N <- 100
 t <- (1:N)/N
 lc_grid <- array(0,c(Nlc,N,5),dimnames=list(NULL,NULL,bands))
@@ -64,9 +46,6 @@ for(ii in 1:Nlc){
         lc_grid[ii,,jj] <- y_approx
     }
 }
-
-## points(lc[,1],lc[,2],col='red')
-
 
 
 
@@ -149,14 +128,6 @@ for(ii in 1:dim(lc_grid)[1]){
 ##     points(t,lc_grid[ii,,JJ],type='l',col=cols[dec[ii]])
 ## }
 ## abline(h=0,col='red',lwd=3)
-
-
-## ### phase shift lightcurves by 1/2, see if local of model error moves
-## lc_grid1 <- lc_grid[,1:50,]
-## lc_grid2 <- lc_grid[,51:100,]
-## lc_grid <- abind(lc_grid2,lc_grid1,along=2)
-
-
 
 ## determine amplitude and templates for sources
 out <- SolveAGamma(lc_grid)
