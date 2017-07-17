@@ -21,7 +21,7 @@ for(ii in 1:length(med_res)){
 
 print("total model error:")
 hist(med_res)
-median(med_res) ## .031 seems reasonable for this number
+median(med_res) ## 0.030333 seems reasonable for this number
 
 
 ## find model error caused by shape and fixing amplitude
@@ -42,7 +42,6 @@ hist(med_res)
 median(med_res) ## perfect mean offers only small advantage over actual model
 
 
-######### TODO: fix this
 ## find model error due to shape by fitting
 ## model individually for each band/lc
 ## this removes model error caused by mean and fixing amplitude ratio
