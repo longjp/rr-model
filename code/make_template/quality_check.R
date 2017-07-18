@@ -9,6 +9,12 @@ load("../data/clean/sdss_rrab.RData")
 load("../fit_template/template.RData")
 
 
+## store plots in quality_check folder
+unlink("quality_check",recursive=TRUE)
+dir.create("quality_check")
+
+
+
 ## find model error
 med_res <- vector("numeric",length(tms))
 for(ii in 1:length(med_res)){
@@ -113,27 +119,29 @@ for(ii in 1:length(lcs)){
 
 
 
-lcs_resid2 <- do.call(rbind,lcs_resid)
+lcs_resid <- do.call(rbind,lcs_resid)
 
 
-#### TODO: some issues with edge effects where model is more
-#### wrong near phase = 0, possible due to complex shape there
-lcs_resid <- lcs_resid2[lcs_resid2$band=="g",]
-plot(0,0,ylim=c(.3,-.3),
-     xlab="phase",ylab="magnitude",
-     xlim=c(0,2),xaxs='i',col=0)
-lc1 <- lcs_resid
-lc1 <- lc1[order(lc1[,1]),]
-lc2 <- lc1
-lc2[,1] <- lc1[,1] + 1
-lc_temp <-rbind(lc1,lc2)
-points(lc_temp$time,lc_temp$mag,
-       col="#00000030")
 
-out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
-abline(h=0,lwd=2)
-points(lc_temp[,1],out,type='l',col='red',lwd=2)
+for(ii in 1:length(bands)){
+    lcs_resid_band <- lcs_resid[lcs_resid$band==bands[ii],]
+    pdf(paste0("quality_check/residuals_",bands[ii],".pdf"))
+    plot(0,0,ylim=c(.3,-.3),
+         xlab="phase",ylab="magnitude residual",
+         xlim=c(0,2),xaxs='i',col=0,main=paste0(bands[ii]," band residuals"))
+    lc1 <- lcs_resid_band
+    lc1 <- lc1[order(lc1[,1]),]
+    lc2 <- lc1
+    lc2[,1] <- lc1[,1] + 1
+    lc_temp <-rbind(lc1,lc2)
+    points(lc_temp$time,lc_temp$mag,
+           col="#00000030")
 
+    out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+    abline(h=0,lwd=2)
+    points(lc_temp[,1],out,type='l',col='red',lwd=2)
+    dev.off()
+}
 
 ## segments(lc_temp$time,
     ##          lc_temp$mag+lc_temp$error,
