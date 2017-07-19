@@ -14,46 +14,12 @@ load("../../fit_template/template.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")
-
+source("../../common/plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_sim_class.RData")
 load("results.RData")
 source("../params.R")
-
-
-
-
-
-## makes nice plot
-plotLC <- function(lc,p_est,coeffs,tem,main="",ylim=NULL){
-    colpch <- 1:5
-    names(colpch) <- names(tem$betas)
-    lc1 <- lc
-    lc1[,1] <- (lc$time %% p_est)/p_est
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    if(is.null(ylim)){
-        ylim <- rev(range(lc_temp$mag))
-    }
-    plot(lc_temp$time,lc_temp$mag,
-         col=colpch[lc_temp$band],pch=colpch[lc_temp$band],
-         ylim=ylim,
-         xlab="time",ylab="magnitude",
-         xlim=c(0,2),xaxs='i',main=main)
-    segments(lc_temp$time,
-             lc_temp$mag+lc_temp$error,
-             lc_temp$time,
-             lc_temp$mag-lc_temp$error)
-    ti <- (1:100)/100
-    ti <- c(ti,ti+1)
-    m <- PredictAllBand(ti,1,coeffs,tem)
-    for(ii in 1:length(tem$betas)){
-        points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
-    }
-}
-
 
 
 
