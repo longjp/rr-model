@@ -3,42 +3,11 @@ load("../data/clean/sdss_rrab.RData")
 load("../fit_template/template.RData")
 source("../fit_template/fit_template.R")
 source("../common/funcs.R")
+source("../common/plot_funcs.R")
 library(zoo)
 
-## makes nice plot
-plotLC <- function(lc,p_est,tem,coeffs=NULL,add=FALSE,pch=TRUE){
-    colpch <- 1:length(tem$betas)
-    if(!pch){
-        colpch <- rep(length(tem$betas)+1,length(tem$betas))
-    }
-    names(colpch) <- names(tem$betas)
-    lc1 <- lc
-    lc1[,1] <- (lc$time %% p_est)/p_est
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    if(add==FALSE){
-        plot(0,0,ylim=rev(range(lc_temp$mag)),
-             xlab="time",ylab="magnitude",
-             xlim=c(0,2),xaxs='i',col=0)
-    }
-    points(lc_temp$time,lc_temp$mag,
-         col=colpch[lc_temp$band],pch=colpch[lc_temp$band])
-    segments(lc_temp$time,
-             lc_temp$mag+lc_temp$error,
-             lc_temp$time,
-             lc_temp$mag-lc_temp$error)
-    if(!is.null(coeffs)){
-        ti <- (1:100)/100
-        ti <- c(ti,ti+1)
-        m <- PredictAllBand(ti,1,coeffs,tem)
-        for(ii in 1:length(tem$betas)){
-            points(ti,m[,ii],type='l',col=colpch[names(tem$betas)[ii]])
-        }
-    }
-}
 
-
+##### TODO: do we need this code?
 ## remove photometric measurements with uncertainty greater than scut
 scut <- .2
 for(ii in 1:length(tms)){
@@ -98,10 +67,28 @@ omega_est <- 1/p_est
 coeffs <- ComputeCoeffs(lc_sdss,omega_est,tem)
 names(coeffs) <- c("mu","ebv","amp","phase")
 
+
+
 ## plot folded light curve
-plotLC(lc_sdss,p_est,tem,coeffs)
+plotLC(lc_sdss,p_est,coeffs,tem)
 
 
+
+
+
+
+###### TODO:
+#### what data do we need
+### lcs_des
+### lcs_sdss
+### periods
+#### the above files need to be ordered, i.e.
+### lcs_des[[ii]], lcs_sdss[[ii]], periods[ii] refer to same lc
+
+## idea: make clean .RData file with
+## des lightcurves
+## des id (perhaps as names of list of des lightcurves)
+## sdss id (if available)
 
 
 ## compute median dust
