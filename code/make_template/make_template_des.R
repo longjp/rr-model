@@ -6,29 +6,10 @@ source("../common/funcs.R")
 source("../common/plot_funcs.R")
 library(zoo)
 
-
-##### TODO: do we need this code?
-## remove photometric measurements with uncertainty greater than scut
-scut <- .2
-for(ii in 1:length(tms)){
-    for(jj in 1:length(tms[[ii]])){
-        temp <- tms[[ii]][[jj]]
-        tms[[ii]][[jj]] <- temp[temp[,3] < scut,]
-    }
-}    
-
-## get light curves with at least 50 observations / band in each band
-bands <- names(tms[[1]])
-bands <- bands[order(bands)]
-nobs <- matrix(0,nrow=length(tms),ncol=length(bands))
-for(ii in 1:length(bands)){
-    nobs[,ii] <- vapply(tms,function(x){nrow(x[[bands[ii]]])},c(0))
-}
-to_use <- rowSums(nobs > 45) == 5
-tms <- tms[to_use]
-periods <- periods[to_use]
-Nlc <- length(tms)
-
+## for storing plots
+plot_foldername <- "quality_check_des"
+unlink(plot_foldername,recursive=TRUE)
+dir.create(plot_foldername)
 
 ## read in katelyn catalog data and get sdss ids in nice form
 cat <- read.table("known_rr_lcs/rrab_only.tab",colClasses=c("numeric","character","character","character","numeric"),
@@ -45,7 +26,7 @@ periods <- periods[to_use]
 tms <- tms[to_use]
 lcs_sdss <- lapply(tms,TMtoLC)
 
-
+## read in des lcs
 lcs_des <- vector("list",length(tms))
 for(ii in 1:length(lcs_des)){
     fname <- gsub("./","",cat$filename[cat$ID==sdss_id[ii]],fixed=TRUE)
@@ -55,43 +36,7 @@ for(ii in 1:length(lcs_des)){
     lcs_des[[ii]] <- lc
 }
 
-
-
-
 ## estimate coefficients using sdss data + known periods
-ii <- 1
-lc_sdss <- lcs_sdss[[ii]]
-lc_des <- lcs_des[[ii]]
-p_est <- periods[ii]
-omega_est <- 1/p_est
-coeffs <- ComputeCoeffs(lc_sdss,omega_est,tem)
-names(coeffs) <- c("mu","ebv","amp","phase")
-
-
-
-## plot folded light curve
-plotLC(lc_sdss,p_est,coeffs,tem)
-
-
-
-
-
-
-###### TODO:
-#### what data do we need
-### lcs_des
-### lcs_sdss
-### periods
-#### the above files need to be ordered, i.e.
-### lcs_des[[ii]], lcs_sdss[[ii]], periods[ii] refer to same lc
-
-## idea: make clean .RData file with
-## des lightcurves
-## des id (perhaps as names of list of des lightcurves)
-## sdss id (if available)
-
-
-## compute median dust
 coeffs <- matrix(0,nrow=length(tms),ncol=4)
 colnames(coeffs) <- c("mu","ebv","amp","phase")
 for(ii in 1:length(tms)){
@@ -101,6 +46,13 @@ for(ii in 1:length(tms)){
     coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem)
 }
 
+
+### TODO: the des l.c.s do not match fits that well
+## plot folded light curve
+ii <- 1
+par(mfcol=c(2,1))
+plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem)
+plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 
 
 #####
@@ -148,21 +100,15 @@ extc <- read.table("extc.dat",stringsAsFactors=FALSE)
 extc <- extc[extc[,1]=="DES",c(2,3)]
 tem$dust[extc$V2] <- extc$V3
 
-## set extinction to new values
 
 
-unlink("quality_check_des",recursive=TRUE)
-dir.create("quality_check_des")
-
-
+## how do we empirically estimate new absolute magnitudes?
 lcs_resid <- lcs_des
 for(ii in 1:length(lcs_des)){
     omega_est <- 1/periods[ii]
     lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
     lcs_resid[[ii]][,3] <- lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem)
 }
-
-
 
 lcs_resid <- do.call(rbind,lcs_resid)
 
@@ -187,21 +133,3 @@ for(ii in 1:length(bs)){
     points(lc_temp[,1],out,type='l',col='red',lwd=2)
     dev.off()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-hist(coeffs[,2])
-summary(coeffs[,2])
-
-
-
-
