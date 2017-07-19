@@ -215,11 +215,3 @@ p_est <- ps_rr[ords[ii]]
 plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
        main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)))
 
-
-
-
-
-plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
-       main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)),
-       ylim=c(25,19))
-
