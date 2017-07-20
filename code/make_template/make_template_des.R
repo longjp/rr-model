@@ -167,11 +167,6 @@ for(ii in 1:length(bs)){
 ## get rid of u band
 tem <- RemoveBand(tem,"u")
 
-## have make_template_des.R run make_template.R
-
-## rename make_template.R to make_template_sloan.R
-
-
 ## save template
 save(tem,file="../fit_template/template_des.RData")
 
