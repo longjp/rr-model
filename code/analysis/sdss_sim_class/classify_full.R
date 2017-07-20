@@ -23,10 +23,14 @@ source("../params.R")
 
 
 
-## compute fisher von mises MLE
-## X is n x p matrix
-mlefvonmises_simple_k <- function(t){
-    X <- cbind(cos(2*pi*t),sin(2*pi*t))
+## arguments
+##   rho : vector of phases on [0,1) scale
+##
+## value
+## k_hat : 1-step mle of kappa from
+##         fisher von mises dist on unit circle
+mlefvonmises_simple_k <- function(rho){
+    X <- cbind(cos(2*pi*rho),sin(2*pi*rho))
     x_sum <- colSums(X)
     x_sum_norm <- sqrt(sum(x_sum*x_sum))
     Rbar <- x_sum_norm / nrow(X)
@@ -65,7 +69,17 @@ summary(rss[to_use])
 summary(rss)
 
 
-plot(ps,kappa_feat)
+
+### plot kappa versus period
+col_pch <- c(1,2)
+names(col_pch) <- c("not","rr")
+pdf("kappa_period_sdss.pdf")
+par(mar=c(5,5,1,1))
+plot(ps,kappa_feat,xlab="Period Estimate",ylab="k",cex.lab=1.3,cex.axis=1.3,
+     col=col_pch[cl],pch=col_pch[cl])
+legend("topleft",c("Not RR","RR"),pch=col_pch,col=col_pch,cex=1.5)
+dev.off()
+
 
 
 
@@ -103,6 +117,47 @@ abline(a=0,b=1)
 e <- 20 / (60*60*24)
 table(abs(ps[to_use]-periods[to_use]) < e)
 table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
+
+
+
+
+### find and plot a RR Lyrae with period .5 and a aliased non RR with period .5
+tms_FULL_not <- tms_FULL[cl!="rr"]
+ps_not <- ps[cl!="rr"]
+coeffs_not <- coeffs[cl!="rr",]
+ords <- order(abs(ps_not-.5),decreasing=FALSE)
+ii <- 2
+tm <- tms_FULL_not[[ords[ii]]]
+lc <- TMtoLC(tm)
+names(lc)[4] <- "error"
+p_est <- ps_not[ords[ii]]
+pdf("alias_not_rr.pdf",width=12,height=5)
+plotLC(lc,p_est,coeffs_not[ords[ii],1:4],tem,
+       main=paste0("period estimate=",round(p_est,5),"   kappa=",round(coeffs_not[ords[ii],6],2)))
+dev.off()
+
+
+
+
+### find and plot a RR Lyrae with period .5 and a aliased non RR with period .5
+tms_FULL_rr <- tms_FULL[cl=="rr"]
+ps_rr <- ps[cl=="rr"]
+coeffs_rr <- coeffs[cl=="rr",]
+ords <- order(abs(ps_rr-.5),decreasing=FALSE)
+ii <- 1
+tm <- tms_FULL_rr[[ords[ii]]]
+lc <- TMtoLC(tm)
+names(lc)[4] <- "error"
+p_est <- ps_rr[ords[ii]]
+pdf("alias_rr_rr.pdf",width=12,height=5)
+plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
+       main=paste0("period estimate=",round(p_est,5),"   kappa=",round(coeffs_rr[ords[ii],6],2)))
+dev.off()
+
+
+
+
+
 
 
 ## get RSS measures, fit RF, get classifier accuracy, example lcs which are misclassified
