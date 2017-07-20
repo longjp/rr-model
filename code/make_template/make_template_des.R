@@ -4,6 +4,7 @@ load("../fit_template/template.RData")
 source("../fit_template/fit_template.R")
 source("../common/funcs.R")
 source("../common/plot_funcs.R")
+source("funcs.R")
 library(zoo)
 
 ## for storing plots
@@ -57,52 +58,23 @@ plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 
 #####
 ### add Y band template that is identical to z
-### this will be updated in make_template_des.R
-# absolute mags
-createY <- TRUE
-if(createY){
-    tem$betas['Y'] <- tem$betas['z']
-    tem$betas <- tem$betas[order(names(tem$betas))]
-    ## dust
-    tem$dust['Y'] <- tem$dust['z']
-    tem$dust <- tem$dust[order(names(tem$dust))]
-    ## model error
-    tem$model_error['Y'] <- tem$model_error['z']
-    tem$model_error <- tem$model_error[order(names(tem$model_error))]
-    ## templates
-    te <- matrix(0,nrow=nrow(tem$templates)+1,ncol=ncol(tem$templates))
-    rownames(te) <- c(rownames(tem$templates),"Y")
-    te[1:nrow(tem$templates),] <- tem$templates
-    te["Y",] <- te["z",]
-    te <- te[order(rownames(te)),]
-    tem$templates <- te
-    ## templatesd
-    te <- matrix(0,nrow=nrow(tem$templatesd)+1,ncol=ncol(tem$templatesd))
-    rownames(te) <- c(rownames(tem$templatesd),"Y")
-    te[1:nrow(tem$templatesd),] <- tem$templatesd
-    te["Y",] <- te["z",]
-    te <- te[order(rownames(te)),]
-    tem$templatesd <- te
-    ## tempalate_funcs
-    tem$template_funcs["Y"] <- tem$template_funcs["z"]
-    tem$template_funcs <- tem$template_funcs[order(names(tem$template_funcs))]
-    ## tempalated_funcs
-    tem$templated_funcs["Y"] <- tem$templated_funcs["z"]
-    tem$templated_funcs <- tem$templated_funcs[order(names(tem$templated_funcs))]
-}
+tem <- AddBand(tem,"Y","z")
 
 
 
-
-
-## set dust to new values
+## set dust to DES values
 extc <- read.table("extc.dat",stringsAsFactors=FALSE)
 extc <- extc[extc[,1]=="DES",c(2,3)]
 tem$dust[extc$V2] <- extc$V3
 
 
 
-## how do we empirically estimate new absolute magnitudes?
+###
+### MODEL RESIDUAL ANALYSIS
+###
+
+
+### STEP 1: compute residuals as a function of phase by band
 lcs_resid <- lcs_des
 for(ii in 1:length(lcs_des)){
     omega_est <- 1/periods[ii]
@@ -114,8 +86,57 @@ lcs_resid <- do.call(rbind,lcs_resid)
 
 bs <- unique(lcs_resid$band)
 
+abs_mag_shift <- rep(0,length(bs))
+names(abs_mag_shift) <- names(bs)
+
 for(ii in 1:length(bs)){
     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
+    pdf(paste0("quality_check_des/residuals_",bs[ii],"_old.pdf"))
+    plot(0,0,ylim=c(.3,-.3),
+         xlab="phase",ylab="magnitude residual",
+         xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
+    lc1 <- lcs_resid_band
+    lc1 <- lc1[order(lc1[,1]),]
+    lc2 <- lc1
+    lc2[,1] <- lc1[,1] + 1
+    lc_temp <-rbind(lc1,lc2)
+    points(lc_temp$time,lc_temp$mag,
+           col="#00000030")
+
+    out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+    abline(h=0,lwd=2)
+    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
+    points(lc_temp[,1],out,type='l',col='red',lwd=2)
+    dev.off()
+}
+
+
+
+### STEP 2: shift absolute magnitudes to make mean 0
+## shift absolute magnitudes to mean 0
+tem$betas[bs] <- tem$betas[bs] + abs_mag_shift
+
+
+
+### STEP 3: rerun step 1, residuals should now have mean 0
+lcs_resid <- lcs_des
+for(ii in 1:length(lcs_des)){
+    omega_est <- 1/periods[ii]
+    lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
+    lcs_resid[[ii]][,3] <- lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem)
+}
+
+lcs_resid <- do.call(rbind,lcs_resid)
+
+bs <- unique(lcs_resid$band)
+
+abs_mag_shift <- rep(0,length(bs))
+names(abs_mag_shift) <- names(bs)
+
+for(ii in 1:length(bs)){
+    lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
     pdf(paste0("quality_check_des/residuals_",bs[ii],"_new.pdf"))
     plot(0,0,ylim=c(.3,-.3),
          xlab="phase",ylab="magnitude residual",
@@ -130,6 +151,31 @@ for(ii in 1:length(bs)){
 
     out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
     abline(h=0,lwd=2)
+    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
     points(lc_temp[,1],out,type='l',col='red',lwd=2)
     dev.off()
 }
+
+
+
+
+
+####
+#### SAVE OUTPUT
+####
+
+## get rid of u band
+tem <- RemoveBand(tem,"u")
+
+## have make_template_des.R run make_template.R
+
+## rename make_template.R to make_template_sloan.R
+
+
+## save template
+save(tem,file="../fit_template/template_des.RData")
+
+
+
+
+
