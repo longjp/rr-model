@@ -37,7 +37,7 @@ mlefvonmises_simple_k <- function(rho){
     k_hat <- (Rbar*(2-Rbar^2)) / (1-Rbar^2)
     return(k_hat)
 }
-        
+
 
 
 
@@ -126,7 +126,7 @@ tms_FULL_not <- tms_FULL[cl!="rr"]
 ps_not <- ps[cl!="rr"]
 coeffs_not <- coeffs[cl!="rr",]
 ords <- order(abs(ps_not-.5),decreasing=FALSE)
-ii <- 2
+ii <- 20
 tm <- tms_FULL_not[[ords[ii]]]
 lc <- TMtoLC(tm)
 names(lc)[4] <- "error"

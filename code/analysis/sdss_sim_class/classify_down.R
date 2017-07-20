@@ -73,12 +73,6 @@ summary(rss)
 
 
 
-pdf("kappa_period_des.pdf")
-par(mar=c(5,5,1,1))
-plot(ps,kappa_feat,xlab="Period Estimate",ylab="k",cex.lab=1.3,cex.axis=1.3)
-dev.off()
-
-
 
 
 
