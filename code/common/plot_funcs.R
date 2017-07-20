@@ -1,9 +1,14 @@
-plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
+plotLC <- function(lc,p_est,coeffs,tem,main=NULL,tem_only=TRUE){
     bandpch <- 1:6
     names(bandpch) <- c("u","g","r","i","z","Y")
     bandcol <- c("dodgerblue3","green","red",
                  "mediumorchid1","black","peachpuff4")
     names(bandcol) <- c("u","g","r","i","z","Y")
+    if(tem_only){
+        bands <- names(tem$betas)
+        bandpch <- bandpch[names(bandpch) %in% bands]
+        bandcol <- bandcol[names(bandcol) %in% bands]
+    }
     lc1 <- lc
     lc1[,1] <- (lc$time %% p_est)/p_est
     lc2 <- lc1
@@ -20,7 +25,7 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
          col=bandcol[lc_temp$band],pch=bandpch[lc_temp$band],
          ylim=rev(range(lc_temp$mag)),
          xlab="Phase",ylab="Magnitude",
-         xlim=c(0,2),xaxs='i',cex.axis=1.5,cex.lab=1.5,main=main)
+         xlim=c(0,2),xaxs='i',cex.axis=1.5,cex.lab=1.5,main=main,cex.main=1.5)
     segments(lc_temp$time,
              lc_temp$mag+lc_temp$error,
              lc_temp$time,
