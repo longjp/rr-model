@@ -1,6 +1,5 @@
 rm(list=ls())
 unlink("*.RData")
-unlink("*.pdf")
 source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
@@ -50,7 +49,7 @@ for(ii in 1:Nlc){
 
 ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
-pdf("band_means.pdf")
+pdf("figs/band_means.pdf")
 pairs(m)
 dev.off()
 
@@ -145,7 +144,7 @@ amps <- out$a*gscale
 ## templates only
 ylim <- range(templates)
 xlim <- range(t)
-pdf("templates.pdf",height=8,width=12)
+pdf("figs/sdss_templates.pdf",height=8,width=12)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
 for(ii in 1:5){
@@ -160,7 +159,7 @@ dev.off()
 ## dec <- findInterval(periods,c(-Inf,decLocations, Inf))
 ## for(JJ in 1:5){
 ##     ylim <- range(templates[JJ,])
-##     pdf(paste0("template_",JJ,".pdf"),height=8,width=12)
+##     pdf(paste0("figs/sdss_template_",JJ,".pdf"),height=8,width=12)
 ##     plot(0,0,ylim=ylim,xlim=c(0,1),col=0,xlab="phase",ylab="mag",xaxs="i")
 ##     for(ii in 1:Nlc){
 ##         points(t,lc_grid[ii,,JJ]/amps[ii],type='l',col=cols[dec[ii]])
@@ -181,7 +180,7 @@ templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 ## VISUALIZE TEMPLATE DERIVATIVES
 ylim <- range(templatesd)
 xlim <- range(t)
-pdf("templatesd.pdf",height=8,width=12)
+pdf("figs/sdss_templatesd.pdf",height=8,width=12)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Derivative Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
 for(ii in 1:5){
