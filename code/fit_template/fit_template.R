@@ -376,7 +376,7 @@ CheckTemLC <- function(tem,lc){
 
 ## useful for calling these functions from python, see template.py for example
 TBMEtoLC <- function(time,band,mag,error){
-    return(data.frame(time,band,mag,error))
+    return(data.frame(time,band,mag,error,stringsAsFactors=FALSE))
 }
 
 ## if lc has only one band, need to use ComputeBetaOne rather than ComputeBeta
