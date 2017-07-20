@@ -72,7 +72,12 @@ summary(rss[to_use])
 summary(rss)
 
 
-plot(ps,kappa_feat)
+
+pdf("kappa_period_des.pdf")
+par(mar=c(5,5,1,1))
+plot(ps,kappa_feat,xlab="Period Estimate",ylab="k",cex.lab=1.3,cex.axis=1.3)
+dev.off()
+
 
 
 
@@ -129,6 +134,20 @@ table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
 feats <- cbind(ps,coeffs[,c(2,3,5,6)])
 rf.fit <- randomForest(feats,as.factor(cl))
 rf.fit
+
+## recent error rate
+## Call:
+##  randomForest(x = feats, y = as.factor(cl)) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 2
+
+##         OOB estimate of  error rate: 5.29%
+## Confusion matrix:
+##     not  rr class.error
+## not 974  26   0.0260000
+## rr   47 332   0.1240106
+
 
 preds <- predict(rf.fit,type='prob')[,2]
 preds_cl <- predict(rf.fit)
