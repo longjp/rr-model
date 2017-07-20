@@ -3,7 +3,7 @@ rm(list=ls())
 ## load necessary libraries
 library('parallel')
 library('multiband')
-load("../../fit_template/template.RData")
+load("../../fit_template/template_sdss.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")

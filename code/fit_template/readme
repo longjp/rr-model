@@ -11,7 +11,8 @@ template.py
 template.R
  - R demonstration of FitTemplate, ComputeCoeffs functions
 
-template.RData
+template_sdss.RData
+template_des.RData
  - light curve shape information use by template functions
  - created by make_template/make_template.R
 

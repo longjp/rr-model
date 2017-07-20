@@ -1,6 +1,6 @@
 rm(list=ls())
 library(RColorBrewer)
-load("template.RData")
+load("template_sdss.RData")
 
 templates <- tem$templates
 t <- tem$temp_time

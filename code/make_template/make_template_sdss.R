@@ -237,7 +237,7 @@ tem$model_error <- model_error
 
 
 ## save template
-save(tem,file="../fit_template/template.RData")
+save(tem,file="../fit_template/template_sdss.RData")
 
 
 

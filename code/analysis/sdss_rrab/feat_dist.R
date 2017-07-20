@@ -1,6 +1,6 @@
 rm(list=ls())
 
-load("../../fit_template/template.RData")
+load("../../fit_template/template_sdss.RData")
 load("../../data/clean/sdss_rrab.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")

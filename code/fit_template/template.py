@@ -11,7 +11,7 @@ import itertools
 ## set up rpy2 so we can call R functions
 r=robjects.r
 r.source("fit_template.R")
-r.load("template.RData") ## loads r.tem, see later code for usage
+r.load("template_sdss.RData") ## loads r.tem, see later code for usage
 FitTemplate=robjects.r['FitTemplate']
 ComputeCoeffs=robjects.r['ComputeCoeffs']
 

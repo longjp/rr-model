@@ -6,7 +6,7 @@ library(zoo)
 source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
-load("../fit_template/template.RData")
+load("../fit_template/template_sdss.RData")
 
 
 ## store plots in quality_check folder

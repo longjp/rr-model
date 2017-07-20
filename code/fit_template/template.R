@@ -2,7 +2,7 @@
 ### PART 1 below is the most useful, other parts are more code checking
 rm(list=ls())
 source("fit_template.R")
-load("template.RData")
+load("template_sdss.RData")
 
 ## read in data and plot
 fname <- "LC_4099.dat"

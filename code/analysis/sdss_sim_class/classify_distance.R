@@ -5,7 +5,7 @@ set.seed(1234)
 library('parallel')
 library('multiband')
 library('randomForest')
-load("../../fit_template/template.RData")
+load("../../fit_template/template_sdss.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")
@@ -140,7 +140,7 @@ plot(features[,5],features[,2],col=cl.plot,pch=cl.plot,
 legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
 
-load("../../fit_template/template.RData")
+load("../../fit_template/template_sdss.RData")
 
 pdf("features_template_downsampled.pdf",height=5,width=6)
 par(mar=c(5,5,1,1))
