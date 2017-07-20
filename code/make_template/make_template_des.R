@@ -10,8 +10,6 @@ library(zoo)
 
 ## for storing plots
 plot_foldername <- "figs"
-unlink(plot_foldername,recursive=TRUE)
-dir.create(plot_foldername)
 
 ## read in katelyn catalog data and get sdss ids in nice form
 cat <- read.table("known_rr_lcs/rrab_only.tab",colClasses=c("numeric","character","character","character","numeric"),

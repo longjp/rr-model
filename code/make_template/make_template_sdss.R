@@ -4,6 +4,9 @@ source('../common/funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
+library(zoo)
+
+plot_foldername <- "figs"
 
 ## remove photometric measurements with uncertainty greater than scut
 scut <- .2
@@ -140,6 +143,141 @@ amps <- out$a*gscale
 
 
 
+
+ComputeDerivative <- function(x,len,gap=2){
+    n <- length(x)
+    x <- c(x[(n-gap+1):n],x,x[1:gap])
+    return((x[(2*gap+1):(n+2*gap)] - x[1:n]) / (2*gap*len))
+}
+
+len <- t[2] - t[1]
+templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
+
+
+
+
+tem <- list(betas=betas,dust=dust,
+            templates=templates,templatesd=templatesd)
+
+## functions for interpolating templates
+temp_time <- seq(0,1,length.out=ncol(tem$templates))
+tem$temp_time <- temp_time
+tem$template_funcs <- list()
+for(jj in 1:nrow(tem$templates)){
+    tem$template_funcs[[jj]] <- approxfun(temp_time,tem$templates[jj,])
+}
+names(tem$template_funcs) <- bands
+      
+tem$templated_funcs <- list()
+for(jj in 1:nrow(tem$templatesd)){
+    tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
+}
+names(tem$templated_funcs) <- bands
+
+
+
+#### TEMPLATE MODEL refinement
+#### fit model on all light curves, compute residuals, refit templates, recompute templatesd
+#### this addresses oversmoothing at local min/max and produces better fits
+
+coeffs <- matrix(0,nrow=length(tms),ncol=4)
+colnames(coeffs) <- c("mu","ebv","amp","phase")
+for(ii in 1:length(tms)){
+    lc <- TMtoLC(tms[[ii]])
+    p_est <- periods[ii]
+    omega_est <- 1/p_est
+    coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem,use.errors=FALSE)
+}
+
+
+
+lcs <- lapply(tms,TMtoLC)
+lcs_resid <- lcs
+for(ii in 1:length(lcs)){
+    omega_est <- 1/periods[ii]
+    lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
+    lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem)
+}
+
+lcs_resid <- do.call(rbind,lcs_resid)
+
+bs <- unique(lcs_resid$band)
+
+abs_mag_shift <- rep(0,length(bs))
+names(abs_mag_shift) <- names(bs)
+
+for(ii in 1:length(bs)){
+    lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
+    pdf(paste0(plot_foldername,"/sdss_iter1_residuals_",bs[ii],".pdf"))
+    plot(0,0,ylim=c(.3,-.3),
+         xlab="phase",ylab="magnitude residual",
+         xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
+    lc1 <- lcs_resid_band
+    lc1 <- lc1[order(lc1[,1]),]
+    lc2 <- lc1
+    lc2[,1] <- lc1[,1] + 1
+    lc_temp <-rbind(lc1,lc2)
+    points(lc_temp$time,lc_temp$mag,
+           col="#00000030")
+
+    out <- rollmean(lc_temp[,3],200,na.pad=TRUE)
+    abline(h=0,lwd=2)
+    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
+    points(lc_temp[,1],out,type='l',col='red',lwd=2)
+    dev.off()
+}
+
+
+
+#### TODO: from lc1, estimate deviation from template as a function of phase
+decLocations <- tem$temp_time[1:(length(tem$temp_time)-1)]
+dec <- findInterval(lc1[,1],c(decLocations, 1))
+out <- tapply(lc1[,3],INDEX=as.factor(dec),FUN=mean)
+out[length(out)+1] <- out[1]
+plot(out) ## looks very bad
+
+plot(tem$templates[1,])
+a
+
+### should we scale the template correction by a?
+
+### TODO:
+###### why do plots show significant deviation from mean 0 in
+###### filters. are absolute magnitudes used wrong?
+## especially when apply(lc_grid,3,mean) is almost 0 for each filter
+
+
+
+
+
+
+
+## set model error initially to 0, so subsequent code runs
+tem$model_error <- rep(0,length(tem$betas))
+names(tem$model_error) <- names(tem$betas)
+
+
+
+
+##
+## estimate model error by band
+##
+med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
+for(ii in 1:nrow(med_res)){
+    lc <- TMtoLC(tms[[ii]])
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=median)
+    med_res[ii,] <- a
+}
+model_error <- sqrt(apply(med_res,2,median))
+names(model_error) <- bands
+tem$model_error <- model_error
+
+
+
+
 ### VISUALIZE TEMPLATES
 ## templates only
 ylim <- range(templates)
@@ -168,15 +306,6 @@ dev.off()
 ##     dev.off()
 ## }
 
-ComputeDerivative <- function(x,len,gap=2){
-    n <- length(x)
-    x <- c(x[(n-gap+1):n],x,x[1:gap])
-    return((x[(2*gap+1):(n+2*gap)] - x[1:n]) / (2*gap*len))
-}
-
-len <- t[2] - t[1]
-templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
-
 ## VISUALIZE TEMPLATE DERIVATIVES
 ylim <- range(templatesd)
 xlim <- range(t)
@@ -189,48 +318,6 @@ for(ii in 1:5){
 legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
 
-
-
-
-
-tem <- list(betas=betas,dust=dust,
-            templates=templates,templatesd=templatesd)
-
-## functions for interpolating templates
-temp_time <- seq(0,1,length.out=ncol(tem$templates))
-tem$temp_time <- temp_time
-tem$template_funcs <- list()
-for(jj in 1:nrow(tem$templates)){
-    tem$template_funcs[[jj]] <- approxfun(temp_time,tem$templates[jj,])
-}
-names(tem$template_funcs) <- bands
-      
-tem$templated_funcs <- list()
-for(jj in 1:nrow(tem$templatesd)){
-    tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
-}
-names(tem$templated_funcs) <- bands
-
-
-## set model error initially to 0, so subsequent code runs
-tem$model_error <- rep(0,length(tem$betas))
-names(tem$model_error) <- names(tem$betas)
-
-
-##
-## estimate model error by band
-##
-med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
-for(ii in 1:nrow(med_res)){
-    lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=median)
-    med_res[ii,] <- a
-}
-model_error <- sqrt(apply(med_res,2,median))
-names(model_error) <- bands
-tem$model_error <- model_error
 
 
 
