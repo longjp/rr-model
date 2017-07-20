@@ -9,7 +9,7 @@ source("funcs.R")
 library(zoo)
 
 ## for storing plots
-plot_foldername <- "quality_check_des"
+plot_foldername <- "figs"
 unlink(plot_foldername,recursive=TRUE)
 dir.create(plot_foldername)
 
@@ -93,7 +93,7 @@ names(abs_mag_shift) <- names(bs)
 for(ii in 1:length(bs)){
     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
     abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
-    pdf(paste0("quality_check_des/residuals_",bs[ii],"_old.pdf"))
+    pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_old.pdf"))
     plot(0,0,ylim=c(.3,-.3),
          xlab="phase",ylab="magnitude residual",
          xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
@@ -138,7 +138,7 @@ names(abs_mag_shift) <- names(bs)
 for(ii in 1:length(bs)){
     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
     abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
-    pdf(paste0("quality_check_des/residuals_",bs[ii],"_new.pdf"))
+    pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_new.pdf"))
     plot(0,0,ylim=c(.3,-.3),
          xlab="phase",ylab="magnitude residual",
          xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))

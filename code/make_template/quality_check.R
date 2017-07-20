@@ -9,9 +9,9 @@ load("../data/clean/sdss_rrab.RData")
 load("../fit_template/template_sdss.RData")
 
 
-## store plots in quality_check folder
-unlink("quality_check",recursive=TRUE)
-dir.create("quality_check")
+## store plots in figs folder
+unlink("figs",recursive=TRUE)
+dir.create("figs")
 
 
 
@@ -125,7 +125,7 @@ lcs_resid <- do.call(rbind,lcs_resid)
 
 for(ii in 1:length(bands)){
     lcs_resid_band <- lcs_resid[lcs_resid$band==bands[ii],]
-    pdf(paste0("quality_check/residuals_",bands[ii],".pdf"))
+    pdf(paste0("figs/sdss_residuals_",bands[ii],".pdf"))
     plot(0,0,ylim=c(.3,-.3),
          xlab="phase",ylab="magnitude residual",
          xlim=c(0,2),xaxs='i',col=0,main=paste0(bands[ii]," band residuals"))
