@@ -147,8 +147,6 @@ if(ix != 1){
     templates <- cbind(templates[,ix:ncol(templates)],templates[,1:(ix-1)])
 }
 
-
-
 ComputeDerivative <- function(x,len,gap=2){
     n <- length(x)
     x <- c(x[(n-gap+1):n],x,x[1:gap])
