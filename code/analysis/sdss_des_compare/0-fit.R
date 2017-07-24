@@ -57,4 +57,4 @@ period_est_des_old <- mclapply(1:N,FitTemplateParallel,
 period_est_des_old <- matrix(unlist(period_est_des_old),ncol=topN,byrow=TRUE)
 
 
-save(period_est_sdss_old,period_est_sdss,period_est_des_old,period_est_des,file="results.RData")
+save(period_est_sdss_old,period_est_sdss,period_est_des_old,period_est_des,file="0-fit.RData")
