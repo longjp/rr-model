@@ -24,5 +24,27 @@ for(ii in 1:length(lcs_des)){
 tms_des <- lapply(lcs_des,LCtoTM)
 names(tms_des) <- cat$filename
 
+
+## use des light curves with sdss crossmatch
+## want to order light curves by filename
+load("clean/sdss_rrab.RData")
+tms_sdss <- tms
+names(tms_sdss) <- gsub(".dat","",gsub("LC_","",names(tms_sdss)))
+to_use <- sdss_id %in% names(tms_sdss)
+sum(to_use)
+tms_des <- tms_des[to_use]
+sdss_id <- sdss_id[to_use]
+tms_des <- tms_des[order(sdss_id)]
+
+## get sdss sources which are in des, order
+to_use <- names(tms_sdss) %in% sdss_id
+sum(to_use)
+tms_sdss <- tms_sdss[to_use]
+periods <- periods[to_use]
+ords <- order(names(tms_sdss))
+tms_sdss <- tms_sdss[ords]
+periods <- periods[ords]
+
+
 ## save output
-save(tms_des,sdss_id,file="clean/des.RData")
+save(tms_des,tms_sdss,periods,file="clean/des.RData")
