@@ -4,10 +4,10 @@ GetFreqs <-function(period_min,period_max,freq_del = 0.1/4000){
     return(seq(freq_min, freq_max, freq_del))
 }
 
-FitTemplateParallel <- function(ii,tms,omegas,tem,NN,topN){
+FitTemplateParallel <- function(ii,tms,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE,topN=topN){
     print(ii)
     lc <- TMtoLC(tms[[ii]])
-    rss <- FitTemplate(lc,omegas,tem,NN=NN)
+    rss <- FitTemplate(lc,omegas,tem,NN=NN,use.errors=use.errors,use.dust=use.dust)
     ps <- 1/omegas[sort_local_min(1:length(rss),rss)]
     ps <- SeparateBest(ps,0.0002,topN)
     return(ps)
