@@ -19,7 +19,7 @@ source("../funcs.R")
 load("../../data/clean/des.RData")
 
 ## parameters for simulation
-tms <- rep(0,4) ## for compatibility with following source function
+tms <- rep(0,length(tms_sdss)) ## for compatibility with following source function
 source("../params.R")
 
 ## run 1: sdss data with old templates
