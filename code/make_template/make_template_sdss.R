@@ -140,6 +140,8 @@ rownames(templates) <- dimnames(lc_grid)[[3]]
 gscale <- diff(range(templates["g",]))
 templates <- templates / gscale
 amps <- out$a*gscale
+## phase shift so g-band max is phase 0
+
 
 
 
@@ -176,69 +178,86 @@ names(tem$templated_funcs) <- bands
 
 
 
-#### TEMPLATE MODEL refinement
-#### fit model on all light curves, compute residuals, refit templates, recompute templatesd
-#### this addresses oversmoothing at local min/max and produces better fits
+## #### TEMPLATE MODEL refinement
+## #### fit model on all light curves, compute residuals, refit templates, recompute templatesd
+## #### this addresses oversmoothing at local min/max and produces better fits
 
-coeffs <- matrix(0,nrow=length(tms),ncol=4)
-colnames(coeffs) <- c("mu","ebv","amp","phase")
-for(ii in 1:length(tms)){
-    lc <- TMtoLC(tms[[ii]])
-    p_est <- periods[ii]
-    omega_est <- 1/p_est
-    coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem,use.errors=FALSE)
-}
-
-
-
-lcs <- lapply(tms,TMtoLC)
-lcs_resid <- lcs
-for(ii in 1:length(lcs)){
-    omega_est <- 1/periods[ii]
-    lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
-    lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem)
-}
-
-lcs_resid <- do.call(rbind,lcs_resid)
-
-bs <- unique(lcs_resid$band)
-
-abs_mag_shift <- rep(0,length(bs))
-names(abs_mag_shift) <- names(bs)
-
-for(ii in 1:length(bs)){
-    lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
-    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
-    pdf(paste0(plot_foldername,"/sdss_iter1_residuals_",bs[ii],".pdf"))
-    plot(0,0,ylim=c(.3,-.3),
-         xlab="phase",ylab="magnitude residual",
-         xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
-    lc1 <- lcs_resid_band
-    lc1 <- lc1[order(lc1[,1]),]
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    points(lc_temp$time,lc_temp$mag,
-           col="#00000030")
-
-    out <- rollmean(lc_temp[,3],200,na.pad=TRUE)
-    abline(h=0,lwd=2)
-    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
-    points(lc_temp[,1],out,type='l',col='red',lwd=2)
-    dev.off()
-}
+## coeffs <- matrix(0,nrow=length(tms),ncol=4)
+## colnames(coeffs) <- c("mu","ebv","amp","phase")
+## for(ii in 1:length(tms)){
+##     lc <- TMtoLC(tms[[ii]])
+##     p_est <- periods[ii]
+##     omega_est <- 1/p_est
+##     coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem,use.errors=FALSE)
+## }
 
 
 
-#### TODO: from lc1, estimate deviation from template as a function of phase
-decLocations <- tem$temp_time[1:(length(tem$temp_time)-1)]
-dec <- findInterval(lc1[,1],c(decLocations, 1))
-out <- tapply(lc1[,3],INDEX=as.factor(dec),FUN=mean)
-out[length(out)+1] <- out[1]
-plot(out) ## looks very bad
+## lcs <- lapply(tms,TMtoLC)
+## lcs_resid <- lcs
+## for(ii in 1:length(lcs)){
+##     omega_est <- 1/periods[ii]
+##     lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
+##     lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem)
+## }
 
-plot(tem$templates[1,])
-a
+## lcs_resid <- do.call(rbind,lcs_resid)
+
+## bs <- unique(lcs_resid$band)
+
+## abs_mag_shift <- rep(0,length(bs))
+## names(abs_mag_shift) <- names(bs)
+
+
+
+
+## for(ii in 1:length(bs)){
+##     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+##     abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
+##     pdf(paste0(plot_foldername,"/sdss_iter1_residuals_",bs[ii],".pdf"))
+##     plot(0,0,ylim=c(.3,-.3),
+##          xlab="phase",ylab="magnitude residual",
+##          xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
+##     lc1 <- lcs_resid_band
+##     lc1 <- lc1[order(lc1[,1]),]
+##     lc2 <- lc1
+##     lc2[,1] <- lc1[,1] + 1
+##     lc_temp <-rbind(lc1,lc2)
+##     points(lc_temp$time,lc_temp$mag,
+##            col="#00000030")
+
+##     out <- rollmean(lc_temp[,3],201,na.pad=TRUE)
+##     abline(h=0,lwd=2)
+##     abline(h=abs_mag_shift[ii],col='blue',lwd=2)
+##     points(lc_temp[,1],out,type='l',col='red',lwd=2)
+##     dev.off()
+## }
+
+## library(splines)
+
+
+## nknots <- 200
+## knots <- seq(0,2,length.out=nknots+2)[2:(nknots+1)]
+## coeffs.spline <- matrix(0,nrow=length(lc_temp),ncol=nknots+2)
+## preds <- ns(lc_temp[,1],knots=knots,Boundary.knots=c(0,2))
+## lm.fit <- lm(lc_temp[,3]~preds)
+## spline_coeffs <- lm.fit$coefficients
+## plot(lc_temp[,1],lc_temp[,3],xlab="phase",ylab="brightness (mag)",col="#00000010",ylim=c(.3,-.3))
+## points(lc_temp[,1],matrix(c(rep(1,nrow(preds)),preds),nrow=nrow(preds))%*%spline_coeffs,
+##        type='l',lwd=2,col='red')
+
+
+## out <- matrix(c(rep(1,nrow(preds)),preds),nrow=nrow(preds))%*%spline_coeffs
+
+## #### TODO: from lc1, estimate deviation from template as a function of phase
+## decLocations <- tem$temp_time[1:(length(tem$temp_time)-1)]
+## dec <- findInterval(lc1[,1],c(decLocations, 1))
+## out <- tapply(lc1[,3],INDEX=as.factor(dec),FUN=mean)
+## out[length(out)+1] <- out[1]
+## plot(out) ## looks very bad
+
+## plot(tem$templates[1,])
+## a
 
 ### should we scale the template correction by a?
 
@@ -260,21 +279,20 @@ names(tem$model_error) <- names(tem$betas)
 
 
 
-##
-## estimate model error by band
-##
+## TODO: improve this by using different level of error
+## in each filter, need to trust errors more before doing this
 med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
 for(ii in 1:nrow(med_res)){
     lc <- TMtoLC(tms[[ii]])
     coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
     preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=median)
+    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=mean)
     med_res[ii,] <- a
 }
-model_error <- sqrt(apply(med_res,2,median))
+model_error <- sqrt(apply(med_res,2,mean))
 names(model_error) <- bands
 tem$model_error <- model_error
-
+tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filters
 
 
 
