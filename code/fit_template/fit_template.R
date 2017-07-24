@@ -266,8 +266,7 @@ NewtonUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,templated_
         mu <- est["mu"]
         a <- est["a"]
         d <- est["d"]
-    }
-    else {
+    } else {
         est <- ComputeBetaOne(m,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
@@ -304,8 +303,7 @@ AmpMuDustUpdate <- function(phi,omega,m,t,dust,weights,nb,template_funcs,use.err
         mu <- est["mu"]
         a <- est["a"]
         d <- est["d"]
-    }
-    else {
+    } else {
         est <- ComputeBetaOne(m,gammaf,weights,use.errors)
         mu <- est["mu"]
         a <- est["a"]
