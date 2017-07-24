@@ -1,6 +1,6 @@
 ## modifies sdss template to create des template
 rm(list=ls())
-load("../data/clean/sdss_rrab.RData")
+load("../data/clean/des.RData")
 load("../fit_template/template_sdss.RData")
 source("../fit_template/fit_template.R")
 source("../common/funcs.R")
@@ -11,35 +11,14 @@ library(zoo)
 ## for storing plots
 plot_foldername <- "figs"
 
-## read in katelyn catalog data and get sdss ids in nice form
-cat <- read.table("known_rr_lcs/rrab_only.tab",colClasses=c("numeric","character","character","character","numeric"),
-                  header=TRUE)
-cat$ID <- gsub(".0","",cat$ID,fixed=TRUE)
-sdss_id <- gsub(".dat","",names(tms))
-sdss_id <- gsub("LC_","",sdss_id)
 
-## get l.c.s which have cross matched with des
-to_use <- sdss_id %in% cat$ID
-Nlc <- sum(to_use)
-sdss_id <- sdss_id[to_use]
-periods <- periods[to_use]
-tms <- tms[to_use]
-lcs_sdss <- lapply(tms,TMtoLC)
-
-## read in des lcs
-lcs_des <- vector("list",length(tms))
-for(ii in 1:length(lcs_des)){
-    fname <- gsub("./","",cat$filename[cat$ID==sdss_id[ii]],fixed=TRUE)
-    lc <- read.table(paste0("known_rr_lcs/",fname),header=TRUE,stringsAsFactors=FALSE)
-    lc <- lc[,c(1,4,2,3)]
-    names(lc) <- c("time","band","mag","error")
-    lcs_des[[ii]] <- lc
-}
+lcs_sdss <- lapply(tms_sdss,TMtoLC)
+lcs_des <- lapply(tms_des,TMtoLC)
 
 ## estimate coefficients using sdss data + known periods
-coeffs <- matrix(0,nrow=length(tms),ncol=4)
+coeffs <- matrix(0,nrow=length(lcs_sdss),ncol=4)
 colnames(coeffs) <- c("mu","ebv","amp","phase")
-for(ii in 1:length(tms)){
+for(ii in 1:length(tms_sdss)){
     lc <- lcs_sdss[[ii]]
     p_est <- periods[ii]
     omega_est <- 1/p_est
@@ -49,12 +28,14 @@ for(ii in 1:length(tms)){
 
 ### TODO: the des l.c.s do not match fits that well
 ## plot folded light curve
-ii <- 1
+ii <- 2
 par(mfcol=c(2,1))
 plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem)
 plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 
 
+
+##### create DES template
 #####
 ### add Y band template that is identical to z
 tem <- AddBand(tem,"Y","z")
