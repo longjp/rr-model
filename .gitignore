@@ -9,6 +9,7 @@ sandbox*
 meeting_notes
 todo
 known_rr_lcs
+*.vrb
 
 ## JPL: copied global .gitignore here b/c shared repo
 # ignore compiled files, log files, ect.
