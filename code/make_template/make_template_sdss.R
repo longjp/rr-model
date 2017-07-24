@@ -304,15 +304,15 @@ tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filt
 ## colors for plotting
 ylim <- c(-.7,.4)
 xlim <- range(t)
-bands <- rownames(templates)
+bands_order <- c("u","g","r","i","z")
 pdf(paste0(plot_foldername,"/sdss_templates.pdf"),height=8,width=12)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
-for(ii in 1:length(bands)){
+for(ii in bands_order){
     points(t,templates[ii,],type='l',lwd=4,
-           col=bandcol[bands[ii]],lty=bandpch[bands[ii]])
+           col=bandcol[ii],lty=bandpch[ii])
 }
-legend("bottomleft",bands,col=bandcol[bands],lty=bandpch[bands],lwd=4,cex=1.5)
+legend("bottomleft",bands_order,col=bandcol[bands_order],lty=bandpch[bands_order],lwd=4,cex=1.5)
 dev.off()
 
 ## templates with light curves

@@ -148,15 +148,15 @@ if(ix != 1){
 ## templates only
 ylim <- c(-.7,.4)
 xlim <- range(t)
-bands <- rownames(templates)
+bands_order <- c("u","g","r","i","z")
 pdf(paste0(plot_foldername,"/sdss_templates_old.pdf"),height=8,width=12)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
-for(ii in 1:length(bands)){
+for(ii in bands_order){
     points(t,templates[ii,],type='l',lwd=4,
-           col=bandcol[bands[ii]],lty=bandpch[bands[ii]])
+           col=bandcol[ii],lty=bandpch[ii])
 }
-legend("bottomleft",bands,col=bandcol[bands],lty=bandpch[bands],lwd=4,cex=1.5)
+legend("bottomleft",bands_order,col=bandcol[bands_order],lty=bandpch[bands_order],lwd=4,cex=1.5)
 dev.off()
 
 ## templates with light curves
@@ -200,27 +200,6 @@ for(jj in 1:nrow(tem$templatesd)){
     tem$templated_funcs[[jj]] <- approxfun(temp_time,tem$templatesd[jj,])
 }
 names(tem$templated_funcs) <- bands
-
-
-## set model error initially to 0, so subsequent code runs
-tem$model_error <- rep(0,length(tem$betas))
-names(tem$model_error) <- names(tem$betas)
-
-
-##
-## estimate model error by band
-##
-med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
-for(ii in 1:nrow(med_res)){
-    lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=median)
-    med_res[ii,] <- a
-}
-model_error <- sqrt(apply(med_res,2,median))
-names(model_error) <- bands
-tem$model_error <- model_error
 
 
 ## save template
