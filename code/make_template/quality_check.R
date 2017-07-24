@@ -15,6 +15,72 @@ dir.create("figs")
 
 
 
+#### COMPUTE VARIOUS SOURCES OF MODEL ERROR
+
+## MODEL ERROR: TOTAL
+med_res <- vector("list",length(tms))
+for(ii in 1:length(med_res)){
+    lc <- TMtoLC(tms[[ii]])
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    med_res[[ii]] <- (preds - lc[,3])^2 #- lc[,4]^2
+}
+
+
+print("total model error:")
+hist(unlist(med_res))
+sqrt(median(unlist(med_res))) ## 0.030333 seems reasonable for this number
+
+
+
+## MODEL ERROR: WHAT IF WE LET MEANS FLOAT
+med_res <- vector("list",length(tms))
+for(ii in 1:length(med_res)){
+    temp <- tms[[ii]]
+    for(jj in 1:length(temp)){
+        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem$betas[jj]
+    }
+    lc <- TMtoLC(temp)
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    med_res[[ii]] <- (preds - lc[,3])^2 #- lc[,4]^2
+}
+
+print("model error caused by shape and fixing amplitude ratio:")
+hist(unlist(med_res))
+sqrt(median(unlist(med_res))) ## perfect mean offers only small advantage over actual model
+
+
+
+
+
+## find model error due to shape by fitting
+## model individually for each band/lc
+## this removes model error caused by fixing mean, amplitude, phases amplitude ratio
+med_res <- vector("list",length(tms))
+for(ii in 1:length(med_res)){
+    lc <- TMtoLC(tms[[ii]])
+    bands <- unique(lc$band)
+    med_res[[ii]] <- vector("list",length(bands))
+    for(jj in 1:length(bands)){
+        temp <- lc[lc$band %in% bands[jj],]
+        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem,use.dust=FALSE)
+        preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
+        med_res[[ii]][[jj]] <- (preds - temp[,3])^2 #- temp[,4]^2
+    }
+}
+
+print("model error caused only by shape:")
+hist(unlist(med_res),main="shape only")
+sqrt(median(unlist(med_res)))
+
+
+
+
+
+
+
+
 ## find model error
 med_res <- vector("numeric",length(tms))
 for(ii in 1:length(med_res)){
@@ -55,14 +121,13 @@ med_res <- vector("numeric",length(tms))
 for(ii in 1:length(med_res)){
     lc <- TMtoLC(tms[[ii]])
     bands <- unique(lc$band)
-    errors <- list()
+    med_res <- vector("list",length(bands))
     for(jj in 1:length(bands)){
         temp <- lc[lc$band %in% bands[jj],]
         coeffs <- ComputeCoeffs(temp,1/periods[ii],tem,use.dust=FALSE)
         preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
-        errors[[jj]] <- abs(preds - temp[,3])
+        med_res[[ii]][[jj]] <- abs(preds - temp[,3])
     }
-    med_res[ii] <- median(unlist(errors))
 }
 
 print("model error caused only by shape:")
@@ -96,7 +161,6 @@ rowMeans(tem$templates)
 
 
 
-### TODO: clean below here
 ######### analyze residuals as a function of phase (should be mean 0)
 
 ## compute residuals
@@ -135,13 +199,21 @@ for(ii in 1:length(bands)){
     lc2[,1] <- lc1[,1] + 1
     lc_temp <-rbind(lc1,lc2)
     points(lc_temp$time,lc_temp$mag,
-           col="#00000030")
+           col="#00000010")
 
-    out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+    out <- rollmedian(lc_temp[,3],201,na.pad=TRUE)
     abline(h=0,lwd=2)
+    abline(h=mean(lc_temp[,3]),col="blue",lwd=2)
     points(lc_temp[,1],out,type='l',col='red',lwd=2)
     dev.off()
 }
+
+
+median(abs(lc_temp[,3]))
+
+lc_temp[,4]
+
+median(abs(rnorm(n=length(lc_temp[,4]),mean=0,sd=lc_temp[,4])))
 
 ## segments(lc_temp$time,
     ##          lc_temp$mag+lc_temp$error,
