@@ -16,7 +16,7 @@ FitTemplate=robjects.r['FitTemplate']
 ComputeCoeffs=robjects.r['ComputeCoeffs']
 
 ## load a light curve, put in nice format
-fname="LC_4099.dat"
+fname="LC_402316.dat"
 with open(fname) as csvf:
     f = csv.reader(csvf,delimiter=' ')
     time, band, mag, error = zip(*f)
@@ -49,10 +49,10 @@ coeffs=ComputeCoeffs(lc,omega,r.tem) ## parameter estimates of best fit frequenc
 ## the output is [distance modulus (mu),amount of dust (E[B-V]),amplitude (a),phase (rho)]
 # >>> coeffs
 # R object with classes: ('numeric',) mapped to:
-# <FloatVector - Python:0x7fddd8481808 / R:0x5a67d10>
-# [16.090652, 0.104854, 0.590259, 0.273550]
+# <FloatVector - Python:0x7f045e5fbac8 / R:0x68acfa0>
+# [19.317127, 0.058982, 1.215803, 0.201546]
 # >>> pest
-# 0.6417558439896901
+# 0.543079805578008
 
 ###### now plot results
 ## plot lightcurve folded on estimated period
@@ -123,7 +123,7 @@ for i in range(0,len(class_colours)):
 plt.legend(recs,cols.keys(),loc=4)
 
 
-### add template fits, should look bad because not dust subtracted
+### add template fits, means will be off for light curves with a lot of dust
 gamma = r.tem[2]
 gamma = np.resize(gamma,(5,100))
 t=(np.arange(100)/100.)*pest
@@ -135,3 +135,45 @@ for ii in np.arange(gamma.shape[0]):
 
 plt.show()
 
+
+
+###### FIT MODEL on DES version of light curve
+#### compare sloan / des fits on same RRL
+r.load("template_des.RData") ## loads des template
+
+
+## load des light curve, put in nice format
+fname="LC_402316_des.dat"
+with open(fname) as csvf:
+    f = csv.reader(csvf,delimiter='\t')
+    next(f,None)
+    time, mag, error, band = zip(*f)
+
+
+no_pound = [not '#' in x for x in time]    
+time = list(itertools.compress(time, no_pound))
+band = list(itertools.compress(band, no_pound))
+mag = list(itertools.compress(mag, no_pound))
+error = list(itertools.compress(error, no_pound))
+
+
+time = np.array(time,dtype='float64')
+mag = np.array(mag,dtype='float64')
+error = np.array(error,dtype='float64')
+
+
+## create R dataframe using time,band,mag,error
+lc = robjects.r['TBMEtoLC'](FloatVector(time),StrVector(band),FloatVector(mag),FloatVector(error))
+
+rss_des=FitTemplate(lc,omegas,r.tem)
+## select best fitting period, ie lowest rss
+omega_des = omegas[np.argmin(rss_des)] ## best fit frequency
+## parameter estimates of best fit frequency, compare to sloan above
+pest_des=1.0/omega_des ## best fit period
+coeffs_des=ComputeCoeffs(lc,omega_des,r.tem) 
+## des estimates
+pest_des
+coeffs_des
+## sloan estimates
+pest
+coeffs

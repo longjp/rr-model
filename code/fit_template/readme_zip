@@ -26,3 +26,7 @@ LC_4099.dat
  - example RRL light curve from SDSS Stripe 82
 LC_999886.dat
  - example non-RRL light curve from SDSS Stripe 82, fits should be nonsense
+LC_402316.dat
+ - sloan RR Lyrae
+LC_402316_des.dat
+ - des version of LC_402316.dat, poorly sampled
