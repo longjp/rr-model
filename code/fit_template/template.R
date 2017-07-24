@@ -2,7 +2,13 @@
 ### PART 1 below is the most useful, other parts are more code checking
 rm(list=ls())
 source("fit_template.R")
+
+## load sdss and des templates
 load("template_sdss.RData")
+tem_sdss <- tem
+load("template_des.RData")
+tem_des <- tem
+tem <- NULL
 
 ## read in data and plot
 fname <- "LC_4099.dat"
@@ -56,11 +62,13 @@ plotLC <- function(lc,p_est,coeffs,tem){
 
 ## fit template model and obtain coefficients
 omegas <- seq(from=1.0,to=5.0,by=0.1/4000.0)
-rss <- FitTemplate(lc,omegas,tem)
+rss <- FitTemplate(lc,omegas,tem_sdss)
 omega_est <- omegas[which.min(rss)]
 p_est <- 1/omega_est
-coeffs <- ComputeCoeffs(lc,omega_est,tem)
+p_est
+coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss)
 names(coeffs) <- c("mu","ebv","amp","phase")
+coeffs
 ## correct values near:
 ## coeffs
 ##[1] 16.0914314  0.1071064  0.5444982  0.3935931
@@ -70,13 +78,13 @@ plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
 
 ## plot folded light curve with best fit
-plotLC(lc,p_est,coeffs,tem)
+plotLC(lc,p_est,coeffs,tem_sdss)
 
 ## check that phase determined by NewtonUpdate is close to best phase
 ## by performing a grid search on phase, comparing min of grid
 ## search to min found by newton
 phis <- (1:100)/100
-rss_phi <- ComputeRSSPhase(lc,omega_est,tem,phis=phis)
+rss_phi <- ComputeRSSPhase(lc,omega_est,tem_sdss,phis=phis)
 plot(phis,rss_phi)
 abline(v=coeffs[4])
 
@@ -87,16 +95,16 @@ abline(v=coeffs[4])
 ##         here we test if model works when use.dust=FALSE
 ebv <- coeffs[2]
 ## remove dust
-bands <- names(tem$dust)
+bands <- names(tem_sdss$dust)
 for(ii in 1:length(bands)){
-    lc$mag[lc$band==bands[ii]] <- lc$mag[lc$band==bands[ii]] - tem$dust[ii]*ebv
+    lc$mag[lc$band==bands[ii]] <- lc$mag[lc$band==bands[ii]] - tem_sdss$dust[ii]*ebv
 }
 
 
-rss <- FitTemplate(lc,omegas,tem,use.dust=FALSE)
+rss <- FitTemplate(lc,omegas,tem_sdss,use.dust=FALSE)
 omega_est <- omegas[which.min(rss)]
 p_est <- 1/omega_est
-coeffs <- ComputeCoeffs(lc,omega_est,tem,use.dust=FALSE)
+coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss,use.dust=FALSE)
 names(coeffs) <- c("mu","ebv","amp","phase")
 
 ## view rss
@@ -104,14 +112,14 @@ plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
 
 ## plot folded light curve with best fit
-plotLC(lc,p_est,coeffs,tem)
+plotLC(lc,p_est,coeffs,tem_sdss)
 
 
 
 ## check that phase determine by NewtonUpdate is close to best phase
 ## by performing a grid search
 phis <- (1:100)/100
-rss_phi <- ComputeRSSPhase(lc,omega_est,tem,phis=phis,use.dust=FALSE)
+rss_phi <- ComputeRSSPhase(lc,omega_est,tem_sdss,phis=phis,use.dust=FALSE)
 plot(phis,rss_phi)
 abline(v=coeffs[4])
 
@@ -134,45 +142,111 @@ segments(lc$time,lc$mag+lc$error,lc$time,lc$mag-lc$error)
 
 
 ###### a) use.errors=TRUE
-rss <- FitTemplate(lc,omegas,tem)
+rss <- FitTemplate(lc,omegas,tem_sdss)
 omega_est <- omegas[which.min(rss)]
 p_est <- 1/omega_est
-coeffs <- ComputeCoeffs(lc,omega_est,tem)
+coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss)
 names(coeffs) <- c("mu","ebv","amp","phase")
+coeffs
+### E[B-V] should be near 0
+## coeffs
+##           mu          ebv          amp        phase 
+## 16.107599078 -0.002595868  0.575895456  0.274028610 
 
 ## view rss
 plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
 
 ## plot folded light curve with best fit
-plotLC(lc,p_est,coeffs,tem)
+plotLC(lc,p_est,coeffs,tem_sdss)
 
 ## check that phase determine by NewtonUpdate is close to best phase
 ## by performing a grid search
 phis <- (1:100)/100
-rss_phi <- ComputeRSSPhase(lc,omega_est,tem,phis=phis)
+rss_phi <- ComputeRSSPhase(lc,omega_est,tem_sdss,phis=phis)
 plot(phis,rss_phi)
 abline(v=coeffs[4])
 
 
 ###### b) use.errors=FALSE, should get poor parameter estimates
-rss <- FitTemplate(lc,omegas,tem,use.errors=FALSE)
+rss <- FitTemplate(lc,omegas,tem_sdss,use.errors=FALSE)
 omega_est <- omegas[which.min(rss)]
 p_est <- 1/omega_est
-coeffs <- ComputeCoeffs(lc,omega_est,tem,use.errors=FALSE)
+coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss,use.errors=FALSE)
 names(coeffs) <- c("mu","ebv","amp","phase")
+coeffs
+p_est
 
 ## view rss
 plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
 
 ## plot folded light curve with best fit
-plotLC(lc,p_est,coeffs,tem)
+plotLC(lc,p_est,coeffs,tem_sdss)
 
 ## check that phase determine by NewtonUpdate is close to best phase
 ## by performing a grid search
 phis <- (1:100)/100
-rss_phi <- ComputeRSSPhase(lc,omega_est,tem,phis=phis,use.errors=FALSE)
+rss_phi <- ComputeRSSPhase(lc,omega_est,tem_sdss,phis=phis,use.errors=FALSE)
 plot(phis,rss_phi)
 abline(v=coeffs[4])
+
+
+
+
+
+##
+## PART 4: templates on des data
+##         
+
+
+## read in sdss data
+fname <- "LC_402316.dat"
+lc <- read.table(fname,stringsAsFactors=FALSE)
+names(lc) <- c("time","band","mag","error")
+
+
+## fit model
+rss <- FitTemplate(lc,omegas,tem_sdss)
+omega_est <- omegas[which.min(rss)]
+p_est <- 1/omega_est
+coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss)
+names(coeffs) <- c("mu","ebv","amp","phase")
+coeffs
+
+
+plot(1/omegas,rss,xlab="period",ylab="rss")
+abline(v=p_est)
+
+## plot folded light curve with best fit
+plotLC(lc,p_est,coeffs,tem_sdss)
+
+
+
+## read in des data for same light curve
+fname <- "LC_402316_des.dat"
+lc_des <- read.table(fname,header=TRUE,stringsAsFactors=FALSE)
+lc_des <- lc_des[,c(1,4,2,3)]
+names(lc_des) <- c("time","band","mag","error")
+
+## refit coefficients using des data and templates
+coeffs_des <- ComputeCoeffs(lc_des,omega_est,tem_des)
+plotLC(lc_des,p_est,coeffs_des,tem_des)
+
+
+## estimate period with des templates
+rss_des <- FitTemplate(lc_des,omegas,tem_des)
+omega_est_des <- omegas[which.min(rss_des)]
+p_est_des <- 1/omega_est_des
+
+par(mfcol=c(2,1))
+plot(1/omegas,rss,xlab="period",ylab="rss sloan data")
+abline(v=p_est)
+plot(1/omegas,rss_des,xlab="period",ylab="rss des data")
+abline(v=p_est_des)
+
+
+p_est_des
+p_est
+
 
