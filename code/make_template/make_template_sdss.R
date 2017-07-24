@@ -1,6 +1,7 @@
 rm(list=ls())
 unlink("*.RData")
 source('../common/funcs.R')
+source('plot_options.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
@@ -141,8 +142,10 @@ gscale <- diff(range(templates["g",]))
 templates <- templates / gscale
 amps <- out$a*gscale
 ## phase shift so g-band max is phase 0
-
-
+ix <- which.min(templates['g',])
+if(ix != 1){
+    templates <- cbind(templates[,ix:ncol(templates)],templates[,1:(ix-1)])
+}
 
 
 
@@ -298,15 +301,18 @@ tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filt
 
 ### VISUALIZE TEMPLATES
 ## templates only
-ylim <- range(templates)
+## colors for plotting
+ylim <- c(-.7,.4)
 xlim <- range(t)
-pdf("figs/sdss_templates.pdf",height=8,width=12)
+bands <- rownames(templates)
+pdf(paste0(plot_foldername,"/sdss_templates.pdf"),height=8,width=12)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
-for(ii in 1:5){
-    points(t,templates[ii,],type='l',lwd=4,col=ii,lty=ii)
+for(ii in 1:length(bands)){
+    points(t,templates[ii,],type='l',lwd=4,
+           col=bandcol[bands[ii]],lty=bandpch[bands[ii]])
 }
-legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
+legend("bottomleft",bands,col=bandcol[bands],lty=bandpch[bands],lwd=4,cex=1.5)
 dev.off()
 
 ## templates with light curves
