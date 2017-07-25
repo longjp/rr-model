@@ -86,6 +86,21 @@
   \end{center}
 \end{frame}
 
+\begin{frame}{Period Estimation Accuracy}
+  \begin{itemize}
+  \item 194 RRab DES lightcurves cross--matched into Sloan
+  \item 85\% periods estimated correctly with new model
+  \item small ($\approx$ 2\% improvement) from old model
+  \end{itemize}
+    \begin{tabular}{ r | c | c | c | c | c | c }
+\# epochs & $<15$ & [15,19] & [20,24] & [25,29] & $\geq 30$ & total\\ 
+      \hline 
+\# sources & 34 & 81 & 51 & 19 & 9 & 194\\ 
+      frac. correct est. & 0.70 & 0.87 & 0.88 & 0.89 & 1.00 & 0.85
+    \end{tabular}
+    
+\end{frame}
+
 %% \begin{frame}{Template Shapes: DES Filters}
 %%   \begin{center}
 %%     \includegraphics[scale=0.3]{figs/sdss_templates.pdf}
@@ -297,7 +312,7 @@ def kappa(phi):
   \begin{itemize}
   \item \textbf{sanity check 1:} model dust estimates close to dust maps?
   \item \textbf{sanity check 2:} perturb a few magnitudes, check updated model fits with use.errors=TRUE and use.errors=FALSE
-  \item \textbf{sanity check 3:} better results than before
+  \item \textbf{sanity check 3:} better results than before?
   \item \textbf{sanity check X:} lots of other possibilities
   \end{itemize}
 
