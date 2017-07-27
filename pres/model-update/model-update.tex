@@ -86,20 +86,6 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Period Estimation Accuracy}
-  \begin{itemize}
-  \item 194 RRab DES lightcurves cross--matched into Sloan
-  \item 85\% periods estimated correctly with new model
-  \item small ($\approx$ 2\% improvement) from old model
-  \end{itemize}
-    \begin{tabular}{ r | c | c | c | c | c | c }
-\# epochs & $<15$ & [15,19] & [20,24] & [25,29] & $\geq 30$ & total\\ 
-      \hline 
-\# sources & 34 & 81 & 51 & 19 & 9 & 194\\ 
-      frac. correct est. & 0.70 & 0.87 & 0.88 & 0.89 & 1.00 & 0.85
-    \end{tabular}
-    
-\end{frame}
 
 %% \begin{frame}{Template Shapes: DES Filters}
 %%   \begin{center}
@@ -150,7 +136,7 @@
 %% \end{frame}
 
 
-\begin{frame}{Dust and Photometric Errors}
+\begin{frame}{Dust, Photometric Errors, DES Filters}
   \begin{itemize}
     \item Dust
   \begin{itemize}
@@ -164,6 +150,13 @@
   \item Photometric errors not used in old code fitting.
   \item Using photometric errors but not model error is dangerous (overweights obs with low photometric error)
   \item New code (optionally) uses model and photometric uncertainty
+  \end{itemize}
+\item DES Filters
+  \begin{itemize}
+  \item Fit SDSS Templates to cross matched SDSS light curves
+  \item Computed residuals for DES light curves
+  \item Shifted absolute mag. so mean 0 residuals in each DES filter
+  \item Small change for g,r,i,z, $\approx 0.08$ mags for Y
   \end{itemize}
   \end{itemize}
   \end{frame}
@@ -199,6 +192,22 @@ rss=FitTemplate(lc,omegas,r.tem,NN,use_errors,use_dust)
   
 See \texttt{template.py} file for examples.
   
+\end{frame}
+
+
+\begin{frame}{Period Estimation Accuracy}
+  \begin{itemize}
+  \item 194 RRab DES lightcurves cross--matched into Sloan
+  \item 85\% periods estimated correctly with new model
+  \item small ($\approx$ 2\% improvement) from old model
+  \end{itemize}
+    \begin{tabular}{ r | c | c | c | c | c | c }
+\# epochs & $<15$ & [15,19] & [20,24] & [25,29] & $\geq 30$ & total\\ 
+      \hline 
+\# sources & 34 & 81 & 51 & 19 & 9 & 194\\ 
+      frac. correct est. & 0.70 & 0.87 & 0.88 & 0.89 & 1.00 & 0.85
+    \end{tabular}
+    
 \end{frame}
 
 
