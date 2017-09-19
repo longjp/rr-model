@@ -68,16 +68,70 @@ dust <- dust[order(names(dust))]
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
-lpmed <- log10(median(periods))
-betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-names(betas) <- rrmag$bnd
+
+## lpmed <- log10(median(periods))
+## betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
+## names(betas) <- rrmag$bnd
+
+
+## absolute mag period dependence
+betasM <- matrix(0,nrow=length(periods),ncol=5)
+for(ii in 1:length(periods)){
+    betasM[ii,] <- rrmag$c0 + rrmag$p1*(log10(periods[ii]) + 0.2) + rrmag$p2*(log10(periods[ii]) + 0.2)^2
+}
+colnames(betasM) <- rrmag$bnd
+
 
 ## estimate ebv and mu for each lc
 rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-m_shift <- t(t(m) - betas)
+
+## why not make betas depend on period and subtract off a different period
+## each time
+m_shift <- m - betasM
 for(ii in 1:nrow(m)){
     rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
 }
+
+head(rs)
+median(abs(rs))
+
+
+d_val <- matrix(0,nrow=nrow(m),ncol=2)
+for(ii in 1:nrow(m)){
+    d_val[ii,] <- lm(m_shift[ii,]~dust)$coefficients
+}
+colnames(d_val) <- c("mu","my_dust")
+d_val <- data.frame(ID=names(tms),d_val)
+
+
+## compare dust to sesar dust
+tab <- read.table("../data/raw/apj326724t3_mrt.txt",skip=30)
+tab <- tab[,c(1,4,5)]
+names(tab) <- c("ID","dust","dist")
+tab$ID <- paste0("LC_",tab$ID,".dat")
+
+dust_comp <- merge(tab,d_val)
+dust_comp$my_dist <- 10^(dust_comp$mu/5 + 1)/1000
+
+
+lim <- range(c(dust_comp$dist,dust_comp$my_dist))
+
+pdf("distance_comparison.pdf")
+par(mar=c(5,5,1,1))
+plot(dust_comp$dist,dust_comp$my_dist,xlim=c(5,70),ylim=c(5,70),
+     xlab="Sesar Distance",ylab="Model Distance - New",cex.lab=1.3)
+dev.off()
+
+
+lim <- c(0,.8)
+pdf("dust_comparison.pdf")
+par(mar=c(5,5,1,1))
+plot(dust_comp$dust,dust['r']*dust_comp$my_dust,ylim=lim,xlim=lim,xlab="Schlegel Dust r",ylab="Model Dust r - New",
+     cex.lab=1.3)
+abline(a=0,b=1)
+dev.off()
+
+
 
 #### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
@@ -159,8 +213,9 @@ templatesd <- t(apply(templates,1,function(x){ComputeDerivative(x,len)}))
 
 
 
-tem <- list(betas=betas,dust=dust,
-            templates=templates,templatesd=templatesd)
+tem <- list(dust=dust,
+            templates=templates,
+            templatesd=templatesd)
 
 ## functions for interpolating templates
 temp_time <- seq(0,1,length.out=ncol(tem$templates))
@@ -274,26 +329,27 @@ names(tem$templated_funcs) <- bands
 
 
 ## set model error initially to 0, so subsequent code runs
-tem$model_error <- rep(0,length(tem$betas))
-names(tem$model_error) <- names(tem$betas)
+tem$model_error <- rep(0,length(tem$dust))
+names(tem$model_error) <- names(tem$dust)
+
+tem$model_error <- tem$model_error + 2 ## lots of model error
 
 
-
-
+## TODO: turned off for now, turn on again later
 ## TODO: improve this by using different level of error
 ## in each filter, need to trust errors more before doing this
-med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
-for(ii in 1:nrow(med_res)){
-    lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=mean)
-    med_res[ii,] <- a
-}
-model_error <- sqrt(apply(med_res,2,mean))
-names(model_error) <- bands
-tem$model_error <- model_error
-tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filters
+## med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
+## for(ii in 1:nrow(med_res)){
+##     lc <- TMtoLC(tms[[ii]])
+##     coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
+##     preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+##     a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=mean)
+##     med_res[ii,] <- a
+## }
+## model_error <- sqrt(apply(med_res,2,mean))
+## names(model_error) <- bands
+## tem$model_error <- model_error
+## tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filters
 
 
 
@@ -341,11 +397,21 @@ legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
 
 
-
-
+tem$rrmag <- rrmag
+tem$abs_mag <- function(p){
+    abs_mag <- tem$rrmag$c0 + tem$rrmag$p1*log10(p + 0.2) + tem$rrmag$p2*log10(p + 0.2)^2
+    names(abs_mag) <- tem$rrmag$bnd
+    return(abs_mag)
+}
 
 ## save template
 save(tem,file="../fit_template/template_sdss.RData")
+
+
+
+## input period, output absolute mag in each filter?
+## then subtract off absolute mag at each new period
+
 
 
 
