@@ -24,6 +24,11 @@ for(ii in 1:N){
 }
 
 
+###### TODO:
+## 1. estimate distances old way, compare to sesar, should see 10% scatter
+## 2. use sesar 2010 and estimated amplitudes to improve distance estimate
+## 3. how to present results, is this somehow accounting for period?
+
 
 coeff <- cbind(coeffs,periods,rss.n)
 colnames(coeff) <- c("mu","ebv","amp_g (p_to_p)","phi","period","MAR")

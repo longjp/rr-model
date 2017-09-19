@@ -178,10 +178,18 @@ where $\epsilon_{ib} \sim N(0,\sigma^2)$ where $i$ indexes star and $b$ indexes 
 
 This is a two factor (one factor band, one factor light curve) ANCOVA model (C is for covariance, $R_b$ and $p_i$ are continuous covariates) with an interaction between extinction and light curve ($\mu_i + E[B-V]_iR_b$) and between band and log period ($\beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2$).
 
-The model needs to be made identifiable. Two questions:
+A few problems with this model
 \begin{enumerate}
-\item Need to parameterize this model so it is identifiable. How can we preserve meaning of $\mu$ as distance modulus?
-\item How do we implement this model in \texttt{R}?
+\item $\beta_{0b}$ can only be determined up to a component which is orthogonal to $R_b$. In particular,
+  \begin{equation*}
+    \mu_i + E[B-V]_iR_b + \beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2 = \mu_i + (E[B-V]_i-1)R_b + \beta_{0b} + R_{b} + \beta_{1b}p_i + \beta_{2b}p_i^2
+    \end{equation*}
+\item $\beta_{0b}$ can only be parameterized with $B-1$ parameters because otherwise overparameterized with $\mu_i$ (this is the standard problem in 2--way ANOVA, essentially cannot determine both band absolute magnitudes and distance modulii without external data)
+\item Can also adjust the amount of dust in the direction of log periods. Specifically,
+  \begin{equation*}
+    \mu_i + E[B-V]_iR_b + \beta_{0b} + \beta_{1b}p_i + \beta_{2b}p_i^2 = \mu_i + (E[B-V]_i-cp_i)R_b + \beta_{0b} + R_{b} + (\beta_{1b}+cR_b)p_i + \beta_{2b}p_i^2
+  \end{equation*}
+  Same idea for $p_i^2$ term.
 \end{enumerate}
 
 \end{document}
