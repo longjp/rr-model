@@ -30,13 +30,16 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
     coeffs <- c(0,0,0,runif(1))
     rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
     rss <- rep(0,length(omegas))
+    betas <- tem$abs_mag(1/omegas,tem) ## obtain absolute magnitudes at all frequencies
     for(ii in 1:length(omegas)){
+        m_temp <- m - rep.int(betas[ii,],nb) ## correct for absolute magnitude
+        ##lc$mag <- lc$mag - rep.int(tem$betas,nb)
         for(jj in 1:NN){
-            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m,t,dust,weights,nb,
+            coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m_temp,t,dust,weights,nb,
                                    tem$template_funcs,tem$templated_funcs,use.errors,use.dust)
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
-        resid <- m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
+        resid <- m_temp - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
         rss[ii] <- min(sum(weights*resid^2),rss_max)
     }
     return(rss)
@@ -72,6 +75,8 @@ ComputeCoeffs <- function(lc,omega,tem,NN=20,use.errors=TRUE,use.dust=TRUE){
     t <- dat[[1]]$time
     weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
+    ##lc$mag <- lc$mag - rep.int(tem$betas,nb)
+    m <- m - rep.int(tem$abs_mag(1/omega,tem)[1,],nb)
     coeffs <- c(0,0,0,runif(1))
     J <- 0
     ## J prevents infinite loops
@@ -115,6 +120,7 @@ ComputeCoeffsPhase <- function(lc,omega,phi,tem,use.errors=TRUE,use.dust=TRUE){
     t <- dat[[1]]$time
     weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
+    m <- m - rep.int(tem$abs_mag(1/omega,tem)[1,],nb)
     coeffs <- AmpMuDustUpdate(phi,omega,m,t,dust,weights,nb,tem$template_funcs,use.errors,use.dust)
     return(c(coeffs,phi))
 }
@@ -135,7 +141,7 @@ ComputeCoeffsPhase <- function(lc,omega,phi,tem,use.errors=TRUE,use.dust=TRUE){
 ##              m  : vector of predicted magnitudes
 PredictSingleBand <- function(times,band,omega,coeffs,tem){
     t_temp <- (times*omega + coeffs[4]) %% 1.0
-    m <- (coeffs[1] + tem$betas[band] + coeffs[2]*tem$dust[band] +
+    m <- (coeffs[1] + tem$abs_mag(1/omega,tem)[1,band] + coeffs[2]*tem$dust[band] +
           coeffs[3]*tem$template_funcs[[band]](t_temp))
     return(m)
 }
@@ -209,6 +215,7 @@ ComputeRSSPhase <- function(lc,omega,tem,phis=(1:100)/100,use.errors=TRUE,use.du
     t <- dat[[1]]$time
     weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
+    m <- m - rep.int(tem$abs_mag(1/omega,tem)[1,],nb)
     rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
     rss <- rep(0,length(phis))
     for(ii in 1:length(phis)){
@@ -232,7 +239,7 @@ AugmentData <- function(lc,tem,use.errors){
     lc <- lc[order(lc$band),]
     nb <- table(lc$band)
     lc$dust <- rep.int(tem$dust,nb)
-    lc$mag <- lc$mag - rep.int(tem$betas,nb)
+    ##lc$mag <- lc$mag - rep.int(tem$betas,nb)
     lc$band <- NULL
     if(use.errors){
         lc$error <- sqrt(lc$error^2 + rep.int(tem$model_error,nb)^2) ## adds model error to photometric error
@@ -361,7 +368,7 @@ CheckTemLC <- function(tem,lc){
     }
     bs <- names(tem$dust)[names(tem$dust) %in% unique(lc$band)]
     if(length(bs) < length(tem$dust)){
-        tem$betas <- tem$betas[bs]
+        tem$betas <- tem$betas[,bs,drop=FALSE]
         tem$dust <- tem$dust[bs]
         tem$model_error <- tem$model_error[bs]
         tem$templates <- tem$templates[bs,]
