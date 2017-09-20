@@ -46,11 +46,11 @@ plotLC <- function(lc,p_est,coeffs,tem){
              lc_temp$mag+lc_temp$error,
              lc_temp$time,
              lc_temp$mag-lc_temp$error,col='grey')
-    ti <- (1:100)/100
-    ti <- c(ti,ti+1)
-    m <- PredictAllBand(ti,1,coeffs,tem)
+    ti <- seq(0,p_est,length.out=100)
+    ti <- c(ti,ti+p_est)
+    m <- PredictAllBand(ti,1/p_est,coeffs,tem)
     for(ii in 1:ncol(m)){
-        points(ti,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
+        points(ti/p_est,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
     }
 }
 
