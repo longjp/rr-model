@@ -317,15 +317,15 @@ names(tem$templated_funcs) <- bands
 
 ### should we scale the template correction by a?
 
-### TODO:
-###### why do plots show significant deviation from mean 0 in
-###### filters. are absolute magnitudes used wrong?
-## especially when apply(lc_grid,3,mean) is almost 0 for each filter
-
-
-
-
-
+## returns matrix with nrow=length(p) and ncol=ncol(tem$betas)
+## rows correspond to periods in p and columns are absolute
+## magnitudes
+tem$betas <- t(rrmag[,c("c0","p1","p2")])
+colnames(tem$betas) <- rrmag$bnd
+tem$abs_mag <- function(p,tem){
+    X <- cbind(1,log10(p + 0.2),log10(p + 0.2)^2)
+    return(X%*%tem$betas)
+}
 
 
 ## set model error initially to 0, so subsequent code runs
@@ -393,16 +393,6 @@ for(ii in 1:5){
 legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
 
-tem$betas <- t(rrmag[,c("c0","p1","p2")])
-colnames(tem$betas) <- rrmag$bnd
-
-## returns matrix with nrow=length(p) and ncol=ncol(tem$betas)
-## rows correspond to periods in p and columns are absolute
-## magnitudes
-tem$abs_mag <- function(p,tem){
-    X <- cbind(1,log10(p + 0.2),log10(p + 0.2)^2)
-    return(X%*%tem$betas)
-}
 
 ## save template
 save(tem,file="../fit_template/template_sdss.RData")
