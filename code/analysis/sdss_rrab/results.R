@@ -8,7 +8,7 @@ load("../../fit_template/template_sdss.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
 source("../funcs.R")
-source("../plot_funcs.R")
+source("../../common/plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_rrab.RData")
@@ -17,7 +17,8 @@ source("../params.R")
 unlink("figs",recursive=TRUE)
 dir.create("figs")
 
-coes <- matrix(0,nrow=length(tms),ncol=4)
+coes <- matrix(0,nrow=length(tms),ncol=5)
+coes[,5] <- periods
 
 ## ## colors for plotting
 ## bandpch <- 1:6
@@ -33,7 +34,7 @@ for(ii in 1:length(tms)){
     tm <- tms[[ii]]
     omega <- 1/periods[ii]
     coeffs <- ComputeCoeffs(TMtoLC(tm),omega,tem)
-    coes[ii,] <- coeffs
+    coes[ii,1:4] <- coeffs
     pdf(paste0("figs/",ii,".pdf"),height=12,width=8)
     par(mar=c(3,4,2,1),mfcol=c(5,1))
     dev <- vector("list",length(tm))
@@ -81,9 +82,9 @@ tab <- tab[,c(1,4)]
 names(tab) <- c("ID","dust")
 
 
+ID <- as.numeric(sub("LC_","",sub(".dat","",names(tms))))
+dust <- data.frame(ID,my_dust=coes[,2],mu=coes[,1],period=coes[,5])
 
-dust <- data.frame(as.numeric(sub("LC_","",sub(".dat","",names(tms)))),coes[,2],coes[,1],rss.n)
-names(dust) <- c("ID","my_dust","mu","rss")
 
 nrow(tab)
 nrow(dust)
@@ -109,6 +110,11 @@ plot(out$dust,out$my_dust*tem$dust['r'],
 abline(a=0,b=1)
 dev.off()
 
+pdf("dust_residual_versus_period.pdf",width=7,height=6)
+par(mar=c(5,5,1,1))
+plot(out$period,out$my_dust*tem$dust['r']-out$dust,xlab="Period of RRL",
+     ylab="Dust Error = Model Dust in r - Schlegel Dust in r",cex.lab=1.3)
+dev.off()
 
 ## make plots of best fitting and worst fitting light curves
 ords <- order(rss.n,decreasing=FALSE)
