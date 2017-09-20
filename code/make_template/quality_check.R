@@ -14,7 +14,6 @@ unlink("figs",recursive=TRUE)
 dir.create("figs")
 
 
-
 #### COMPUTE VARIOUS SOURCES OF MODEL ERROR
 
 ## MODEL ERROR: TOTAL
@@ -38,7 +37,7 @@ med_res <- vector("list",length(tms))
 for(ii in 1:length(med_res)){
     temp <- tms[[ii]]
     for(jj in 1:length(temp)){
-        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem$betas[jj]
+        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem$abs_mag(periods[ii],tem)[1,names(temp)[jj]]
     }
     lc <- TMtoLC(temp)
     coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
@@ -77,64 +76,6 @@ sqrt(median(unlist(med_res)))
 
 
 
-
-
-
-
-## find model error
-med_res <- vector("numeric",length(tms))
-for(ii in 1:length(med_res)){
-    lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    med_res[ii] <- median(abs(preds - lc[,3]))
-}
-
-
-print("total model error:")
-hist(med_res)
-median(med_res) ## 0.030333 seems reasonable for this number
-
-
-## find model error caused by shape and fixing amplitude
-med_res <- vector("numeric",length(tms))
-for(ii in 1:length(med_res)){
-    temp <- tms[[ii]]
-    for(jj in 1:length(temp)){
-        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem$betas[jj]
-    }
-    lc <- TMtoLC(temp)
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-    med_res[ii] <- median(abs(preds - lc[,3]))
-}
-
-print("model error caused by shape and fixing amplitude ratio:")
-hist(med_res)
-median(med_res) ## perfect mean offers only small advantage over actual model
-
-
-## find model error due to shape by fitting
-## model individually for each band/lc
-## this removes model error caused by mean and fixing amplitude ratio
-med_res <- vector("numeric",length(tms))
-for(ii in 1:length(med_res)){
-    lc <- TMtoLC(tms[[ii]])
-    bands <- unique(lc$band)
-    med_res <- vector("list",length(bands))
-    for(jj in 1:length(bands)){
-        temp <- lc[lc$band %in% bands[jj],]
-        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem,use.dust=FALSE)
-        preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
-        med_res[[ii]][[jj]] <- abs(preds - temp[,3])
-    }
-}
-
-print("model error caused only by shape:")
-hist(med_res,main="shape only")
-median(med_res) 
-
-
 ## how much error due only to photometry?
 med_res <- vector("numeric",length(tms))
 for(ii in 1:length(med_res)){
@@ -145,9 +86,6 @@ for(ii in 1:length(med_res)){
 print("photometric error:")
 hist(med_res)
 median(med_res)
-
-
-
 
 
 
@@ -210,8 +148,6 @@ for(ii in 1:length(bands)){
 
 
 median(abs(lc_temp[,3]))
-
-lc_temp[,4]
 
 median(abs(rnorm(n=length(lc_temp[,4]),mean=0,sd=lc_temp[,4])))
 
