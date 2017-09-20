@@ -37,14 +37,13 @@ hist(n_epochs)
 cut(n_epochs,breaks=c(5,10,15,20,25,30,Inf))
 
 
-a <- findInterval(n_epochs,c(10,15,20,25,30))
+a <- findInterval(n_epochs,c(9,15,20,25,30))
 b <- abs(period_est_des[,1]-periods)/periods < .01
 tapply(1*b,list(a),FUN=mean)
 table(a)
-tapply(1*b,list(a),FUN=sum)
 unique(a)
 ?findInterval
 
 
-sum(n_epochs <= 10)
-sum(n_epochs < 10)
+sum(n_epochs <= 15)
+sum(n_epochs < 15)
