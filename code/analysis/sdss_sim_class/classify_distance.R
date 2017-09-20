@@ -5,6 +5,7 @@ set.seed(1234)
 library('parallel')
 library('multiband')
 library('randomForest')
+library(L1pack)
 load("../../fit_template/template_sdss.RData")
 source("../../fit_template/fit_template.R")
 source("../../common/funcs.R")
@@ -172,11 +173,12 @@ table(predict(rf.fit),cl)
 
 
 ########## PLOT DISTANCES FOR LIGHTCURVES
-pdf("distance_comparison.pdf",width=7,height=7)
+##pdf("distance_comparison.pdf",width=7,height=7)
 to_use <- distance <= 120
 par(mar=c(5,5,1,1))
 x <- distance[cl=="rr" & to_use]
 y <- 10^((features[cl=="rr" & to_use,"mu"])/5 + 1)/1000
+a <- features[cl=="rr" & to_use,"a"]
 lim <- c(0,120)
 plot(x,y,
      xlab="Sesar 2010 Distance (kpc)",
@@ -188,7 +190,13 @@ error_budget <- 0.1
 lines(0:120,(1-error_budget)*(0:120),lty=2,lwd=2)
 lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
 legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
-dev.off()
+##dev.off()
+
+plot(a,x-y)
+## lm.fit <- lm(x-y~a)
+## abline(lm.fit)
+fit.l1 <- l1fit(a,x-y)
+abline(fit.l1$coeff,col='red')
 
 ## rr lyrae misclassified as non-rr lyrae tended to be further away, as expected
 cl_pred <- predict(rf.fit)
