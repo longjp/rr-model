@@ -29,36 +29,12 @@ coes[,5] <- periods
 
 
 ## plot all bands with best fit parameters, store in figs
-rss.n <- vector("list",length(tms))
 for(ii in 1:length(tms)){
     tm <- tms[[ii]]
     omega <- 1/periods[ii]
     coeffs <- ComputeCoeffs(TMtoLC(tm),omega,tem)
     coes[ii,1:4] <- coeffs
-    pdf(paste0("figs/",ii,".pdf"),height=12,width=8)
-    par(mar=c(3,4,2,1),mfcol=c(5,1))
-    dev <- vector("list",length(tm))
-    for(jj in names(tem$dust)){
-        pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
-            + coeffs[3]*tem$template_funcs[[jj]]((tem$temp_time + coeffs[4]) %% 1))
-        xlim <- range(tem$temp_time/omega)
-        ylim <- range(range(pred),tm[[jj]]$mag)
-        plot(tem$temp_time/omega,pred,type='l',xlab="Phase",ylab="Mag",ylim=rev(ylim),
-         xlim=xlim,main=paste0(jj," band"))
-        if(!is.null(tm[[jj]])){
-            points((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag)
-            segments((tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag+tm[[jj]]$error,
-            (tm[[jj]]$time %% (1/omega)),tm[[jj]]$mag-tm[[jj]]$error,
-            col='grey')
-        }
-        pred <- (coeffs[1] + tem$betas[jj] + coeffs[2]*tem$dust[jj]
-            + coeffs[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coeffs[4]) %% 1))
-        dev[[jj]] <- abs(pred - tm[[jj]][,2])
-    }
-    rss.n[[ii]] <- unlist(dev)
-    dev.off()
-}
-
+}    
 
 ## make all plots together
 for(ii in 1:length(tms)){
