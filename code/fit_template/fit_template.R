@@ -159,7 +159,7 @@ PredictSingleBand <- function(times,band,omega,coeffs,tem){
 ## value
 ##              m  : matrix of predictions, columns are bands, rows times
 PredictAllBand <- function(times,omega,coeffs,tem){
-    bands <- names(tem$betas)
+    bands <- colnames(tem$betas)
     m <- vapply(bands,function(x){PredictSingleBand(times,x,omega,coeffs,tem)},rep(0,length(times)))
     return(m)
 }
