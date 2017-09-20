@@ -332,24 +332,21 @@ names(tem$templated_funcs) <- bands
 tem$model_error <- rep(0,length(tem$dust))
 names(tem$model_error) <- names(tem$dust)
 
-tem$model_error <- tem$model_error + 2 ## lots of model error
 
-
-## TODO: turned off for now, turn on again later
 ## TODO: improve this by using different level of error
 ## in each filter, need to trust errors more before doing this
-## med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
-## for(ii in 1:nrow(med_res)){
-##     lc <- TMtoLC(tms[[ii]])
-##     coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
-##     preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
-##     a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=mean)
-##     med_res[ii,] <- a
-## }
-## model_error <- sqrt(apply(med_res,2,mean))
-## names(model_error) <- bands
-## tem$model_error <- model_error
-## tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filters
+med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
+for(ii in 1:nrow(med_res)){
+    lc <- TMtoLC(tms[[ii]])
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem,use.errors=FALSE)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    a <- tapply((preds - lc[,3])^2 - lc[,4]^2,INDEX=lc[,2],FUN=mean)
+    med_res[ii,] <- a
+}
+model_error <- sqrt(apply(med_res,2,mean))
+names(model_error) <- bands
+tem$model_error <- model_error
+tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filters
 
 
 
