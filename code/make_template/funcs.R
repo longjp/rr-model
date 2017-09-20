@@ -3,8 +3,9 @@
 ## creates a new band with name newb
 ## newb is created as a copy of oldb
 AddBand <- function(tem,newb,oldb){
-    tem$betas[newb] <- tem$betas[oldb]
-    tem$betas <- tem$betas[order(names(tem$betas))]
+    tem$betas <- cbind(tem$betas,tem$betas[,oldb])
+    colnames(tem$betas)[ncol(tem$betas)] <- newb
+    tem$betas <- tem$betas[,order(colnames(tem$betas))]
     ## dust
     tem$dust[newb] <- tem$dust[oldb]
     tem$dust <- tem$dust[order(names(tem$dust))]

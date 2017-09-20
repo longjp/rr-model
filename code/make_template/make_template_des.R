@@ -26,9 +26,8 @@ for(ii in 1:length(tms_sdss)){
 }
 
 
-### TODO: the des l.c.s do not match fits that well
-## plot folded light curve
-ii <- 2
+## plot folded light curve for des, sdss
+ii <- 1
 par(mfcol=c(2,1))
 plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem)
 plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
@@ -40,7 +39,7 @@ plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 ### add Y band template that is identical to z
 tem <- AddBand(tem,"Y","z")
 
-
+tem$betas
 
 ## set dust to DES values
 extc <- read.table("extc.dat",stringsAsFactors=FALSE)
@@ -49,9 +48,14 @@ tem$dust[extc$V2] <- extc$V3
 
 
 
+
+
+
 ###
 ### MODEL RESIDUAL ANALYSIS
 ###
+
+### TODO: reestimate c0, p1, and p2 terms for ALL bands? since these coefficients are for SDSS
 
 
 ### STEP 1: compute residuals as a function of phase by band
