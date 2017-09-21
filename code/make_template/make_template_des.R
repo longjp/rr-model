@@ -7,6 +7,7 @@ source("../common/funcs.R")
 source("../common/plot_funcs.R")
 source("funcs.R")
 library(zoo)
+library(L1pack)
 
 ## for storing plots
 plot_foldername <- "figs"
@@ -39,8 +40,6 @@ plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 ### add Y band template that is identical to z
 tem <- AddBand(tem,"Y","z")
 
-tem$betas
-
 ## set dust to DES values
 extc <- read.table("extc.dat",stringsAsFactors=FALSE)
 extc <- extc[extc[,1]=="DES",c(2,3)]
@@ -52,93 +51,137 @@ tem$dust[extc$V2] <- extc$V3
 
 
 ###
-### MODEL RESIDUAL ANALYSIS
+### DETERMINE PERIOD-ABS MAG DEPENDENCE FOR DES BANDS
 ###
 
-### TODO: reestimate c0, p1, and p2 terms for ALL bands? since these coefficients are for SDSS
-
-
-### STEP 1: compute residuals as a function of phase by band
+### compute residuals as a function of band
 lcs_resid <- lcs_des
 for(ii in 1:length(lcs_des)){
     omega_est <- 1/periods[ii]
     lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
-    lcs_resid[[ii]][,3] <- lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem)
+    lcs_resid[[ii]][,3] <- (lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem) +
+                            tem$abs_mag(1/omega_est,tem)[1,][lcs_des[[ii]]$band])
 }
 
-lcs_resid <- do.call(rbind,lcs_resid)
+tms_resid <- lapply(lcs_resid,LCtoTM)
 
-bs <- unique(lcs_resid$band)
+### plot residuals as a function of band and estimate function
+bands <- unique(unlist(lapply(tms_resid,names)))
+betas_des <- matrix(0,nrow=3,ncol=length(bands))
+rownames(betas_des) <- rownames(tem$betas)
+colnames(betas_des) <- bands
 
-abs_mag_shift <- rep(0,length(bs))
-names(abs_mag_shift) <- names(bs)
-
-for(ii in 1:length(bs)){
-    lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
-    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
-    pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_old.pdf"))
-    plot(0,0,ylim=c(.3,-.3),
-         xlab="phase",ylab="magnitude residual",
-         xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
-    lc1 <- lcs_resid_band
-    lc1 <- lc1[order(lc1[,1]),]
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    points(lc_temp$time,lc_temp$mag,
-           col="#00000030")
-
-    out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
-    abline(h=0,lwd=2)
-    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
-    points(lc_temp[,1],out,type='l',col='red',lwd=2)
-    dev.off()
+pdf("period_mag_des.pdf",width=12,height=8)
+par(mfcol=c(2,3),mar=c(5,5,3,1))
+for(ii in 1:length(bands)){
+    mags <- vector("numeric",length(tms_resid))
+    band <- bands[ii]
+    for(jj in 1:length(mags)){
+        temp <- tms_resid[[jj]][[band]]
+        if(is.null(temp)){
+            mags[jj] <- NA
+        } else {
+            mags[jj] <- median(temp$mag)
+        }
+    }
+    plot(periods,mags,main=band,ylim=c(.25,.9),cex.lab=1.3,cex.main=1.5,
+         ylab="Absolute Magnitude",xlab="Period")
+    ## plot fits to sdss
+    vec <- tem$betas[,band]
+    ti <- seq(min(periods),max(periods),length.out=100)
+    points(ti,vec[1] + vec[2]*log10(ti+.2) + vec[3]*log10(ti+.2)^2,type='l',col="red",lwd=2)
+    ## estimate fits to des, plot
+    X <- cbind(1,log10(periods+.2),log10(periods+.2)^2)
+    betas_des[,ii] <- lm(mags~X-1)$coefficients
+    points(ti,(cbind(1,log10(ti+.2),log10(ti+.2)^2)%*%betas_des[,ii,drop=FALSE])[,1],type='l',col='black',lwd=2)
 }
+plot(0,0,col=0,axes=F,xlab="",ylab="")
+legend("center",c("DES Median Mag, Dust and Distance Corrected","Given Relationships for SDSS","Fits to DES"),
+       col=c("black","red","black"),lty=c(0,1,1),pch=c(1,-1,-1),lwd=2,cex=1.3)
+dev.off()
 
 
 
-### STEP 2: shift absolute magnitudes to make mean 0
-## shift absolute magnitudes to mean 0
-tem$betas[bs] <- tem$betas[bs] + abs_mag_shift
+
+
+## store new DES values for betas
+tem$betas <- betas_des
 
 
 
-### STEP 3: rerun step 1, residuals should now have mean 0
-lcs_resid <- lcs_des
-for(ii in 1:length(lcs_des)){
-    omega_est <- 1/periods[ii]
-    lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
-    lcs_resid[[ii]][,3] <- lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem)
-}
+## lcs_resid <- do.call(rbind,lcs_resid)
 
-lcs_resid <- do.call(rbind,lcs_resid)
+## bs <- unique(lcs_resid$band)
 
-bs <- unique(lcs_resid$band)
+## abs_mag_shift <- rep(0,length(bs))
+## names(abs_mag_shift) <- names(bs)
 
-abs_mag_shift <- rep(0,length(bs))
-names(abs_mag_shift) <- names(bs)
+## for(ii in 1:length(bs)){
+##     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+##     abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
+##     pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_old.pdf"))
+##     plot(0,0,ylim=c(.3,-.3),
+##          xlab="phase",ylab="magnitude residual",
+##          xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
+##     lc1 <- lcs_resid_band
+##     lc1 <- lc1[order(lc1[,1]),]
+##     lc2 <- lc1
+##     lc2[,1] <- lc1[,1] + 1
+##     lc_temp <-rbind(lc1,lc2)
+##     points(lc_temp$time,lc_temp$mag,
+##            col="#00000030")
 
-for(ii in 1:length(bs)){
-    lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
-    abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
-    pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_new.pdf"))
-    plot(0,0,ylim=c(.3,-.3),
-         xlab="phase",ylab="magnitude residual",
-         xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
-    lc1 <- lcs_resid_band
-    lc1 <- lc1[order(lc1[,1]),]
-    lc2 <- lc1
-    lc2[,1] <- lc1[,1] + 1
-    lc_temp <-rbind(lc1,lc2)
-    points(lc_temp$time,lc_temp$mag,
-           col="#00000030")
+##     out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+##     abline(h=0,lwd=2)
+##     abline(h=abs_mag_shift[ii],col='blue',lwd=2)
+##     points(lc_temp[,1],out,type='l',col='red',lwd=2)
+##     dev.off()
+## }
 
-    out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
-    abline(h=0,lwd=2)
-    abline(h=abs_mag_shift[ii],col='blue',lwd=2)
-    points(lc_temp[,1],out,type='l',col='red',lwd=2)
-    dev.off()
-}
+
+
+## ### STEP 2: shift absolute magnitudes to make mean 0
+## ## shift absolute magnitudes to mean 0
+## tem$betas[bs] <- tem$betas[bs] + abs_mag_shift
+
+
+
+## ### STEP 3: rerun step 1, residuals should now have mean 0
+## lcs_resid <- lcs_des
+## for(ii in 1:length(lcs_des)){
+##     omega_est <- 1/periods[ii]
+##     lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
+##     lcs_resid[[ii]][,3] <- lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem)
+## }
+
+## lcs_resid <- do.call(rbind,lcs_resid)
+
+## bs <- unique(lcs_resid$band)
+
+## abs_mag_shift <- rep(0,length(bs))
+## names(abs_mag_shift) <- names(bs)
+
+## for(ii in 1:length(bs)){
+##     lcs_resid_band <- lcs_resid[lcs_resid$band==bs[ii],]
+##     abs_mag_shift[ii] <- mean(lcs_resid_band[,3])
+##     pdf(paste0(plot_foldername,"/residuals_",bs[ii],"_new.pdf"))
+##     plot(0,0,ylim=c(.3,-.3),
+##          xlab="phase",ylab="magnitude residual",
+##          xlim=c(0,2),xaxs='i',col=0,main=paste0(bs[ii]," band residuals"))
+##     lc1 <- lcs_resid_band
+##     lc1 <- lc1[order(lc1[,1]),]
+##     lc2 <- lc1
+##     lc2[,1] <- lc1[,1] + 1
+##     lc_temp <-rbind(lc1,lc2)
+##     points(lc_temp$time,lc_temp$mag,
+##            col="#00000030")
+
+##     out <- rollmedian(lc_temp[,3],51,na.pad=TRUE)
+##     abline(h=0,lwd=2)
+##     abline(h=abs_mag_shift[ii],col='blue',lwd=2)
+##     points(lc_temp[,1],out,type='l',col='red',lwd=2)
+##     dev.off()
+## }
 
 
 
@@ -147,6 +190,8 @@ for(ii in 1:length(bs)){
 ####
 #### SAVE OUTPUT
 ####
+
+## TODO: update RemoveBand so it does not delete betas
 
 ## get rid of u band
 tem <- RemoveBand(tem,"u")
