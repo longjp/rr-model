@@ -49,8 +49,10 @@ coeffs=ComputeCoeffs(lc,omega,r.tem) ## parameter estimates of best fit frequenc
 ## the output is [distance modulus (mu),amount of dust (E[B-V]),amplitude (a),phase (rho)]
 # >>> coeffs
 # R object with classes: ('numeric',) mapped to:
-# <FloatVector - Python:0x7f045e5fbac8 / R:0x68acfa0>
-# [19.317127, 0.058982, 1.215803, 0.201546]
+# <FloatVector - Python:0x7f21066690c8 / R:0x6230398>
+# [19.120615, 0.112804, 1.230939, 0.172301]
+# >>> omega
+# 1.8413499999980392
 # >>> pest
 # 0.543079805578008
 
@@ -67,16 +69,18 @@ for i in range(0,len(class_colours)):
 
 plt.legend(recs,cols.keys(),loc=4)
 
+## TODO: use R function to directly calculate predicted magnitudes
+
 ### add template fits
-gamma = r.tem[2]
+gamma = r.tem[1]
 gamma = np.resize(gamma,(5,100))
 t=(np.arange(100)/100.)*pest
 ords=np.argsort((t - coeffs[3]*pest) % pest)
+abs_mag = r.tem[7](pest,r.tem) ## get absolute magnitudes at pest
 for ii in np.arange(gamma.shape[0]):
-    m=coeffs[0] + r.tem[0][ii] + r.tem[1][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
+    m=coeffs[0] + abs_mag[ii] + r.tem[0][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
     plt.plot(t,m[ords],'k',color=cols[r.tem[0].names[ii]])
-
-
+    
 plt.show()
 
 ######## plot unfolded (raw light curve)
@@ -98,7 +102,7 @@ plt.show()
 
 
 
-###### FIT MODEL without dust
+# ###### FIT MODEL without dust
 NN = IntVector(np.array([5],dtype='int'))
 use_errors = BoolVector(np.array([True],dtype='bool'))
 use_dust = BoolVector(np.array([False],dtype='bool'))
@@ -124,16 +128,19 @@ plt.legend(recs,cols.keys(),loc=4)
 
 
 ### add template fits, means will be off for light curves with a lot of dust
-gamma = r.tem[2]
+gamma = r.tem[1]
 gamma = np.resize(gamma,(5,100))
 t=(np.arange(100)/100.)*pest
 ords=np.argsort((t - coeffs[3]*pest) % pest)
+abs_mag = r.tem[7](pest,r.tem) ## get absolute magnitudes at pest
 for ii in np.arange(gamma.shape[0]):
-    m=coeffs[0] + r.tem[0][ii] + r.tem[1][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
+    m=coeffs[0] + abs_mag[ii] + r.tem[0][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
     plt.plot(t,m[ords],'k',color=cols[r.tem[0].names[ii]])
 
 
 plt.show()
+
+
 
 
 
