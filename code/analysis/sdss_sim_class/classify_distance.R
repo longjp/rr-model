@@ -42,8 +42,9 @@ for(ii in 1:N){
     dev2 <- rep(0,length(tm))
     dev3 <- rep(0,length(tm))
     for(jj in 1:length(tm)){
-        pred <- (coes[1] + tem$betas[jj] + coes[2]*tem$dust[jj]
-            + coes[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coes[4]) %% 1))
+        pred <- PredictSingleBand(tm[[jj]][,1],names(tm)[jj],omega,coes,tem)
+        ## pred <- (coes[1] + tem$betas[jj] + coes[2]*tem$dust[jj]
+        ##     + coes[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coes[4]) %% 1))
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
         dev2[jj] <- sum(abs((pred - tm[[jj]][,2])/tm[[jj]][,3]))
         dev3[jj] <- sum(abs((pred - tm[[jj]][,2])/(tm[[jj]][,3] + .2)))
