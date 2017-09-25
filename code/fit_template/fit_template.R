@@ -33,7 +33,6 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
     betas <- tem$abs_mag(1/omegas,tem) ## obtain absolute magnitudes at all frequencies
     for(ii in 1:length(omegas)){
         m_temp <- m - rep.int(betas[ii,],nb) ## correct for absolute magnitude
-        ##lc$mag <- lc$mag - rep.int(tem$betas,nb)
         for(jj in 1:NN){
             coeffs <- NewtonUpdate(coeffs[4],omegas[ii],m_temp,t,dust,weights,nb,
                                    tem$template_funcs,tem$templated_funcs,use.errors,use.dust)
