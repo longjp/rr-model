@@ -28,7 +28,7 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
     weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
     coeffs <- c(0,0,0,runif(1))
-    rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
+    ##rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
     rss <- rep(0,length(omegas))
     betas <- tem$abs_mag(1/omegas,tem) ## obtain absolute magnitudes at all frequencies
     for(ii in 1:length(omegas)){
@@ -39,7 +39,8 @@ FitTemplate <- function(lc,omegas,tem,NN=5,use.errors=TRUE,use.dust=TRUE){
         }
         gammaf <- ConstructGamma(t,nb,coeffs[4],omegas[ii],tem$template_funcs)
         resid <- m_temp - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
-        rss[ii] <- min(sum(weights*resid^2),rss_max)
+        ##rss[ii] <- min(sum(weights*resid^2),rss_max)
+        rss[ii] <- sum(weights*resid^2)
     }
     return(rss)
 }
