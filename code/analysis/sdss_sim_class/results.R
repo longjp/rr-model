@@ -91,3 +91,4 @@ for(ii in 1:length(tms)){
     plotLC(lc,p_est,coeffs,tem,main=NULL,tem_only=TRUE)
     dev.off()
 }
+
