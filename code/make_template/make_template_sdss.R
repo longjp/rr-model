@@ -51,7 +51,7 @@ for(ii in 1:Nlc){
 
 
 
-## compute mean mag in each band / lc
+## ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
 pdf("figs/band_means.pdf")
 pairs(m)
@@ -69,11 +69,6 @@ rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
 
-## lpmed <- log10(median(periods))
-## betas <- rrmag$c0 + rrmag$p1*(lpmed + 0.2) + rrmag$p2*(lpmed + 0.2)^2
-## names(betas) <- rrmag$bnd
-
-
 ## absolute mag period dependence
 betasM <- matrix(0,nrow=length(periods),ncol=5)
 for(ii in 1:length(periods)){
@@ -82,24 +77,25 @@ for(ii in 1:length(periods)){
 colnames(betasM) <- rrmag$bnd
 
 
+## m <- matrix(0,nrow=length(tms),ncol=length(bands))
+## for(ii in 1:length(bands)){
+##     m[,ii] <- vapply(tms,function(x){mean(x[[bands[ii]]][,2])},c(0))
+## }
+
+
+
 ## estimate ebv and mu for each lc
 rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-
-## why not make betas depend on period and subtract off a different period
-## each time
+d_val <- matrix(0,nrow=nrow(m),ncol=2)
 m_shift <- m - betasM
 for(ii in 1:nrow(m)){
-    rs[ii,] <- lm(m_shift[ii,]~dust)$residuals
+    lm.fit <- lm(m_shift[ii,]~dust)
+    rs[ii,] <- lm.fit$residuals
+    d_val[ii,] <- lm.fit$coefficients
 }
 
 head(rs)
 median(abs(rs))
-
-
-d_val <- matrix(0,nrow=nrow(m),ncol=2)
-for(ii in 1:nrow(m)){
-    d_val[ii,] <- lm(m_shift[ii,]~dust)$coefficients
-}
 colnames(d_val) <- c("mu","my_dust")
 d_val <- data.frame(ID=names(tms),d_val)
 
@@ -120,6 +116,9 @@ pdf("distance_comparison.pdf")
 par(mar=c(5,5,1,1))
 plot(dust_comp$dist,dust_comp$my_dist,xlim=c(5,70),ylim=c(5,70),
      xlab="Sesar Distance",ylab="Model Distance - New",cex.lab=1.3)
+abline(a=0,b=1)
+abline(a=0,b=1.05)
+abline(a=0,b=.95)
 dev.off()
 
 
@@ -132,8 +131,6 @@ abline(a=0,b=1)
 dev.off()
 
 
-
-#### NOTE: CORRELATION IN RESIDUALS FOR G AND U APPEARS RELATED TO PERIOD
 
 ## make lc_grid mean 0 for each band, source
 for(ii in 1:Nlc){
@@ -394,8 +391,88 @@ legend("bottomleft",bands,col=1:length(bands),lty=1:length(bands),lwd=4,cex=1.5)
 dev.off()
 
 
+
+
+
+### compute residuals as a function of band
+lcs <- lapply(tms,TMtoLC)
+lcs_resid <- lcs
+for(ii in 1:length(lcs)){
+    omega_est <- 1/periods[ii]
+    coeffs <- ComputeCoeffs(lcs[[ii]],omega_est,tem)
+    lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[4]) %% 1.0
+    lcs_resid[[ii]][,3] <- (lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs,tem) +
+                            tem$abs_mag(1/omega_est,tem)[1,][lcs[[ii]]$band])
+}
+
+tms_resid <- lapply(lcs_resid,LCtoTM)
+
+
+
+bands <- unique(unlist(lapply(tms_resid,names)))
+betas_est <- matrix(0,nrow=3,ncol=length(bands))
+rownames(betas_est) <- rownames(tem$betas)
+colnames(betas_est) <- bands
+
+pdf("period_mag_sdss.pdf",width=12,height=8)
+par(mfcol=c(2,3),mar=c(5,5,3,1))
+for(ii in 1:length(bands)){
+    mags <- vector("numeric",length(tms_resid))
+    band <- bands[ii]
+    for(jj in 1:length(mags)){
+        temp <- tms_resid[[jj]][[band]]
+        if(is.null(temp)){
+            mags[jj] <- NA
+        } else {
+            mags[jj] <- median(temp$mag)
+        }
+    }
+    plot(periods,mags,main=band,cex.lab=1.3,cex.main=1.5,
+         ylab="Absolute Magnitude",xlab="Period")
+    ## plot fits to sdss
+    vec <- tem$betas[,band]
+    ti <- seq(min(periods),max(periods),length.out=100)
+    points(ti,vec[1] + vec[2]*log10(ti+.2) + vec[3]*log10(ti+.2)^2,type='l',col="red",lwd=2)
+    ## estimate fits to sdss, plot
+    X <- cbind(1,log10(periods+.2),log10(periods+.2)^2)
+    betas_est[,ii] <- lm(mags~X-1)$coefficients
+    points(ti,(cbind(1,log10(ti+.2),log10(ti+.2)^2)%*%betas_est[,ii,drop=FALSE])[,1],type='l',col='black',lwd=2)
+}
+plot(0,0,col=0,axes=F,xlab="",ylab="")
+legend("center",c("SDSS Median Mag, Dust and Distance Corrected","Given Relationships for SDSS","Fits to SDSS"),
+       col=c("black","red","black"),lty=c(0,1,1),pch=c(1,-1,-1),lwd=2,cex=1.3)
+dev.off()
+
+
+
+
+#### CONSTRUCT OLD TEMPLATE, NO PERIOD-ABS MAG DEPENDENCE
+## find betas at median period, old template style
+pmed <- median(periods)
+betas_fixed <- rrmag$c0 + rrmag$p1*(log10(pmed) + 0.2) + rrmag$p2*(log10(pmed) + 0.2)^2
+names(betas_fixed) <- rrmag$bnd
+
+
+tem_old <- tem
+tem_old$pmed <- pmed
+tem_old$abs_mag <- function(p,tem){
+    p <- rep(tem$pmed,length(p)) ## ignore period inputs, use median
+    X <- cbind(1,log10(p + 0.2),log10(p + 0.2)^2)
+    return(X%*%tem$betas)
+}
+
+## testing template functions
+tem$abs_mag(0.5,tem)
+tem$abs_mag(0.6,tem)
+tem$abs_mag(median(periods),tem)
+tem$abs_mag(c(0.5,.6,median(periods)),tem)
+tem_old$abs_mag(0.5,tem_old)
+tem_old$abs_mag(0.6,tem_old)
+tem_old$abs_mag(c(0.5,0.6),tem_old)
+
+
 ## save template
-save(tem,file="../fit_template/template_sdss.RData")
+save(tem,tem_old,file="../fit_template/template_sdss.RData")
 
 ## input period, output absolute mag in each filter?
 ## then subtract off absolute mag at each new period
