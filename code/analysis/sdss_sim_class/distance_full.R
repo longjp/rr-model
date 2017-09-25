@@ -25,6 +25,7 @@ dir.create("figs")
 N <- sum(cl=="rr")
 
 
+
 ## fraction of times period is best
 print("accuracies, top period:")
 est <- period_est_FULL[,1] ## just use best fit period
@@ -36,8 +37,6 @@ print(paste("0.01%:",mean(abs((periods[1:N] - est[1:N])/periods[1:N]) < 0.0001))
 plot(periods[1:N],est[1:N],xlim=c(.2,1),ylim=c(.2,1))
 
 
-
-### QUESTION: WHY does period_est_FULL have NA values?
 
 ###### estimate coefficients
 N <- sum(cl=="rr")
