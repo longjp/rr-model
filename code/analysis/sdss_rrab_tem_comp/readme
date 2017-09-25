@@ -1,0 +1,8 @@
+# this pipeline compares distances, dust, and period estimation
+# accuracy for
+# 1. old templates: no dependence of absolute mag on period
+# 2. new templates: dependence of absolute mag on period
+#
+# on data sets
+# 1. well sampled sdss stripe 82 rrl
+# 2. down sampled sdss stripe 82 rrl
