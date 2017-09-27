@@ -139,12 +139,29 @@ There are degeneries in the model in the sense that different sets of parameters
     \beta_{0b} + E[B-V]_iR_b = (\beta_{0b} + cR_b) + (E[B-V]_i-c)R_b
   \end{equation*}
   Thus systematic biases in $E[B-V]_i$ may be due to incorrect $\beta_{0b}$ values.
-\item 
+\item $\mu$ and $\beta_{1b}$,$\beta_{2b}$: One can alter all of the $\mu_i$ and all of the $\beta_{1b}$ or $\beta_{2b}$. Specifically for any $c$:
+  \begin{equation*}
+    \mu_i + \beta_{1b}x_i = (\mu_i + cx_i) + (\beta_{1b}-c)x_i
+  \end{equation*}
+  This would produce distance modulli which are biased in the ``direction''
+  \begin{equation*}
+    x_i=\log_{10}(p_i+0.2).
+  \end{equation*}
+  The same degeneracy holds for $\beta_{02}$ and $x_i^2$.
 \end{enumerate}
 
 \section{Comparison}
 \label{sec:compare}
 
+For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fix the values of $\beta_{0b}$, $\beta_{1b}$, and $\beta_{2b}$. Once these values have been fixed, all degeneracies are gone and we can estimate the $\gamma_b$ values using well--sampled RRL data and then for any given light curve estimate the vector of parameters $(\mu_i,\text{E[B-V]}_i,a_i,p_i,\phi_i)$. We obtain RRL parameter fits using two sets of $\beta$ parameters:
+\begin{itemize}
+\item \underline{Period Dependent Abs Mag:} Lucas set a set of $\beta$ values. This is contained in \texttt{rrmag.dat} on the project website.
+\item \underline{Fixed Absolute Mag (Old Templates):} This is the method Katelyn is currently using. The median period for a set a few hundered RRL is $\approx 0.59$. Using the \texttt{rrmag.dat} values we compute
+  \begin{equation*}
+    M_b(0.59) = (u=1.73,g=0.64,r=0.49,i=0.48,z=0.51)
+  \end{equation*}
+  This is the absolute magnitude used for fitting at \underline{all} periods in the grid.
+\end{itemize}
 
 \section{Questions}
 \label{sec:questions}
