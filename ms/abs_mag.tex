@@ -153,7 +153,7 @@ There are degeneries in the model in the sense that different sets of parameters
 \section{Comparison}
 \label{sec:compare}
 
-For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fix the values of $\beta_{0b}$, $\beta_{1b}$, and $\beta_{2b}$. Once these values have been fixed, all degeneracies are gone and we can estimate the $\gamma_b$ values using well--sampled RRL data and then for any given light curve estimate the vector of parameters $(\mu_i,\text{E[B-V]}_i,a_i,p_i,\phi_i)$. We obtain RRL parameter fits using two sets of $\beta$ parameters:
+For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fix the values of $\beta_{0b}$, $\beta_{1b}$, and $\beta_{2b}$. Once these values have been fixed, all degeneracies are gone and we can estimate the $\gamma_b$ values using well--sampled RRL data. Then for any given light curve we can estimate the vector of parameters $(\mu_i,\text{E[B-V]}_i,a_i,p_i,\phi_i)$. We obtain RRL parameter fits using two sets of $\beta$ parameters:
 \begin{itemize}
 \item \underline{Period Dependent Abs Mag:} The file \texttt{rrmag.dat} on the project website contains a set of $\beta$ values. When fitting for the $5$ RRL specific parameter on a grid of periods, the absolute magnitude is computed for each period in the grid and subtracted off the observed magnitudes.
 \item \underline{Fixed Absolute Mag (Old Templates):} This is the method Katelyn is currently using. The median period for a set a few hundred well--sampled RRL is $\approx 0.59$. Using the \texttt{rrmag.dat} $\beta$ values we compute
@@ -164,15 +164,20 @@ For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fi
 \end{itemize}
 The fixed absolute magnitude method was used because the original fitting code could only use fixed absolute magnitudes. The choice of $M_b(0.59)$ was used because this was the absolute magnitude for a typical RRL. The updated code can use any period, absolute magnitude relationship (fixed or not).
 
-We fit these two templates on 1) \underline{well--sampled} SDSS Stripe 82 RRL and 2) downsampled (total RRL). We compare the fits based on three metrics:
+We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsampled SDSS Stripe 82 RRL. We compare the fits based on three metrics:
 \begin{enumerate}
-\item Period estimation accuracy: Model estimated periods are compared to Sesar 2010 reported periods. These periods appear to be very close to correct.
-\item Distance: Model estimated distances are compared to the Sesar 2010 distance estimates. Sesar claims XXX level of accuracy. I am not certain that is accounts for all sources of uncertainty. \todo{note on how sesar computes, which equations}
-\item Dust: Model estimated extinction in $r--band$ ($\text{E[B-V]}_iR_r$) is compared to values reported by Sesar from Schlegel, \todo{see XXX}.
+\item \underline{Period estimation:} Model estimated periods are compared to Sesar 2010 reported periods. Sesar 2010 periods are all very close to correct.
+\item \underline{Distance:} Model estimated distances are compared to the Sesar 2010 distance estimates. Sesar discusses distance determination and uncertainty in Section 4.1. ``The estimated fractional error in the heliocentric distance is 0.06.''
+\item \underline{Dust:} Model estimated extinction in r--band ($\text{E[B-V]}_iR_r$) is compared to values reported by Sesar 2010 (Table 3) which are taken from Schlegel et. al. 1998.
 \end{enumerate}
 
 \section{Questions}
 \label{sec:questions}
+
+\begin{enumerate}
+\item circularity of argument in terms of estimating distance parameters
+\item issue with estimating distance from mean mag or after fitting model
+\end{enumerate}
 
 
 
