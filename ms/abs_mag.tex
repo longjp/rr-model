@@ -78,34 +78,76 @@
 
 \section{Model}
 
-Let $m_{ib}(t)$ be the magnitude of light curve $i$ in band $b$ at time $t$. This function is composed of a distance modulus, an absolute magnitude, dust, and periodic component varying in time. Specifically:
+Let $m_{ib}(t)$ be the magnitude of light curve $i$ in band $b$ at time $t$. Our model is:
 \begin{equation*}
-m_{ib}(t) = \mu_i + \beta_{b}(p) + \text{E[B-V]}_i\delta_b + a\gamma_b(t/p)
+m_{ib}(t) = \mu_i + M_{b}(p_i) + \text{E[B-V]}_iR_b + a_i\gamma_b(t/p_i + \phi_i)
 \end{equation*}
-where
+where the \underline{lightcurve specific} terms (indexed by $i$) are 
 \begin{align*}
   \mu_i &= \text{ distance modulus }\\
-  \beta_{b}(p) &= \text{ absolute magnitude, dependent on period } p\\
   \text{E[B-V]}_i &= \text{ extinction due to dust }\\
-  \delta_b &= \text{ change in magnitude in band $b$ caused by unit of dust}\\
-  a &= \text{amplitude, shared across all bands}\\
-  p &= \text{period}\\
+  a_i &= \text{amplitude, shared across all bands}\\
+  p_i &= \text{period}\\
+  \phi_i &= \text{phase}
+\end{align*}
+and the \underline{global parameters} common to all RRL are
+\begin{align*}
+  M_{b}(p) &= \text{ absolute magnitude in band $b$, dependent on period } p\\
+  R_b &= \text{ extinction law parameter in band $b$}\\
   \gamma_b &= \text{shape of lightcurve in band $b$}
 \end{align*}
-The $\delta_b$ terms are assumed known throughout this work. The shape terms of the light curve, $\gamma_b$ are mean 0 period $1$ functions. 
-
-
-$\beta_b$ is the mean offset for band $b$, $\alpha_i$ is the mean brightness of light curve $i$, $d_i$ is the amount of dust, $\delta_b$ is the extinction due to dust in band $b$, and $\sigma_{ib} \sim N(0,\sigma^2)$ independent. We can rewrite the model in vector form as
-\begin{equation*}
-\V{m}_i = \V{\beta} + \alpha_i \V{1} + d_i \V{\delta} + \V{\sigma}_i
-\end{equation*}
-where $\V{\sigma}_i \sim N(0,\sigma^2I)$. The model is not identifiable. For example,
+$R_b$ is considered known. $\gamma_b$ is a mean $0$, period $1$ function, i.e.
 \begin{align*}
-\V{m}_i &= (\V{\beta} + c\V{\delta}) + \alpha_i \V{1} + (d_i - c) \V{\delta} + \V{\sigma}_i\\
-\V{m}_i &= (\V{\beta} - c\V{1}) + (\alpha_i + c)\V{1} + d_i\V{\delta} + \V{\sigma}_i\\
-\V{m}_i &= \V{\beta} + (\alpha_i - d_i)\V{1} + d_i(\V{\delta} + 1) + \V{\sigma}_i\\
+  &\int_0^1 \gamma_b(t) dt = 0 \text{ for all } b\\
+  &\gamma_b(t) = \gamma_b(t + 1) \text{ for all } t \text{ and } b.
 \end{align*}
-For identifiability we assume $\V{\delta} \perp \V{1}$, $\V{\beta} \perp \V{1}$, and $\V{\delta} \perp \V{\beta}$.
+This note concerns how we model the absolute magnitude terms $M_b(p)$. Let $\bar{m}_{ib}$ be the mean absolute magnitude for RRL $i$ in band $b$, specifically
+\begin{equation*}
+  \bar{m}_{ib} = \int_0^p m_{ib}(t) dt.
+\end{equation*}
+Since the $\gamma_b$ terms are mean $0$ we have
+\begin{equation*}
+\bar{m}_{ib} = \mu_i + M_{b}(p) + \text{E[B-V]}_iR_b
+\end{equation*}
+$M_{b}(p)$ is assumed to be a quadratic function of log period in each band. Let $x_i = \log_{10}(p_i + 0.2)$. Specifically
+\begin{equation*}
+  M_{b}(p) = \beta_{0b} + \beta_{1b}x_i  + \beta_{2b}x_i^2
+\end{equation*}
+
+In Section \ref{sec:nonident} we discuss some degeneracies among the model parameters which prevent a straigtforward estimation of all terms. In Section \ref{sec:compare} we compare performance (period, distance, dust estimation accuracy) of two sets of $\beta$ parameters. In Section \ref{sec:questions} we address some questions for going forward.
+
+\section{Degeneracies}
+\label{sec:nonident}
+
+There are degeneries in the model in the sense that different sets of parameters will produce the same RRL light curves. Thus using only RRL light curve data, one cannot uniquely determine the parameters. This is called non--identifiability in statistics. The following are a few degeneracies (possibly more not specified):
+\begin{enumerate}
+\item $\mu_i$ and $\beta_{0b}$: We can increase the distance modulli by any fixed amount $c$ by decreasing all the $\beta_{0b}$ by $c$. This will produce the same light curves because:
+  \begin{equation*}
+    \mu_i + \beta_{0b} = (\mu_i + c) + (\beta_{0b}-c)
+  \end{equation*}
+  Since the distance to $RRL$ $i$ (in parsecs) is
+  \begin{equation*}
+    d_i = 10^{\mu_i/5 + 1},
+  \end{equation*}
+  increasing $\mu_i$ by $c$ will result in a distance that is off by $10^{c/5}$ because
+  \begin{equation*}
+   10^{(\mu_i + c)/5 + 1} = (10^{\mu_i/5 + 1})10^{c/5} = d_i10^{c/5}.
+  \end{equation*}
+  Thus systematic biases in $d_i$ may be due to incorrect $\beta_{0b}$ values.
+\item $E[B-V]_i$ and $\beta_{0}$: Keeping all other terms constant and letting $c$ be any real number:
+  \begin{equation*}
+    \beta_{0b} + E[B-V]_iR_b = (\beta_{0b} + cR_b) + (E[B-V]_i-c)R_b
+  \end{equation*}
+  Thus systematic biases in $E[B-V]_i$ may be due to incorrect $\beta_{0b}$ values.
+\item 
+\end{enumerate}
+
+\section{Comparison}
+\label{sec:compare}
+
+
+\section{Questions}
+\label{sec:questions}
 
 
 
