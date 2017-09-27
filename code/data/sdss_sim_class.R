@@ -34,6 +34,7 @@ identical(rrlyrae$V1,temp$V1) ## ids same
 rrlyrae$d <- temp$V5 ## put distances in rrlyrae data frame
 rrlyrae$ra <- temp$V2
 rrlyrae$dec <- temp$V3
+rrlyrae$extcr <- temp$V4
 rrlyrae[,1] <- as.character(rrlyrae[,1])
 rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
 identical(rrlyrae[,1],names(lcsRR))
@@ -48,7 +49,7 @@ periodsRR <- rrlyrae[,3]
 raRR <- rrlyrae$ra
 decRR <- rrlyrae$dec
 distanceRR <- rrlyrae$d
-
+extcrRR <- rrlyrae$extcr
 
 ## load light curves
 folder <- "raw/AllLCs/"
@@ -73,6 +74,7 @@ decNOTRR <- cat$dec[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
 ## compile attributes for each light curve
 periods <- c(periodsRR,rep(0,Nnot)) ## if not rrl, period=0
 distance <- c(distanceRR,rep(0,Nnot)) # if not rrl, distance=0
+extcr <- c(extcrRR,rep(-99,Nnot))
 ra <- c(raRR,raNOTRR)
 dec <- c(decRR,decNOTRR)
 cl <- c(rep("rr",length(lcsRR)),rep("not",Nnot))
@@ -109,4 +111,4 @@ tms <- lapply(lcs,LCtoTM)
 names(tms) <- names(lcs)
 
 ## output lightcurves and periods
-save(tms,tms_FULL,periods,cl,ra,dec,distance,file="clean/sdss_sim_class.RData")
+save(tms,tms_FULL,periods,cl,ra,dec,distance,extcr,file="clean/sdss_sim_class.RData")
