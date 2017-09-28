@@ -60,8 +60,8 @@ ScatterMatrix(periods,period_est_new[,1],period_est_new_FULL[,1],
               period_est_old[,1],period_est_old_FULL[,1],
               xlab="True Period",r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Abs. Mag-Period Dep.",
-              c2lab="Fixed Absolute Mag")
+              c1lab="Dependent Templates",
+              c2lab="Fixed Templates")
 dev.off()
 
 ## compute dust and distance estimates
@@ -82,6 +82,7 @@ DustDistance <- function(p_ests,tms,tem){
     colnames(out) <- c("distance","E[B-V]")
     return(out)
 }
+
 
 ## compute dust, distance using each method / data set
 new_down <- DustDistance(period_est_new[,1],tms,tem)
@@ -120,8 +121,8 @@ ScatterMatrix(sesar[,1],new_down[,1],new_full[,1],
               xlab="Sesar Distance",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Abs. Mag-Period Dep.",
-              c2lab="Fixed Absolute Mag",lim=c(5,120),
+              c1lab="Dependent Templates",
+              c2lab="Fixed Templates",lim=c(5,120),
               y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
 dev.off()
 
@@ -133,10 +134,40 @@ ScatterMatrix(sesar[,2],new_down[,2],new_full[,2],
               xlab="Schlegel r-band Extinction",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Abs. Mag-Period Dep.",
-              c2lab="Fixed Absolute Mag",lim=lim,
+              c1lab="Dependent Templates",
+              c2lab="Fixed Templates",lim=lim,
               y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
 dev.off()
 
 
-periods[,1]
+
+
+
+
+## kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
+## mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
+## mui <- kpc_to_mu(new_full[,1])
+## muis <- kpc_to_mu(distance[1:N])
+## xi <- log10(periods + .2)
+## xi2 <- xi^2
+
+
+## lm.fit <- lm(muis - mui ~ xi + xi2)
+## summary(mui-muis)
+## hist(mui-muis)
+## sd(mui-muis)
+## summary(lm.fit$residuals)
+## hist(lm.fit$residuals)
+## sd(lm.fit$residuals)
+
+
+## par(mfcol=c(1,2))
+## plot(sesar[,1],new_full[,1],main="Original")
+## abline(a=0,b=1)
+## abline(a=0,b=1.05)
+## abline(a=0,b=.95)
+## lm.fit <- lm(muis - mui ~ 1)
+## plot(mu_to_kpc(muis),mu_to_kpc(mui+predict(lm.fit)),main="Intercept Only")
+## abline(a=0,b=1)
+## abline(a=0,b=1.05)
+## abline(a=0,b=.95)
