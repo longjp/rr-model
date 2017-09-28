@@ -114,7 +114,7 @@ $M_{b}(p)$ is assumed to be a quadratic function of log period in each band. Let
   M_{b}(p) = \beta_{0b} + \beta_{1b}x_i  + \beta_{2b}x_i^2
 \end{equation*}
 
-In Section \ref{sec:nonident} we discuss some degeneracies among the model parameters which prevent a straigtforward estimation of all terms. In Section \ref{sec:compare} we compare performance (period, distance, dust estimation accuracy) of two sets of $\beta$ parameters. In Section \ref{sec:questions} we address some questions for going forward.
+In Section \ref{sec:nonident} we discuss some degeneracies among the model parameters which prevent straightforward estimation of all terms. In Section \ref{sec:compare} we compare performance (period, distance, dust estimation accuracy) of two sets of $\beta$ parameters. In Section \ref{sec:questions} we address some questions for going forward.
 
 \section{Degeneracies}
 \label{sec:nonident}
@@ -164,12 +164,62 @@ For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fi
 \end{itemize}
 The fixed absolute magnitude method was used because the original fitting code could only use fixed absolute magnitudes. The choice of $M_b(0.59)$ was used because this was the absolute magnitude for a typical RRL. The updated code can use any period, absolute magnitude relationship (fixed or not).
 
-We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsampled SDSS Stripe 82 RRL. We compare the fits based on three metrics:
+We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsampled SDSS Stripe 82 RRL (20 total mag measurements in griz). We compare the fits based on three metrics:
 \begin{enumerate}
 \item \underline{Period estimation:} Model estimated periods are compared to Sesar 2010 reported periods. Sesar 2010 periods are all very close to correct.
 \item \underline{Distance:} Model estimated distances are compared to the Sesar 2010 distance estimates. Sesar discusses distance determination and uncertainty in Section 4.1. ``The estimated fractional error in the heliocentric distance is 0.06.''
 \item \underline{Dust:} Model estimated extinction in r--band ($\text{E[B-V]}_iR_r$) is compared to values reported by Sesar 2010 (Table 3) which are taken from Schlegel et. al. 1998.
 \end{enumerate}
+
+
+\subsection{Period Estimation Accuracy}
+The table summarizes period estimation accuracy. Both sets of templates acheive essentially the same accuracy:
+
+\begin{center}
+\begin{tabular}{ r | c | c }
+& Downsampled & FULL \\
+  \hline
+  Period Dependent & 80\% & 98\%\\ 
+  Fixed Abs. Mag. & 81\% & 97\%\\ 
+  \hline 
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+  \includegraphics[scale=0.6]{figs_abs_mag/1-results-periods.pdf}
+\end{center}
+
+
+
+\subsection{Distance}
+
+
+\begin{center}
+  \includegraphics[scale=0.6]{figs_abs_mag/1-results-distance.pdf}
+\end{center}
+
+
+\subsection{Dust}
+
+\begin{center}
+  \includegraphics[scale=0.6]{figs_abs_mag/1-results-dust.pdf}
+\end{center}
+
+
+
+
+
+%% \begin{figure}[h]
+%%   \begin{center}
+%%     \begin{includegraphics}[scale=0.5]{figs_abs_mag/1-results-periods.pdf}
+%%       \caption{TODO:CAPTION HERE\label{TODO:LABEL HERE}}
+%%     \end{includegraphics}
+%%   \end{center}
+%% \end{figure}
+
+
+
 
 \section{Questions}
 \label{sec:questions}

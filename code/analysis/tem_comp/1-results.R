@@ -28,37 +28,41 @@ periods <- periods[1:N]
 ## 1. true periods vs. old/new on down,up
 ## 2. sesar distances vs. old/new on down,up
 ## 3. schlegel dust vs. old/new on down,up
-
-
 ScatterMatrix <- function(x,y1,y2,y3,y4,
                           xlab="",r1lab="",r2lab="",
-                          c1lab="",c2lab="",lim=c(0.2,1)){
+                          c1lab="",c2lab="",lim=c(0.2,1),
+                          y1col=1,y2col=1,y3col=1,y4col=1){
     cex.lab=1.3
     par(mar=c(5,5,3,0),mfcol=c(2,2))
     plot(x,y1,xlim=lim,ylim=lim,
-         xlab=xlab,ylab=r1lab,main=c1lab,cex.lab=cex.lab)
+         xlab=xlab,ylab=r1lab,main=c1lab,cex.lab=cex.lab,col=y1col)
+    abline(a=0,b=1)
     par(mar=c(5,5,0,0))
     plot(x,y2,xlim=lim,ylim=lim,
-         xlab=xlab,ylab=r2lab,cex.lab=cex.lab)
+         xlab=xlab,ylab=r2lab,cex.lab=cex.lab,col=y2col)
+    abline(a=0,b=1)
     par(mar=c(5,5,3,1))
     plot(x,y3,xlim=lim,ylim=lim,main=c2lab,
-         xlab=xlab,ylab="",cex.lab=cex.lab)
+         xlab=xlab,ylab="",cex.lab=cex.lab,col=y3col)
+    abline(a=0,b=1)
     par(mar=c(5,5,0,1))
     plot(x,y4,xlim=lim,ylim=lim,
-         xlab=xlab,ylab="",cex.lab=cex.lab)
+         xlab=xlab,ylab="",cex.lab=cex.lab,col=y4col)
+    abline(a=0,b=1)
 }
 
               
     
 
 ####### period estimates
+pdf("figs/1-results-periods.pdf",height=9,width=9)
 ScatterMatrix(periods,period_est_new[,1],period_est_new_FULL[,1],
               period_est_old[,1],period_est_old_FULL[,1],
               xlab="True Period",r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
               c1lab="Abs. Mag-Period Dep.",
               c2lab="Fixed Absolute Mag")
-
+dev.off()
 
 ## compute dust and distance estimates
 
@@ -79,32 +83,60 @@ DustDistance <- function(p_ests,tms,tem){
     return(out)
 }
 
+## compute dust, distance using each method / data set
 new_down <- DustDistance(period_est_new[,1],tms,tem)
 new_full <- DustDistance(period_est_new_FULL[,1],tms_FULL,tem)
 old_down <- DustDistance(period_est_old[,1],tms,tem_old)
 old_full <- DustDistance(period_est_old_FULL[,1],tms_FULL,tem_old)
 
-
-
 ## obtain true distances and dust from sesar table
 sesar <- cbind(distance[1:N],extcr[1:N])
 
 
+## plot point in black if period is correct, red if period is wrong
+is_correct <- function(true,est) abs((true - est)/true) < .01
+y1col <- (!is_correct(periods,period_est_new[,1])) + 1
+y2col <- (!is_correct(periods,period_est_new_FULL[,1])) + 1
+y3col <- (!is_correct(periods,period_est_old[,1])) + 1
+y4col <- (!is_correct(periods,period_est_old_FULL[,1])) + 1
+
+print("downsampled fraction of periods correct with new templates:")
+mean(is_correct(periods,period_est_new[,1]))
+print("downsampled fraction of periods correct with old templates:")
+mean(is_correct(periods,period_est_old[,1]))
+
+print("FULL fraction of periods correct with new templates:")
+mean(is_correct(periods,period_est_new_FULL[,1]))
+print("FULL fraction of periods correct with old templates:")
+mean(is_correct(periods,period_est_old_FULL[,1]))
+
+
+
+
 ####### distance estimates
+pdf("figs/1-results-distance.pdf",height=9,width=9)
 ScatterMatrix(sesar[,1],new_down[,1],new_full[,1],
               old_down[,1],old_full[,1],
               xlab="Sesar Distance",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
               c1lab="Abs. Mag-Period Dep.",
-              c2lab="Fixed Absolute Mag",lim=c(0,120))
+              c2lab="Fixed Absolute Mag",lim=c(5,120),
+              y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
+dev.off()
 
 ####### dust estimates
 lim <- range(c(sesar[,2],new_down[,2],new_full[,2],old_down[,2],old_full[,2]))
+pdf("figs/1-results-dust.pdf",height=9,width=9)
 ScatterMatrix(sesar[,2],new_down[,2],new_full[,2],
               old_down[,2],old_full[,2],
               xlab="Schlegel r-band Extinction",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
               c1lab="Abs. Mag-Period Dep.",
-              c2lab="Fixed Absolute Mag",lim=lim)
+              c2lab="Fixed Absolute Mag",lim=lim,
+              y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
+dev.off()
+
+
+periods[,1]
