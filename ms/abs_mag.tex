@@ -88,7 +88,7 @@ where the \underline{lightcurve specific} terms (indexed by $i$) are
   \text{E[B-V]}_i &= \text{ extinction due to dust }\\
   a_i &= \text{amplitude, shared across all bands}\\
   p_i &= \text{period}\\
-  \phi_i &= \text{phase}
+  \phi_i &= \text{phase in } [0,1)
 \end{align*}
 and the \underline{global parameters} common to all RRL are
 \begin{align*}
@@ -107,11 +107,15 @@ This note concerns how we model the absolute magnitude terms $M_b(p)$. Let $\bar
 \end{equation*}
 Since the $\gamma_b$ terms are mean $0$ we have
 \begin{equation*}
-\bar{m}_{ib} = \mu_i + M_{b}(p) + \text{E[B-V]}_iR_b
+\bar{m}_{ib} = \mu_i + M_{b}(p_i) + \text{E[B-V]}_iR_b
 \end{equation*}
-$M_{b}(p)$ is assumed to be a quadratic function of log period in each band. Let $x_i = \log_{10}(p_i + 0.2)$. Specifically
+$M_{b}(p)$ is assumed to be a quadratic function of log period in each band. Let
 \begin{equation*}
-  M_{b}(p) = \beta_{0b} + \beta_{1b}x_i  + \beta_{2b}x_i^2
+  x_i = \log_{10}(p_i + 0.2).
+\end{equation*}
+Then
+\begin{equation*}
+  M_{b}(p_i) = \beta_{0b} + \beta_{1b}x_i  + \beta_{2b}x_i^2.
 \end{equation*}
 
 In Section \ref{sec:nonident} we discuss some degeneracies among the model parameters which prevent straightforward estimation of all terms. In Section \ref{sec:compare} we compare performance (period, distance, dust estimation accuracy) of two sets of $\beta$ parameters. In Section \ref{sec:questions} we address some questions for going forward.
@@ -119,9 +123,9 @@ In Section \ref{sec:nonident} we discuss some degeneracies among the model param
 \section{Degeneracies}
 \label{sec:nonident}
 
-There are degeneries in the model in the sense that different sets of parameters will produce the same RRL light curves. Thus using only RRL light curve data, one cannot uniquely determine the parameters. This is called non--identifiability in statistics. The following are a few degeneracies (possibly more not specified):
+There are degeneries in the model in the sense that different sets of parameters will produce the same RRL light curves. Thus using only RRL light curve data, one cannot uniquely determine the parameters. This is called non--identifiability in statistics. The following are a few degeneracies (possibly more exist which are not specified here):
 \begin{enumerate}
-\item $\mu_i$ and $\beta_{0b}$: We can increase the distance modulli by any fixed amount $c$ by decreasing all the $\beta_{0b}$ by $c$. This will produce the same light curves because:
+\item $\mu_i$ and $\beta_{0}$: We can increase the distance modulli by any fixed amount $c$ by decreasing all the $\beta_{0b}$ by $c$. This will produce the same light curves because:
   \begin{equation*}
     \mu_i + \beta_{0b} = (\mu_i + c) + (\beta_{0b}-c)
   \end{equation*}
@@ -155,16 +159,16 @@ There are degeneries in the model in the sense that different sets of parameters
 
 For now, we put aside the degeneracy issues of Section \ref{sec:nonident} and fix the values of $\beta_{0b}$, $\beta_{1b}$, and $\beta_{2b}$. Once these values have been fixed, all degeneracies are gone and we can estimate the $\gamma_b$ values using well--sampled RRL data. Then for any given light curve we can estimate the vector of parameters $(\mu_i,\text{E[B-V]}_i,a_i,p_i,\phi_i)$. We obtain RRL parameter fits using two sets of $\beta$ parameters:
 \begin{itemize}
-\item \underline{Period Dependent Abs Mag:} The file \texttt{rrmag.dat} on the project website contains a set of $\beta$ values. When fitting for the $5$ RRL specific parameter on a grid of periods, the absolute magnitude is computed for each period in the grid and subtracted off the observed magnitudes.
-\item \underline{Fixed Absolute Mag (Old Templates):} This is the method Katelyn is currently using. The median period for a set a few hundred well--sampled RRL is $\approx 0.59$. Using the \texttt{rrmag.dat} $\beta$ values we compute
+\item \underline{Dependent Templates:} The file \texttt{rrmag.dat} on the project website contains a set of $\beta$ values. When fitting for the $5$ RRL specific parameter on a grid of periods, the absolute magnitude is computed for each period in the grid and subtracted off the observed magnitudes.
+\item \underline{Fixed Templates (Old Method):} This is the method Katelyn is currently using. The median period for a set a few hundred well--sampled RRL is $\approx 0.59$. Using the \texttt{rrmag.dat} $\beta$ values we compute
   \begin{equation*}
     M_b(0.59) = (u=1.73,g=0.64,r=0.49,i=0.48,z=0.51)
   \end{equation*}
   This is the absolute magnitude used for fitting at \underline{all} periods in the grid.
 \end{itemize}
-The fixed absolute magnitude method was used because the original fitting code could only use fixed absolute magnitudes. The choice of $M_b(0.59)$ was used because this was the absolute magnitude for a typical RRL. The updated code can use any period, absolute magnitude relationship (fixed or not).
+The fixed templates were used because the original fitting code could only use fixed absolute magnitudes. The choice of $M_b(0.59)$ was used because this was the absolute magnitude for a typical RRL. The updated code can use any period, absolute magnitude relationship (fixed or not).
 
-We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsampled SDSS Stripe 82 RRL (20 total mag measurements in griz). We compare the fits based on three metrics:
+We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsampled SDSS Stripe 82 RRL (20 total mag measurements across bands griz). We compare the fits based on three metrics:
 \begin{enumerate}
 \item \underline{Period estimation:} Model estimated periods are compared to Sesar 2010 reported periods. Sesar 2010 periods are all very close to correct.
 \item \underline{Distance:} Model estimated distances are compared to the Sesar 2010 distance estimates. Sesar discusses distance determination and uncertainty in Section 4.1. ``The estimated fractional error in the heliocentric distance is 0.06.''
@@ -173,14 +177,14 @@ We fit these two templates on 1) well--sampled SDSS Stripe 82 RRL and 2) downsam
 
 
 \subsection{Period Estimation Accuracy}
-The table summarizes period estimation accuracy. Both sets of templates acheive essentially the same accuracy:
+The table summarizes period estimation accuracy. Both sets of templates achieve essentially the same accuracy:
 
 \begin{center}
 \begin{tabular}{ r | c | c }
 & Downsampled & FULL \\
   \hline
-  Period Dependent & 80\% & 98\%\\ 
-  Fixed Abs. Mag. & 81\% & 97\%\\ 
+  Dependent Templates & 80\% & 98\%\\ 
+  Fixed Templates & 81\% & 97\%\\ 
   \hline 
 \end{tabular}
 \end{center}
@@ -194,6 +198,7 @@ The table summarizes period estimation accuracy. Both sets of templates acheive 
 
 \subsection{Distance}
 
+In the below plot, color refers to whether the period was correctly determined (black=correct,red=incorrect). The distance estimates are systematically below Sesar's. This could be because Sesar is systematically off or because \textbf{our $\beta_{0b}$ values should be decreased}.  The dependent templates produce better estimates (relative to fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
 
 \begin{center}
   \includegraphics[scale=0.6]{figs_abs_mag/1-results-distance.pdf}
@@ -201,6 +206,9 @@ The table summarizes period estimation accuracy. Both sets of templates acheive 
 
 
 \subsection{Dust}
+
+Black points are correct period estimates, red points are incorrect period estimates. The dust estimates are systematically above Schlegel. This could be because our $\beta_{0}$ values \textbf{should be increased in the direction $R_b$, i.e. $\beta_{0b} \rightarrow \beta_{0b} + cR_b$ where $c$ is positive. This (somewhat) contradicts the change needed to improve agreement with Sesar's distances.}  The dependent templates produce better estimates (than the fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
+
 
 \begin{center}
   \includegraphics[scale=0.6]{figs_abs_mag/1-results-dust.pdf}
@@ -221,12 +229,16 @@ The table summarizes period estimation accuracy. Both sets of templates acheive 
 
 
 
-\section{Questions}
+\section{Questions and Comments}
 \label{sec:questions}
 
 \begin{enumerate}
-\item circularity of argument in terms of estimating distance parameters
-\item issue with estimating distance from mean mag or after fitting model
+\item The dust and distance estimates disagree systematically from Sesar and Schlegel. But I do not think that $\beta_0$ can be altered in a way that improves both. We can only improve one, and that will make the other worse.
+\item The dependent templates appear clearly better when one can correctly estimate the period, but for settings where a substantial fraction of periods are estimated incorrectly, they do not appear much better (possibly worse).
+\item How desirable is it to match Sesar's distances? Could ours be better?
+\item In general, I am concerned about circularity of argument in using some initial values of $\beta$, and then improving them to match Sesar distances / Schlegel templates.
+\item Searching for periods on a $[0.4,1]$ grid (as Katelyn is doing now), should improve period estimates significantly. It appears most incorrect period estimates are aliases in $[0.2,0.4]$ which would not be searched over using the more restricted range grid.
+\item It may be possible to break the above degeneracies if the shape of the RRL ($\gamma_b$) changes systematically as period changes. However incorporating this into the current model would be a lot of work.
 \end{enumerate}
 
 
