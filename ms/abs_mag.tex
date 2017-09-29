@@ -111,7 +111,7 @@ Since the $\gamma_b$ terms are mean $0$ we have
 \end{equation*}
 $M_{b}(p)$ is assumed to be a quadratic function of log period in each band. Let
 \begin{equation*}
-  x_i = \log_{10}(p_i + 0.2).
+  x_i = \log_{10}(p_i) + 0.2.
 \end{equation*}
 Then
 \begin{equation*}
@@ -149,7 +149,7 @@ There are degeneries in the model in the sense that different sets of parameters
   \end{equation*}
   This would produce distance modulli which are biased in the ``direction''
   \begin{equation*}
-    x_i=\log_{10}(p_i+0.2).
+    x_i=\log_{10}(p_i)+0.2.
   \end{equation*}
   The same degeneracy holds for $\beta_{02}$ and $x_i^2$.
 \end{enumerate}
@@ -183,8 +183,8 @@ The table summarizes period estimation accuracy. Both sets of templates achieve 
 \begin{tabular}{ r | c | c }
 & Downsampled & FULL \\
   \hline
-  Dependent Templates & 80\% & 98\%\\ 
-  Fixed Templates & 81\% & 97\%\\ 
+  Dependent Templates & 79\% & 98\%\\ 
+  Fixed Templates & 79\% & 97\%\\ 
   \hline 
 \end{tabular}
 \end{center}
@@ -198,7 +198,7 @@ The table summarizes period estimation accuracy. Both sets of templates achieve 
 
 \subsection{Distance}
 
-In the below plot, color refers to whether the period was correctly determined (black=correct,red=incorrect). The distance estimates are systematically below Sesar's. This could be because Sesar is systematically off or because \textbf{our $\beta_{0b}$ values should be decreased}.  The dependent templates produce better estimates (relative to fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
+In the below plot, color refers to whether the period was correctly determined (black=correct,red=incorrect). The dependent templates produce better estimates (relative to fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
 
 \begin{center}
   \includegraphics[scale=0.6]{figs_abs_mag/1-results-distance.pdf}
@@ -207,7 +207,7 @@ In the below plot, color refers to whether the period was correctly determined (
 
 \subsection{Dust}
 
-Black points are correct period estimates, red points are incorrect period estimates. The dust estimates are systematically above Schlegel. This could be because our $\beta_{0}$ values \textbf{should be increased in the direction $R_b$, i.e. $\beta_{0b} \rightarrow \beta_{0b} + cR_b$ where $c$ is positive. This (somewhat) contradicts the change needed to improve agreement with Sesar's distances.}  The dependent templates produce better estimates (than the fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
+Black points are correct period estimates, red points are incorrect period estimates. The dust estimates are systematically above Schlegel. This could be because our $\beta_{0}$ values \textbf{should be increased in the direction $R_b$, i.e. $\beta_{0b} \rightarrow \beta_{0b} + cR_b$ where $c$ is positive.}  The dependent templates produce better estimates (than the fixed) when the period is estimated correctly but worse estimates when the period is estimated incorrectly.
 
 
 \begin{center}
@@ -233,7 +233,7 @@ Black points are correct period estimates, red points are incorrect period estim
 \label{sec:questions}
 
 \begin{enumerate}
-\item The dust and distance estimates disagree systematically from Sesar and Schlegel. But I do not think that $\beta_0$ can be altered in a way that improves both. We can only improve one, and that will make the other worse.
+\item The dust estimates disagree systematically from Schlegel.
 \item The dependent templates appear clearly better when one can correctly estimate the period, but for settings where a substantial fraction of periods are estimated incorrectly, they do not appear much better (possibly worse).
 \item How desirable is it to match Sesar's distances? Could ours be better?
 \item In general, I am concerned about circularity of argument in using some initial values of $\beta$, and then improving them to match Sesar distances / Schlegel templates.
