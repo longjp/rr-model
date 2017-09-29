@@ -79,7 +79,7 @@ DustDistance <- function(p_ests,tms,tem){
     colnames(coeffs) <- c("mu","E[B-V]","a","phi")
     d <- (10^(coeffs[,1]/5 + 1)) / 1000
     out <- cbind(d,coeffs[,2]*tem$dust['r'])
-    colnames(out) <- c("distance","E[B-V]")
+    colnames(out) <- c("distance","extcr")
     return(out)
 }
 
