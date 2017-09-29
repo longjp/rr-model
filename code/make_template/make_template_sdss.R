@@ -320,7 +320,7 @@ names(tem$templated_funcs) <- bands
 tem$betas <- t(rrmag[,c("c0","p1","p2")])
 colnames(tem$betas) <- rrmag$bnd
 tem$abs_mag <- function(p,tem){
-    X <- cbind(1,log10(p + 0.2),log10(p + 0.2)^2)
+    X <- cbind(1,log10(p) + 0.2,(log10(p) + 0.2)^2)
     return(X%*%tem$betas)
 }
 
@@ -457,7 +457,7 @@ tem_old <- tem
 tem_old$pmed <- pmed
 tem_old$abs_mag <- function(p,tem){
     p <- rep(tem$pmed,length(p)) ## ignore period inputs, use median
-    X <- cbind(1,log10(p + 0.2),log10(p + 0.2)^2)
+    X <- cbind(1,log10(p) + 0.2,(log10(p) + 0.2)^2)
     return(X%*%tem$betas)
 }
 
