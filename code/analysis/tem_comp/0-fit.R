@@ -15,7 +15,8 @@ source("../params.R")
 
 ## relies on fact that RRL are first in list
 N <- sum(cl=="rr")
-mc.cores <- 8
+omegas <- GetFreqs(0.4,0.95) ## frequency grid
+
 
 ## estimate periods for both the full lc (tms_FULL) and downsampled (tms)
 ## using old and new templates
