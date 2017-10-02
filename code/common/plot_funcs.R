@@ -1,14 +1,9 @@
-plotLC <- function(lc,p_est,coeffs,tem,main=NULL,tem_only=TRUE){
+plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
     bandpch <- 1:6
     names(bandpch) <- c("u","g","r","i","z","Y")
     bandcol <- c("dodgerblue3","green","red",
                  "mediumorchid1","black","peachpuff4")
     names(bandcol) <- c("u","g","r","i","z","Y")
-    if(tem_only){
-        bands <- colnames(tem$betas)
-        bandpch <- bandpch[names(bandpch) %in% bands]
-        bandcol <- bandcol[names(bandcol) %in% bands]
-    }
     lc1 <- lc
     lc1[,1] <- (lc$time %% p_est)/p_est
     lc2 <- lc1
@@ -36,5 +31,9 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL,tem_only=TRUE){
     for(ii in 1:ncol(m)){
         points(ti/p_est,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
     }
+    ## only make legend for bands used
+    bands <- sort(union(colnames(tem$betas),unique(lc$band)))
+    bandpch <- bandpch[names(bandpch) %in% bands]
+    bandcol <- bandcol[names(bandcol) %in% bands]
     legend("bottomleft",names(bandcol),col=bandcol,pch=bandpch,lty=bandpch)
 }
