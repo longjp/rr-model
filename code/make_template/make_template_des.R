@@ -27,18 +27,20 @@ for(ii in 1:length(tms_sdss)){
 }
 
 
+##### create DES template
+#####
+### add Y band template that is identical to z
+tem <- AddBand(tem,"Y","z")
+
+
 ## plot folded light curve for des, sdss
-ii <- 1
+ii <- 6
 par(mfcol=c(2,1))
 plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem)
 plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 
 
 
-##### create DES template
-#####
-### add Y band template that is identical to z
-tem <- AddBand(tem,"Y","z")
 
 ## set dust to DES values
 extc <- read.table("extc.dat",stringsAsFactors=FALSE)
@@ -89,11 +91,11 @@ for(ii in 1:length(bands)){
     ## plot fits to sdss
     vec <- tem$betas[,band]
     ti <- seq(min(periods),max(periods),length.out=100)
-    points(ti,vec[1] + vec[2]*log10(ti+.2) + vec[3]*log10(ti+.2)^2,type='l',col="red",lwd=2)
+    points(ti,vec[1] + vec[2]*(log10(ti)+.2) + vec[3]*(log10(ti)+.2)^2,type='l',col="red",lwd=2)
     ## estimate fits to des, plot
-    X <- cbind(1,log10(periods+.2),log10(periods+.2)^2)
+    X <- cbind(1,log10(periods)+.2,(log10(periods)+.2)^2)
     betas_des[,ii] <- lm(mags~X-1)$coefficients
-    points(ti,(cbind(1,log10(ti+.2),log10(ti+.2)^2)%*%betas_des[,ii,drop=FALSE])[,1],type='l',col='black',lwd=2)
+    points(ti,(cbind(1,log10(ti)+.2,(log10(ti)+.2)^2)%*%betas_des[,ii,drop=FALSE])[,1],type='l',col='black',lwd=2)
 }
 plot(0,0,col=0,axes=F,xlab="",ylab="")
 legend("center",c("DES Median Mag, Dust and Distance Corrected","Given Relationships for SDSS","Fits to DES"),

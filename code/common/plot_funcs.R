@@ -16,18 +16,20 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
     else {
         par(mar=c(5,5,5,1))
     }
+    ## obtain magnitude predictions
+    ti <- seq(0,p_est,length.out=100)
+    ti <- c(ti,ti+p_est)
+    m <- PredictAllBand(ti,1/p_est,coeffs,tem)
+    ylim <- rev(range(m,lc$mag))
     plot(lc_temp$time,lc_temp$mag,
          col=bandcol[lc_temp$band],pch=bandpch[lc_temp$band],
-         ylim=rev(range(lc_temp$mag)),
+         ylim=ylim,
          xlab="Phase",ylab="Magnitude",
          xlim=c(0,2),xaxs='i',cex.axis=1.5,cex.lab=1.5,main=main,cex.main=1.5)
     segments(lc_temp$time,
              lc_temp$mag+lc_temp$error,
              lc_temp$time,
              lc_temp$mag-lc_temp$error,col='grey')
-    ti <- seq(0,p_est,length.out=100)
-    ti <- c(ti,ti+p_est)
-    m <- PredictAllBand(ti,1/p_est,coeffs,tem)
     for(ii in 1:ncol(m)){
         points(ti/p_est,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
     }
@@ -35,5 +37,5 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
     bands <- sort(union(colnames(tem$betas),unique(lc$band)))
     bandpch <- bandpch[names(bandpch) %in% bands]
     bandcol <- bandcol[names(bandcol) %in% bands]
-    legend("bottomleft",names(bandcol),col=bandcol,pch=bandpch,lty=bandpch)
+    legend("bottomleft",names(bandcol),col=bandcol,pch=bandpch,lty=1)
 }
