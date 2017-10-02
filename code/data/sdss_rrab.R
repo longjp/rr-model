@@ -24,6 +24,7 @@ periods <- rrlyrae[,3]
 ra <- rrlyrae$ra
 dec <- rrlyrae$dec
 distance <- rrlyrae$d
+extcr <- rrlyrae$extcr
 
 ## load light curves and put in tms format
 lcs <- vector("list",length(fnames))
@@ -35,4 +36,4 @@ tms <- lapply(lcs,LCtoTM)
 names(tms) <- rrlyrae[,1]
 
 ## save
-save(tms,periods,ra,dec,distance,file="clean/sdss_rrab.RData")
+save(tms,periods,ra,dec,distance,extcr,file="clean/sdss_rrab.RData")
