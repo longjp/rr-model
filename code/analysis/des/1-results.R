@@ -1,33 +1,26 @@
 ## results go here
 rm(list=ls())
 source("../../common/funcs.R")
+source("../../fit_template/fit_template.R")
+
 load("0-fit.RData")
 load("../../data/clean/des.RData")
+load("../../fit_template/template_des.RData")
 
-periods <- periods[1:nrow(period_est_sdss)]
+## = period estimate analysis
+## scatterplot, fraction correct, fraction correct by # epochs
 
-
-lim <- c(.2,1)
-par(mfrow=c(2,2))
-plot(periods,period_est_des_old[,1],xlim=lim,ylim=lim,main="DES Old")
+lim <- c(.4,.95)
+par(mar=c(5,5,1,1))
+plot(periods,period_est_des[,1],xlim=lim,ylim=lim,
+     xlab="True Period",ylab="DES Estimate",cex.lab=1.3)
 abline(a=0,b=1)
-plot(periods,period_est_des[,1],xlim=lim,ylim=lim,main="DES New")
-abline(a=0,b=1)
-plot(periods,period_est_sdss_old[,1],xlim=lim,ylim=lim,main="Sloan Old ")
-abline(a=0,b=1)
-plot(periods,period_est_sdss[,1],xlim=lim,ylim=lim,main="Sloan New")
-abline(a=0,b=1)
-
-
-
+     
 fraction_wrong <- function(est,truth,thres=.01){
-    mean(abs(est-truth)/truth > .01)
+    mean(abs(est-truth)/truth > thres)
 }
 
-fraction_wrong(period_est_des_old[,1],periods)
 1-fraction_wrong(period_est_des[,1],periods)
-fraction_wrong(period_est_sdss_old[,1],periods)
-fraction_wrong(period_est_sdss[,1],periods)
 
 
 lcs_des <- lapply(tms_des,TMtoLC)
@@ -47,3 +40,66 @@ unique(a)
 
 sum(n_epochs <= 15)
 sum(n_epochs < 15)
+
+
+
+## = compute coefficients using des data 
+## = compare to sesar distance, schlegel ebv
+## make all plots together
+
+coeffs_des <- matrix(0,nrow=length(tms_des),ncol=4)
+for(ii in 1:length(tms_des)){
+    omega <- 1 / period_est_des[ii,1]
+    lc <- TMtoLC(tms_des[[ii]])
+    coeffs_des[ii,] <- ComputeCoeffs(lc,omega,tem)
+}
+colnames(coeffs_des) <- c("mu","ebv","a","phi")
+
+
+d_des <- 10^(coeffs_des[,1]/5 + 1)/1000
+par(mar=c(5,5,1,1))
+plot(distance,d_des,xlab="Distance Sesar",ylab="Distance DES",
+     cex.lab=1.3)
+abline(a=0,b=1)
+abline(a=0,b=1.05)
+abline(a=0,b=0.95)
+
+
+
+e_des <- coeffs_des[,2]*tem$dust['r']
+par(mar=c(5,5,1,1))
+lim <- c(0,max(c(extcr,e_des)))
+plot(extcr,e_des,xlab="Extinction r Schlegel",ylab="DES Extinction r",
+     cex.lab=1.3,xlim=lim,ylim=lim)
+abline(a=0,b=1)
+
+
+
+
+
+
+
+
+
+## compare parameter estimates to sdss well sampled
+## scatter plots of mu versus mu, phase versus phase, amp versus amp
+load("../../fit_template/template_sdss.RData") ## load sdss templates
+coeffs_sdss <- matrix(0,nrow=length(tms_sdss),ncol=4)
+for(ii in 1:length(tms_sdss)){
+    omega <- 1 / periods[ii]
+    lc <- TMtoLC(tms_sdss[[ii]])
+    coeffs_sdss[ii,] <- ComputeCoeffs(lc,omega,tem)
+}
+colnames(coeffs_sdss) <- c("mu","ebv","a","phi")
+
+
+ii <- 0
+
+ii <- ii + 1
+lim <- range(c(coeffs_sdss[,ii],coeffs_des[,ii]))
+plot(coeffs_sdss[,ii],coeffs_des[,ii],xlim=lim,ylim=lim)
+abline(a=0,b=1)
+
+
+### things look pretty good except for phase, which is totally screwed up
+
