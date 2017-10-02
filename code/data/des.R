@@ -41,10 +41,18 @@ to_use <- names(tms_sdss) %in% sdss_id
 sum(to_use)
 tms_sdss <- tms_sdss[to_use]
 periods <- periods[to_use]
+distance <- distance[to_use]
+ra <- ra[to_use]
+dec <- dec[to_use]
+extcr <- extcr[to_use]
+
 ords <- order(names(tms_sdss))
 tms_sdss <- tms_sdss[ords]
 periods <- periods[ords]
-
+distance <- distance[ords]
+ra <- ra[ords]
+dec <- dec[ords]
+extcr <- extcr[ords]
 
 ## save output
-save(tms_des,tms_sdss,periods,file="clean/des.RData")
+save(tms_des,tms_sdss,periods,distance,ra,dec,extcr,file="clean/des.RData")
