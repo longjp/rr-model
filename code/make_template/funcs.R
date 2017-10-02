@@ -37,9 +37,9 @@ AddBand <- function(tem,newb,oldb){
 
 
 RemoveBand <- function(tem,rb){
-    bands <- names(tem$betas)
+    bands <- colnames(tem$betas)
     bands <- bands[!(bands %in% rb)]
-    tem$betas <- tem$betas[bands]
+    tem$betas <- tem$betas[,bands]
     tem$dust <- tem$dust[bands]
     tem$templates <- tem$templates[bands,]
     tem$templatesd <- tem$templatesd[bands,]
