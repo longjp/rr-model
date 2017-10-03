@@ -140,12 +140,48 @@ ScatterMatrix(sesar[,2],new_down[,2],new_full[,2],
 dev.off()
 
 
+kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
+mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
 
 
 
 
-## kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
-## mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
+plot(kpc_to_mu(new_down[,1]) - kpc_to_mu(sesar[,1]),new_down[,2]-sesar[,2])
+
+
+
+y <- kpc_to_mu(new_full[,1]) - kpc_to_mu(sesar[,1])
+x <- new_full[,2]-sesar[,2]
+lm.fit <- lm(y~x)
+plot(x,y)
+abline(lm.fit$coeff)
+
+
+pdf("extc_mu.pdf")
+par(mar=c(5,5,1,1))
+plot(x,y,
+     ylab="mu Estimate (RR Model) - mu True (sesar)",xlab="Extinction r est (RR Model) - True Extinction r (Schlegel)",
+     main="Well Sampled SDSS Stripe 82 RRL")
+abline(lm.fit$coeff)
+dev.off()
+
+
+
+
+pred_mu <- kpc_to_mu(new_full[,1]) - predict(lm.fit)
+pdf("distance_estimates_corrected.pdf",width=12,height=6)
+par(mfcol=c(1,2),mar=c(5,5,1,1))
+plot(sesar[,1],new_full[,1],xlab="Sesar Distance",ylab="Model Estimate")
+plot(sesar[,1],mu_to_kpc(pred_mu),xlab="Sesar Distance",ylab="Model Estimate (Corrected)")
+dev.off()
+
+
+
+par(mfcol=c(1,2))
+hist(mu_to_kpc(pred_mu)/sesar[,1])
+hist(new_full[,1]/sesar[,1])
+
+
 ## mui <- kpc_to_mu(new_full[,1])
 ## muis <- kpc_to_mu(distance[1:N])
 ## xi <- log10(periods + .2)
