@@ -10,11 +10,13 @@ load("../../fit_template/template_des.RData")
 ## = period estimate analysis
 ## scatterplot, fraction correct, fraction correct by # epochs
 
-lim <- c(.4,.95)
+lim <- c(.2,1)
+pdf("period_accuracy.pdf")
 par(mar=c(5,5,1,1))
 plot(periods,period_est_des[,1],xlim=lim,ylim=lim,
      xlab="True Period",ylab="DES Estimate",cex.lab=1.3)
 abline(a=0,b=1)
+dev.off()
      
 fraction_wrong <- function(est,truth,thres=.01){
     mean(abs(est-truth)/truth > thres)
@@ -56,24 +58,68 @@ for(ii in 1:length(tms_des)){
 colnames(coeffs_des) <- c("mu","ebv","a","phi")
 
 
+cols <- 1*(abs(period_est_des[,1] - periods) / periods > .01) + 1
+
+####### compare distances
 d_des <- 10^(coeffs_des[,1]/5 + 1)/1000
+lim <- range(c(distance,d_des))
+pdf("distance_des.pdf")
 par(mar=c(5,5,1,1))
 plot(distance,d_des,xlab="Distance Sesar",ylab="Distance DES",
-     cex.lab=1.3)
+     cex.lab=1.3,ylim=lim,xlim=lim,col=cols,pch=cols)
 abline(a=0,b=1)
-abline(a=0,b=1.05)
-abline(a=0,b=0.95)
+abline(a=0,b=1.05,lty=2)
+abline(a=0,b=0.95,lty=2)
+legend("bottomright",c("Identity","5% Scatter"),lty=1:2,lwd=2)
+dev.off()
 
 
-
+####### compare extinctions
 e_des <- coeffs_des[,2]*tem$dust['r']
-par(mar=c(5,5,1,1))
 lim <- c(0,max(c(extcr,e_des)))
+pdf("extinction.pdf")
+par(mar=c(5,5,1,1))
 plot(extcr,e_des,xlab="Extinction r Schlegel",ylab="DES Extinction r",
-     cex.lab=1.3,xlim=lim,ylim=lim)
+     cex.lab=1.3,xlim=lim,ylim=lim,col=cols,pch=cols)
 abline(a=0,b=1)
+dev.off()
 
 
+
+
+
+### improved distances by "correcting" based on extinction error
+kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
+mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
+
+
+
+
+x <- e_des-extcr
+y <- coeffs_des[,1]-kpc_to_mu(distance)
+pdf("dust_distance.pdf")
+par(mar=c(5,5,1,1))
+plot(x,y,
+     xlab="Model Estimated Extinction r - Schlegel Extinction r",ylab="mu DES - mu Sesar",
+     cex.lab=1.3,ylim=c(-.5,.5),xlim=c(-.3,.6),col=cols,pch=cols)
+dev.off()
+
+
+lm.fit <- lm(y ~ x)
+
+a
+
+pred_mu <- coeffs_des[,1] - predict(lm.fit)
+
+pdf("distance_des_corrected.pdf")
+par(mar=c(5,5,1,1))
+plot(distance,mu_to_kpc(pred_mu),xlab="Sesar Distance",ylab="Model Estimate (Corrected)",
+     col=cols,pch=cols)
+abline(a=0,b=1)
+abline(a=0,b=.95,lty=2)
+abline(a=0,b=1.05,lty=2)
+legend("bottomright",c("Identity","5% Scatter"),lty=1:2,lwd=2)
+dev.off()
 
 
 
@@ -101,5 +147,16 @@ plot(coeffs_sdss[,ii],coeffs_des[,ii],xlim=lim,ylim=lim)
 abline(a=0,b=1)
 
 
+t_s <- unlist(lapply(lapply(tms_sdss,TMtoLC),function(x){x[,1]}))
+range(t_s)
+diff(range(t_s)) / 365
+
+
+t_d <- unlist(lapply(lapply(tms_des,TMtoLC),function(x){x[,1]}))
+range(t_d)
+diff(range(t_d)) / 365
+
+
+(min(t_d) - max(t_s)) / 365
 ### things look pretty good except for phase, which is totally screwed up
 
