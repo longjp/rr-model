@@ -39,7 +39,7 @@ lc = robjects.r['TBMEtoLC'](FloatVector(time),StrVector(band),FloatVector(mag),F
 
 # ###### fit model to lc
 ## choose frequency grid
-omegas=FloatVector(np.arange(start=1.0,stop=5.0,step=0.1/4000.0))
+omegas=FloatVector(np.arange(start=1.0,stop=2.5,step=0.1/4000.0))
 ## compute rss (residual sum of squares) for each frequency, takes a minute
 rss=FitTemplate(lc,omegas,r.tem)
 ## select best fitting period, ie lowest rss
@@ -49,8 +49,8 @@ coeffs=ComputeCoeffs(lc,omega,r.tem) ## parameter estimates of best fit frequenc
 ## the output is [distance modulus (mu),amount of dust (E[B-V]),amplitude (a),phase (rho)]
 # >>> coeffs
 # R object with classes: ('numeric',) mapped to:
-# <FloatVector - Python:0x7f21066690c8 / R:0x6230398>
-# [19.120615, 0.112804, 1.230939, 0.172301]
+# <FloatVector - Python:0x7f72c849a0c8 / R:0x5f40790>
+# [19.250568, 0.076749, 1.225825, 0.172240]
 # >>> omega
 # 1.8413499999980392
 # >>> pest
@@ -58,20 +58,17 @@ coeffs=ComputeCoeffs(lc,omega,r.tem) ## parameter estimates of best fit frequenc
 
 ###### now plot results
 ## plot lightcurve folded on estimated period
-cols = {'g': 'green', 'i': 'red', 'r':'blue','u': 'orange', 'z': 'yellow'}
+cols = {'u': 'blue', 'g': 'green', 'r':'red', 'i':'violet', 'z':'black'}
 pts=plt.scatter(np.mod(time,pest),mag,color=list(map(cols.get,band)))
 plt.gca().invert_yaxis()
 plt.xlim([0,pest])
-class_colours = list(map(cols.get,band))
 recs = []
-for i in range(0,len(class_colours)):
-    recs.append(mpatches.Rectangle((0,0),1,1,fc=class_colours[i]))
+for i in cols.values():
+    recs.append(mpatches.Rectangle((0,0),1,1,fc=i))
 
 plt.legend(recs,cols.keys(),loc=4)
 
-## TODO: use R function to directly calculate predicted magnitudes
-
-### add template fits
+### add template fits manually
 gamma = r.tem[1]
 gamma = np.resize(gamma,(5,100))
 t=(np.arange(100)/100.)*pest
@@ -80,66 +77,23 @@ abs_mag = r.tem[7](pest,r.tem) ## get absolute magnitudes at pest
 for ii in np.arange(gamma.shape[0]):
     m=coeffs[0] + abs_mag[ii] + r.tem[0][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
     plt.plot(t,m[ords],'k',color=cols[r.tem[0].names[ii]])
+
     
 plt.show()
 
+
 ######## plot unfolded (raw light curve)
-cols = {'g': 'green', 'i': 'red', 'r':'blue','u': 'orange', 'z': 'yellow'}
 pts=plt.scatter(time,mag,color=list(map(cols.get,band)))
 plt.gca().invert_yaxis()
 plt.xlim([np.min(time),np.max(time)])
-class_colours = list(map(cols.get,band))
 recs = []
-for i in range(0,len(class_colours)):
-    recs.append(mpatches.Rectangle((0,0),1,1,fc=class_colours[i]))
+for i in cols.values():
+    recs.append(mpatches.Rectangle((0,0),1,1,fc=i))
+
 
 plt.legend(recs,cols.keys(),loc=4)
 
 plt.show()
-
-
-
-
-
-
-# ###### FIT MODEL without dust
-NN = IntVector(np.array([5],dtype='int'))
-use_errors = BoolVector(np.array([True],dtype='bool'))
-use_dust = BoolVector(np.array([False],dtype='bool'))
-rss=FitTemplate(lc,omegas,r.tem,NN,use_errors,use_dust)
-## select best fitting period, ie lowest rss
-omega = omegas[np.argmin(rss)] ## best fit frequency
-pest=1.0/omega ## best fit period
-NN = IntVector(np.array([20],dtype='int'))
-coeffs=ComputeCoeffs(lc,omega,r.tem,NN,use_errors,use_dust) ## parameter estimates of best fit frequency
-
-###### now plot results
-## plot lightcurve folded on estimated period
-cols = {'g': 'green', 'i': 'red', 'r':'blue','u': 'orange', 'z': 'yellow'}
-pts=plt.scatter(np.mod(time,pest),mag,color=list(map(cols.get,band)))
-plt.gca().invert_yaxis()
-plt.xlim([0,pest])
-class_colours = list(map(cols.get,band))
-recs = []
-for i in range(0,len(class_colours)):
-    recs.append(mpatches.Rectangle((0,0),1,1,fc=class_colours[i]))
-
-plt.legend(recs,cols.keys(),loc=4)
-
-
-### add template fits, means will be off for light curves with a lot of dust
-gamma = r.tem[1]
-gamma = np.resize(gamma,(5,100))
-t=(np.arange(100)/100.)*pest
-ords=np.argsort((t - coeffs[3]*pest) % pest)
-abs_mag = r.tem[7](pest,r.tem) ## get absolute magnitudes at pest
-for ii in np.arange(gamma.shape[0]):
-    m=coeffs[0] + abs_mag[ii] + r.tem[0][ii]*coeffs[1] + coeffs[2]*gamma[ii,:]
-    plt.plot(t,m[ords],'k',color=cols[r.tem[0].names[ii]])
-
-
-plt.show()
-
 
 
 
@@ -178,6 +132,9 @@ omega_des = omegas[np.argmin(rss_des)] ## best fit frequency
 ## parameter estimates of best fit frequency, compare to sloan above
 pest_des=1.0/omega_des ## best fit period
 coeffs_des=ComputeCoeffs(lc,omega_des,r.tem) 
+
+
+######## compare des and sloan estimates
 ## des estimates
 pest_des
 coeffs_des
