@@ -17,7 +17,7 @@ tms <- rep(0,length(tms_des)) ## for compatibility with following source functio
 source("../params.R")
 
 ## estimate periods with des data
-omegas <- GetFreqs(0.4,0.95)
+##omegas <- GetFreqs(0.4,0.95)
 period_est_des <- mclapply(1:N,FitTemplateParallel,
                             tms=tms_des,omegas=omegas,tem=tem,NN=NN,use.errors=TRUE,
                             use.dust=TRUE,topN=topN,mc.cores=mc.cores)
