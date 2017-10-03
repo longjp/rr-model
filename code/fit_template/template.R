@@ -61,7 +61,7 @@ plotLC <- function(lc,p_est,coeffs,tem){
 
 
 ## fit template model and obtain coefficients
-omegas <- seq(from=1.0,to=5.0,by=0.1/4000.0)
+omegas <- seq(from=1.0,to=2.5,by=0.1/4000.0)
 rss <- FitTemplate(lc,omegas,tem_sdss)
 omega_est <- omegas[which.min(rss)]
 p_est <- 1/omega_est
@@ -71,8 +71,10 @@ names(coeffs) <- c("mu","ebv","amp","phase")
 coeffs
 ## correct values near:
 ## coeffs
-##[1] 16.0914314  0.1071064  0.5444982  0.3935931
-## view rss
+##          mu         ebv         amp       phase 
+## 16.17423839  0.08391984  0.58949080  0.24304752 
+## p_est
+## [1] 0.6417558
 
 plot(1/omegas,rss,xlab="period",ylab="rss")
 abline(v=p_est)
