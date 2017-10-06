@@ -155,7 +155,9 @@ x <- new_full[,2]-sesar[,2]
 lm.fit <- lm(y~x)
 plot(x,y)
 abline(lm.fit$coeff)
-
+lm.fit$coeff
+abline(v=0)
+abline(h=0)
 
 pdf("extc_mu.pdf")
 par(mar=c(5,5,1,1))
@@ -163,6 +165,8 @@ plot(x,y,
      ylab="mu Estimate (RR Model) - mu True (sesar)",xlab="Extinction r est (RR Model) - True Extinction r (Schlegel)",
      main="Well Sampled SDSS Stripe 82 RRL")
 abline(lm.fit$coeff)
+abline(v=0)
+abline(h=0)
 dev.off()
 
 
@@ -173,8 +177,13 @@ pdf("distance_estimates_corrected.pdf",width=12,height=6)
 par(mfcol=c(1,2),mar=c(5,5,1,1))
 plot(sesar[,1],new_full[,1],xlab="Sesar Distance",ylab="Model Estimate")
 plot(sesar[,1],mu_to_kpc(pred_mu),xlab="Sesar Distance",ylab="Model Estimate (Corrected)")
+abline(a=0,b=1.01)
+abline(a=0,b=0.99)
 dev.off()
 
+
+
+hist((mu_to_kpc(pred_mu) - sesar[,1])/sesar[,1])
 
 
 par(mfcol=c(1,2))
