@@ -67,8 +67,6 @@ dust <- dust[order(names(dust))]
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
-c0 <- c(0.7672770,0.5045376,0.5504790,1.8889979,0.5098522)
-rrmag$c0 <- c0
 
 ## absolute mag period dependence
 betasM <- matrix(0,nrow=length(periods),ncol=5)
@@ -140,4 +138,4 @@ cc <- mean(x) / dust['r']
 c0 <- rrmag$c0 + cc*dust
 
 
-
+save(c0,file="update_c0.RData")

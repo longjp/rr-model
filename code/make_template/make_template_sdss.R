@@ -1,11 +1,12 @@
 rm(list=ls())
-unlink("*.RData")
+#unlink("*.RData")
 source('../common/funcs.R')
 source('plot_options.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
 library(zoo)
+load("update_c0.RData")
 
 plot_foldername <- "figs"
 
@@ -68,6 +69,7 @@ dust <- dust[order(names(dust))]
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
+rrmag$c0 <- c0
 
 ## absolute mag period dependence
 betasM <- matrix(0,nrow=length(periods),ncol=5)
