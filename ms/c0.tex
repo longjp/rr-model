@@ -1,0 +1,120 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim, amsmath,amssymb,amsthm,graphicx}
+\usepackage[margin=1in,nohead]{geometry}
+\usepackage{sectsty}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{bbm}
+\usepackage{bm}
+
+\sectionfont{\normalsize}
+\subsectionfont{\small}
+
+\title{}
+\date{}
+\author{}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\newcommand{\Remark}[2]{{\color{red}Remark from #1: #2}\xspace}
+\newcommand{\argmin}[1]{\underset{#1}{\operatorname{argmin}}\text{ }}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\text{ }}
+\newcommand{\minimax}[2]{\argmin{#1}\underset{#2}{\operatorname{max}}}
+\newcommand{\bb}{\textbf{b}}
+
+\newcommand{\Var}{\text{Var }}
+\newcommand{\Cov}{\text{Cov }}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbbm{1}}
+
+\newcommand{\V}[1]{{\bm{\mathbf{\MakeLowercase{#1}}}}} % vector
+\newcommand{\M}[1]{{\bm{\mathbf{\MakeUppercase{#1}}}}} % matrix
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+\newenvironment{my_enumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}}{\end{enumerate}
+}
+
+
+
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of [yas] elisp error!TeX Unbound'' for suggested values.
+% See pp. 199-200 of Lamport's [yas] elisp error!LaTeX'' book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}% require fuller float pages
+
+% remember to use [htp] or [htpb] for placement
+
+
+
+
+
+\begin{document}
+\noindent
+\textbf{Calibrating the Period--Absolute Luminosity Relation}\\
+\textbf{\today}\\
+
+\section{Problem and Proposed Solution}
+
+I estimated the r--band extinction and distance modulus $\mu$ for a set of well--sampled RRL using the model. The scatterplot below shows the error in each of these measurements (estimated r--band extinction - Schlegel's r--band extinction) on x--axis and (estimated $\mu$ - Sesar's $\mu$) on the y--axis.
+
+\begin{center}
+\includegraphics[scale=0.5]{figs_c0/extcr_versus_mu.pdf}
+\end{center}
+
+The blue dot is the mean. The mean error in $\mu$ is close to $0$, meaning that on average we estimate distance correctly. However the mean error in r--band extinction is around $0.8$. Recall that with $x = \log_{10}(p) + 0.2$, the period--absolute luminosity relation in band $b$ is
+\begin{equation*}
+  M_{b}(p) = \beta_{0b} + \beta_{1b}x  + \beta_{2b}x^2.
+\end{equation*}
+
+
+This suggests that the $\beta_0 = (\beta_{0u},\beta_{0g},\beta_{0r},\beta_{0i},\beta_{0z})$ I am using is well--calibrated in the $\mu$ direction ($(1,1,1,1,1)$) but not well--calibrated in the extinction law $R = (u=4.8,g=3.74,r=2.59,i=1.92,z=1.43)$ direction.
+
+We can shift the $\beta_0$ vector ($\beta_0 \rightarrow \beta_0 + 0.033R$) so that our average dust error is 0. The table below summarizes these shifts. My main concern is that this shifts are about 5 $\sigma$ from the original value (last row of table). So if we believe the $\sigma$, these new values are implausible. Any thoughts?
+
+% latex table generated in R 3.4.2 by xtable 1.8-2 package
+% Tue Oct 10 16:07:28 2017
+\begin{center}
+\begin{tabular}{rrrrrr}
+  & u & g & r & i & z \\ 
+  \hline
+Beta0 Original & 1.732 & 0.645 & 0.466 & 0.442 & 0.463 \\ 
+  Beta0 Uncertainty & 0.019 & 0.021 & 0.015 & 0.012 & 0.010 \\ 
+  Beta0 New & 1.889 & 0.767 & 0.550 & 0.505 & 0.510 \\ 
+  Number s.d. & 8.172 & 5.763 & 5.676 & 5.371 & 4.629 \\ 
+  \end{tabular}
+\end{center}
+
+The red ellipse is the plot is a contour of the uncertainty we expect from statistical theory for determining distance and dust. Specifically with $X = (1^T,R^T)$ (matrix with first column 1's and second column extinction law), then the ellipse is a contour of $(X^TX)^{-1}$. The observed errors match well with this prediction. Originally this relation had caused me concern, but now I am comfortable with it.
+
+The above considerations show that if we 1) assume we know dust and 2) use the corrected $\beta_0$ values, we should be able to obtain more accurate distances. In addition, the model with have one fewer parameter, a benefit with poorly sampled light curves.
+
+
+\section{Results}
+
+%\bibliographystyle{plainnat}
+%\bibliography{refs}
+
+
+\end{document}
+

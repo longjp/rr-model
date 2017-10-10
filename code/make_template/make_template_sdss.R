@@ -7,6 +7,7 @@ load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
 library(zoo)
 library(ellipse)
+library(xtable)
 
 plot_foldername <- "figs"
 
@@ -69,6 +70,7 @@ dust <- dust[order(names(dust))]
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
+
 
 ## absolute mag period dependence
 betasM <- matrix(0,nrow=length(periods),ncol=5)
@@ -136,10 +138,27 @@ dev.off()
 
 
 
+
+tab_out <- cbind(rrmag[,c("c0","sigc0")],0,0)
+rownames(tab_out) <- rrmag$bnd
+colnames(tab_out) <- c("Beta0 Original","Beta0 Uncertainty","Beta0 New","Number s.d.")
+
 ## update c0
 c0_old <- rrmag$c0
 cc <- mean(x) / dust['r']
 rrmag$c0 <- rrmag$c0 + cc*dust
+
+
+tab_out[,3] <- rrmag$c0
+tab_out[,4] <- abs((tab_out[,1] - tab_out[,3]) / tab_out[,2])
+tab_out <- round(tab_out,3)
+
+
+tab_out <- t(tab_out)
+tab_out <- tab_out[,c("u","g","r","i","z")]
+out <- print(xtable(tab_out,digits=3),hline.after=0)
+
+
 
 ####### end c0 update
 
