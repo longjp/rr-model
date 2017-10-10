@@ -6,6 +6,7 @@ source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
 library(zoo)
+library(ellipse)
 
 plot_foldername <- "figs"
 
@@ -86,7 +87,7 @@ colnames(betasM) <- rrmag$bnd
 
 
 
-####### begin c0 update
+####### BEGIN co UPDATE
 
 ## estimate ebv and mu for each lc
 ests <- data.frame(ID=names(tms),mu_est=0,extcr_est=0)
@@ -117,28 +118,26 @@ plot(comp$mu,comp$mu_est)
 plot(comp$extcr,comp$extcr_est)
 
 
+pdf("extcr_versus_mu.pdf")
 y <- comp$mu_est - comp$mu
 x <- comp$extcr_est-comp$extcr
 par(mar=c(5,5,1,1))
-plot(x,y,xlab="Extinction r Residual",ylab="mu Residual")
+plot(x,y,xlab="Predicted r Extinction - Schlegel r Extinction",ylab="Predicted mu - Sesar mu")
 lm_fit <- lm(y ~ x)
 abline(lm_fit$coeff)
 abline(v=0)
 abline(h=0)
-
+points(mean(x),mean(y),pch=19,col='blue',cex=1.5)
 X <- cbind(dust/dust['r'],1)
 covx <- solve(t(X)%*%X)
 covx <- (var(x)/covx[1,1])*covx
-##covx <- solve(t(X)%*%X) * mean(rss) analytic method
-
-mean(x)
-
 points(ellipse(covx,centre=c(mean(x),mean(y))),col='red',type='l',pch=2,lwd=2)
-points(mean(x),mean(y),pch=19,col='blue',cex=1.5)
+dev.off()
 
 
 
 ## update c0
+c0_old <- rrmag$c0
 cc <- mean(x) / dust['r']
 rrmag$c0 <- rrmag$c0 + cc*dust
 
@@ -464,28 +463,11 @@ dev.off()
 
 #### CONSTRUCT OLD TEMPLATE, NO PERIOD-ABS MAG DEPENDENCE
 ## find betas at median period, old template style
-pmed <- median(periods)
-betas_fixed <- rrmag$c0 + rrmag$p1*(log10(pmed) + 0.2) + rrmag$p2*(log10(pmed) + 0.2)^2
-names(betas_fixed) <- rrmag$bnd
-
-
 tem_old <- tem
-tem_old$pmed <- pmed
-tem_old$abs_mag <- function(p,tem){
-    p <- rep(tem$pmed,length(p)) ## ignore period inputs, use median
-    X <- cbind(1,log10(p) + 0.2,(log10(p) + 0.2)^2)
-    return(X%*%tem$betas)
-}
+tem_old$betas[1,] <- c0_old
 
-## testing template functions
-tem$abs_mag(0.5,tem)
-tem$abs_mag(0.6,tem)
-tem$abs_mag(median(periods),tem)
-tem$abs_mag(c(0.5,.6,median(periods)),tem)
-tem_old$abs_mag(0.5,tem_old)
-tem_old$abs_mag(0.6,tem_old)
-tem_old$abs_mag(c(0.5,0.6),tem_old)
-
+tem$betas
+tem_old$betas
 
 ## save template
 save(tem,tem_old,file="../fit_template/template_sdss.RData")

@@ -21,12 +21,12 @@ omegas <- GetFreqs(0.4,0.95) ## frequency grid
 ## estimate periods for both the full lc (tms_FULL) and downsampled (tms)
 ## using old and new templates
 period_est_new <- mclapply(1:N,FitTemplateParallel,
-                           tms=tms,omegas=omegas,tem=tem,NN=NN,topN=topN,
+                           tms=tms,omegas=omegas,tem=tem,NN=NN,use.dust=FALSE,topN=topN,
                            mc.cores=mc.cores)
 period_est_new <- matrix(unlist(period_est_new),ncol=topN,byrow=TRUE)
 
 period_est_new_FULL <- mclapply(1:N,FitTemplateParallel,
-                                tms=tms_FULL,omegas=omegas,tem=tem,NN=NN,topN=topN,
+                                tms=tms_FULL,omegas=omegas,tem=tem,NN=NN,use.dust=FALSE,topN=topN,
                                 mc.cores=mc.cores)
 period_est_new_FULL <- matrix(unlist(period_est_new_FULL),ncol=topN,byrow=TRUE)
 
