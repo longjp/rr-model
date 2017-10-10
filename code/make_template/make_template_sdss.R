@@ -6,7 +6,6 @@ source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
 library(zoo)
-load("update_c0.RData")
 
 plot_foldername <- "figs"
 
@@ -69,7 +68,6 @@ dust <- dust[order(names(dust))]
 rrmag <- read.table("rrmag.dat",header=TRUE)
 rrmag <- rrmag[rrmag$Sys=="SDSS",]
 rrmag <- rrmag[order(rrmag$bnd),]
-rrmag$c0 <- c0
 
 ## absolute mag period dependence
 betasM <- matrix(0,nrow=length(periods),ncol=5)
@@ -86,53 +84,69 @@ colnames(betasM) <- rrmag$bnd
 
 
 
+
+
+####### begin c0 update
+
 ## estimate ebv and mu for each lc
-rs <- matrix(0,nrow=nrow(m),ncol=ncol(m))
-d_val <- matrix(0,nrow=nrow(m),ncol=2)
-m_shift <- m - betasM
-for(ii in 1:nrow(m)){
-    lm.fit <- lm(m_shift[ii,]~dust)
-    rs[ii,] <- lm.fit$residuals
-    d_val[ii,] <- lm.fit$coefficients
-}
-
-head(rs)
-median(abs(rs))
-colnames(d_val) <- c("mu","my_dust")
-d_val <- data.frame(ID=names(tms),d_val)
-
+ests <- data.frame(ID=names(tms),mu_est=0,extcr_est=0)
 
 ## compare dust to sesar dust
+m_shift <- m - betasM
+rss <- rep(0,nrow(m))
+for(ii in 1:nrow(m)){
+    lm_fit <- lm(m_shift[ii,]~dust)
+    ests[ii,2:3] <- lm_fit$coefficients
+    rss[ii] <- sum(lm_fit$residuals^2)/(length(dust)-2)
+}
+ests[,3] <- ests[,3]*dust['r']
+
+
+
+kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
+mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
+
 tab <- read.table("../data/raw/apj326724t3_mrt.txt",skip=30)
 tab <- tab[,c(1,4,5)]
-names(tab) <- c("ID","dust","dist")
+tab[,3] <- kpc_to_mu(tab[,3])
+names(tab) <- c("ID","extcr","mu")
 tab$ID <- paste0("LC_",tab$ID,".dat")
 
-dust_comp <- merge(tab,d_val)
-dust_comp$my_dist <- 10^(dust_comp$mu/5 + 1)/1000
+comp <- merge(tab,ests)
+plot(comp$mu,comp$mu_est)
+plot(comp$extcr,comp$extcr_est)
 
 
-lim <- range(c(dust_comp$dist,dust_comp$my_dist))
-
-pdf("distance_comparison.pdf")
+y <- comp$mu_est - comp$mu
+x <- comp$extcr_est-comp$extcr
 par(mar=c(5,5,1,1))
-plot(dust_comp$dist,dust_comp$my_dist,xlim=c(5,70),ylim=c(5,70),
-     xlab="Sesar Distance",ylab="Model Distance - New",cex.lab=1.3)
-abline(a=0,b=1)
-abline(a=0,b=1.05)
-abline(a=0,b=.95)
-dev.off()
+plot(x,y,xlab="Extinction r Residual",ylab="mu Residual")
+lm_fit <- lm(y ~ x)
+abline(lm_fit$coeff)
+abline(v=0)
+abline(h=0)
+
+X <- cbind(dust/dust['r'],1)
+covx <- solve(t(X)%*%X)
+covx <- (var(x)/covx[1,1])*covx
+##covx <- solve(t(X)%*%X) * mean(rss) analytic method
+
+mean(x)
+
+points(ellipse(covx,centre=c(mean(x),mean(y))),col='red',type='l',pch=2,lwd=2)
+points(mean(x),mean(y),pch=19,col='blue',cex=1.5)
 
 
-lim <- c(0,.8)
-pdf("dust_comparison.pdf")
-par(mar=c(5,5,1,1))
-plot(dust_comp$dust,dust['r']*dust_comp$my_dust,ylim=lim,xlim=lim,xlab="Schlegel Dust r",ylab="Model Dust r - New",
-     cex.lab=1.3)
-abline(a=0,b=1)
-dev.off()
+
+## update c0
+cc <- mean(x) / dust['r']
+rrmag$c0 <- rrmag$c0 + cc*dust
+
+####### end c0 update
 
 
+
+### DEMEAN AND PHASE ALIGN LIGHTCURVES
 
 ## make lc_grid mean 0 for each band, source
 for(ii in 1:Nlc){
