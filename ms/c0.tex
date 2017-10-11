@@ -76,21 +76,21 @@
 
 \section{Problem and Proposed Solution}
 
-I estimated the r--band extinction and distance modulus $\mu$ for a set of well--sampled RRL using the model. The scatterplot below shows the error in each of these measurements (estimated r--band extinction - Schlegel's r--band extinction) on x--axis and (estimated $\mu$ - Sesar's $\mu$) on the y--axis.
+I estimated the r--band extinction and distance modulus $\mu$ for a set of well--sampled RRL using the model. The scatterplot below shows the error in each of these measurements relative to Schlegel and Sesar values.
 
 \begin{center}
 \includegraphics[scale=0.5]{figs_c0/extcr_versus_mu.pdf}
 \end{center}
 
-The blue dot is the mean. The mean error in $\mu$ is close to $0$, meaning that on average we estimate distance correctly. However the mean error in r--band extinction is around $0.8$. Recall that with $x = \log_{10}(p) + 0.2$, the period--absolute luminosity relation in band $b$ is
+The blue dot is the mean. The mean error in $\mu$ is close to $0$, meaning that on average we estimate distance correctly. However the mean error in r--band extinction is around $0.08$. Recall that with $x(p) = \log_{10}(p) + 0.2$, the period--absolute luminosity relation in band $b$ is
 \begin{equation*}
-  M_{b}(p) = \beta_{0b} + \beta_{1b}x  + \beta_{2b}x^2.
+  M_{b}(p) = \beta_{0b} + \beta_{1b}x(p)  + \beta_{2b}x(p)^2.
 \end{equation*}
 
 
-This suggests that the $\beta_0 = (\beta_{0u},\beta_{0g},\beta_{0r},\beta_{0i},\beta_{0z})$ I am using is well--calibrated in the $\mu$ direction ($(1,1,1,1,1)$) but not well--calibrated in the extinction law $R = (u=4.8,g=3.74,r=2.59,i=1.92,z=1.43)$ direction.
+This suggests that the $\beta_0 = (\beta_{0u},\beta_{0g},\beta_{0r},\beta_{0i},\beta_{0z})$ I am using is well--calibrated in the $\mu$ direction ($(1,1,1,1,1)$) but not well--calibrated in the extinction law direction $R = (u=4.8,g=3.74,r=2.59,i=1.92,z=1.43)$.
 
-We can shift the $\beta_0$ vector ($\beta_0 \rightarrow \beta_0 + 0.033R$) so that our average dust error is 0. The table below summarizes these shifts. My main concern is that this shifts are about 5 $\sigma$ from the original value (last row of table). So if we believe the $\sigma$, these new values are implausible. Any thoughts?
+We can shift the $\beta_0$ vector ($\beta_0 \rightarrow \beta_0 + 0.033R$) so that our average dust error is 0. The table below summarizes these shifts. My main concern is that these shifts are about 5 $\sigma$ from the original value (last row of table). So if we believe the $\sigma$, the Beta0 New values are implausible. Any thoughts?
 
 % latex table generated in R 3.4.2 by xtable 1.8-2 package
 % Tue Oct 10 16:07:28 2017
@@ -105,12 +105,24 @@ Beta0 Original & 1.732 & 0.645 & 0.466 & 0.442 & 0.463 \\
   \end{tabular}
 \end{center}
 
-The red ellipse is the plot is a contour of the uncertainty we expect from statistical theory for determining distance and dust. Specifically with $X = (1^T,R^T)$ (matrix with first column 1's and second column extinction law), then the ellipse is a contour of $(X^TX)^{-1}$. The observed errors match well with this prediction. Originally this relation had caused me concern, but now I am comfortable with it.
+The red ellipse in the plot is a contour of the uncertainty we expect from statistical theory for determining distance and dust. Specifically with $X = (1^T,R^T)$ (matrix with first column 1's and second column extinction law), then the ellipse is a contour of $(X^TX)^{-1}$. The observed errors match well with this prediction. This solves a concern I had with shifting $\beta_0$ causing negative dust estimates.
 
-The above considerations show that if we 1) assume we know dust and 2) use the corrected $\beta_0$ values, we should be able to obtain more accurate distances. In addition, the model with have one fewer parameter, a benefit with poorly sampled light curves.
+The above considerations show that if we 1) assume we know dust and 2) use the corrected $\beta_0$ values, we should be able to obtain more accurate distances. In addition, the model will have one fewer parameter, a benefit with poorly sampled light curves.
 
 
 \section{Results}
+
+We fit the templates with 1) New $\beta_0$ and 2) Old $\beta_0$ on a few hundred SDSS Stripe 82 RRL both the 1) Full Lightcurves and 2) downsampled to 20 photometric measurements. The results for period and distance estimation accuracy are below.
+
+
+%% \begin{center}
+%%   \includegraphics[scale=0.6]{figs_c0/1-results-periods.pdf}
+%% \end{center}
+
+%% \begin{center}
+%%   \includegraphics[scale=0.6]{figs_c0/1-results-distance.pdf}
+%% \end{center}
+
 
 %\bibliographystyle{plainnat}
 %\bibliography{refs}
