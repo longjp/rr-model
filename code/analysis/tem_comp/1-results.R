@@ -60,8 +60,8 @@ ScatterMatrix(periods,period_est_new[,1],period_est_new_FULL[,1],
               period_est_old[,1],period_est_old_FULL[,1],
               xlab="True Period",r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Dependent Templates",
-              c2lab="Fixed Templates")
+              c1lab="New Beta0",
+              c2lab="Old Beta0")
 dev.off()
 
 ## compute dust and distance estimates
