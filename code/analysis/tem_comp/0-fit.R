@@ -19,8 +19,8 @@ omegas <- GetFreqs(0.4,0.95) ## frequency grid
 
 ## create dust corrected tms
 ebv <- extcr / tem$dust['r']
-tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem))
-tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem))
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
 
 ## estimate periods for both the full lc (tms_FULL) and downsampled (tms)
 ## using old and new templates
