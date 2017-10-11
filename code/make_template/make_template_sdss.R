@@ -124,7 +124,7 @@ pdf("extcr_versus_mu.pdf")
 y <- comp$mu_est - comp$mu
 x <- comp$extcr_est-comp$extcr
 par(mar=c(5,5,1,1))
-plot(x,y,xlab="Predicted r Extinction - Schlegel r Extinction",ylab="Predicted mu - Sesar mu")
+plot(x,y,xlab="model estimate r Extinction - Schlegel r Extinction",ylab="model estimate mu - Sesar mu",cex.lab=1.3)
 lm_fit <- lm(y ~ x)
 abline(lm_fit$coeff)
 abline(v=0)
@@ -135,6 +135,9 @@ covx <- solve(t(X)%*%X)
 covx <- (var(x)/covx[1,1])*covx
 points(ellipse(covx,centre=c(mean(x),mean(y))),col='red',type='l',pch=2,lwd=2)
 dev.off()
+
+print(paste0("The mean error in r-band extinction is :",mean(x)))
+print(paste0("The mean error in mu is :",mean(y)))
 
 
 
