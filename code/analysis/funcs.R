@@ -1,3 +1,20 @@
+## returns dust corrected lightcurve
+##    arguments:
+##          tm : lightcurve
+##         ebv : dust for lightcurve tm
+##         tem : templates, contains extinction law in tem$dust
+DustCorrect <- function(tm,ebv,tem){
+    if(mean(names(tm) %in% names(tem$dust))!=1){
+        print("lightcurve has bands: ",names(tm))
+        print("template only has extinction law for:",names(tem$dust))
+        stop()
+    }
+    for(jj in 1:length(tm)){
+        tm[[jj]][,2] <- tm[[jj]][,2] - tem$dust[names(tm)[jj]]*ebv
+    }
+    return(tm)
+}
+
 GetFreqs <-function(period_min,period_max,freq_del = 0.1/4000){
     freq_max <- 1/period_min
     freq_min <- 1/period_max
