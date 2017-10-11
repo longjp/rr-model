@@ -121,8 +121,8 @@ ScatterMatrix(sesar[,1],new_down[,1],new_full[,1],
               xlab="Sesar Distance",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Dependent Templates",
-              c2lab="Fixed Templates",lim=c(5,120),
+              c1lab="New Beta0",
+              c2lab="Old Beta0",lim=c(5,120),
               y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
 dev.off()
 
@@ -134,8 +134,8 @@ ScatterMatrix(sesar[,2],new_down[,2],new_full[,2],
               xlab="Schlegel r-band Extinction",
               r1lab=expression(bold("Downsampled Light Curve")),
               r2lab=expression(bold("Well Sampled Light Curve")),
-              c1lab="Dependent Templates",
-              c2lab="Fixed Templates",lim=lim,
+              c1lab="New Beta0",
+              c2lab="Old Beta0",lim=lim,
               y1col=y1col,y2col=y2col,y3col=y3col,y4col=y4col)
 dev.off()
 
@@ -163,7 +163,7 @@ pdf("extc_mu.pdf")
 par(mar=c(5,5,1,1))
 plot(x,y,
      ylab="mu Estimate (RR Model) - mu True (sesar)",xlab="Extinction r est (RR Model) - True Extinction r (Schlegel)",
-     main="Well Sampled SDSS Stripe 82 RRL")
+     main="Well Sampled SDSS Stripe 82 RRL",col=y1col)
 abline(lm.fit$coeff)
 abline(v=0)
 abline(h=0)
