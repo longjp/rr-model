@@ -24,7 +24,7 @@ N <- nrow(period_est_new)
 periods <- periods[1:N]
 
 
-## make 6 pairs of scatterplots of
+## make 3 pairs of scatterplots of
 ## 1. true periods vs. old/new on down,up
 ## 2. sesar distances vs. old/new on down,up
 ## 3. schlegel dust vs. old/new on down,up
