@@ -71,7 +71,7 @@
 
 \begin{document}
 \noindent
-\textbf{Calibrating the Period--Absolute Luminosity Relation}\\
+\textbf{Calibrating the Period--Absolute Magnitude Relation}\\
 \textbf{\today}\\
 
 \section{Problem and Proposed Solution}
@@ -79,10 +79,10 @@
 I estimated the r--band extinction and distance modulus $\mu$ for a set of well--sampled RRL using the model. The scatterplot below shows the error in each of these measurements relative to Schlegel and Sesar values.
 
 \begin{center}
-\includegraphics[scale=0.5]{figs_c0/extcr_versus_mu.pdf}
+\includegraphics[scale=0.5]{figs_beta0/extcr_versus_mu.pdf}
 \end{center}
 
-The blue dot is the mean. The mean error in $\mu$ is close to $0$, meaning that on average we estimate distance correctly. However the mean error in r--band extinction is around $0.08$. Recall that with $x(p) = \log_{10}(p) + 0.2$, the period--absolute luminosity relation in band $b$ is
+The blue dot is the mean. The mean error in $\mu$ is close to $0$, meaning that on average we estimate distance correctly. However the mean error in r--band extinction is around $0.08$. Recall that with $x(p) = \log_{10}(p) + 0.2$, the period--absolute magnitude relation in band $b$ is
 \begin{equation*}
   M_{b}(p) = \beta_{0b} + \beta_{1b}x(p)  + \beta_{2b}x(p)^2.
 \end{equation*}
@@ -112,16 +112,17 @@ The above considerations show that if we 1) assume we know dust and 2) use the c
 
 \section{Results}
 
-We fit the templates with 1) New $\beta_0$ and 2) Old $\beta_0$ on a few hundred SDSS Stripe 82 RRL both the 1) Full Lightcurves and 2) downsampled to 20 photometric measurements. The results for period and distance estimation accuracy are below.
+We fit the templates with 1) New $\beta_0$ and 2) Old $\beta_0$ on a few hundred SDSS Stripe 82 RRL on the data sets 1) Full Lightcurves and 2) downsampled to 20 photometric measurements. The new beta0 method used Schlegel dust corrected light curves and did not fit for dust. The results for period and distance estimation accuracy are below.
 
+The Old $\beta_0$ gets slightly better period estimation accuracy on well sampled, but less good accuracy on poorly sampled light curves. The distance estimates are much better with the new $\beta_0$.
 
-%% \begin{center}
-%%   \includegraphics[scale=0.6]{figs_c0/1-results-periods.pdf}
-%% \end{center}
+\begin{center}
+  \includegraphics[scale=0.6]{figs_beta0/1-results-periods.pdf}
+\end{center}
 
-%% \begin{center}
-%%   \includegraphics[scale=0.6]{figs_c0/1-results-distance.pdf}
-%% \end{center}
+\begin{center}
+  \includegraphics[scale=0.6]{figs_beta0/1-results-distance.pdf}
+\end{center}
 
 
 %\bibliographystyle{plainnat}
