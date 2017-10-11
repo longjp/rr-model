@@ -66,14 +66,14 @@ dev.off()
 
 ## compute dust and distance estimates
 
-DustDistance <- function(p_ests,tms,tem){
+DustDistance <- function(p_ests,tms,tem,use.dust){
     N <- length(p_ests)
     coeffs <- matrix(0,ncol=4,nrow=N)
     for(ii in 1:N){
         tm <- tms[[ii]]
         omega <- 1/p_ests[ii]
         lc <- TMtoLC(tm)
-        coes <- ComputeCoeffs(lc,omega,tem)
+        coes <- ComputeCoeffs(lc,omega,tem,use.dust=use.dust)
         coeffs[ii,] <- coes
     }
     colnames(coeffs) <- c("mu","E[B-V]","a","phi")
@@ -84,11 +84,17 @@ DustDistance <- function(p_ests,tms,tem){
 }
 
 
+## create dust corrected tms
+ebv <- extcr / tem$dust['r']
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+
+
 ## compute dust, distance using each method / data set
-new_down <- DustDistance(period_est_new[,1],tms,tem)
-new_full <- DustDistance(period_est_new_FULL[,1],tms_FULL,tem)
-old_down <- DustDistance(period_est_old[,1],tms,tem_old)
-old_full <- DustDistance(period_est_old_FULL[,1],tms_FULL,tem_old)
+new_down <- DustDistance(period_est_new[,1],tmsc,tem,use.dust=FALSE)
+new_full <- DustDistance(period_est_new_FULL[,1],tmsc_FULL,tem,use.dust=FALSE)
+old_down <- DustDistance(period_est_old[,1],tms,tem_old,use.dust=TRUE)
+old_full <- DustDistance(period_est_old_FULL[,1],tms_FULL,tem_old,use.dust=TRUE)
 
 ## obtain true distances and dust from sesar table
 sesar <- cbind(distance[1:N],extcr[1:N])
@@ -144,6 +150,7 @@ kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
 mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
 
 
+hist(new_full[,1]/sesar[,1])
 
 
 plot(kpc_to_mu(new_down[,1]) - kpc_to_mu(sesar[,1]),new_down[,2]-sesar[,2])
