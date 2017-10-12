@@ -15,6 +15,9 @@ r.load("template_sdss.RData") ## loads r.tem, see later code for usage
 FitTemplate=robjects.r['FitTemplate']
 ComputeCoeffs=robjects.r['ComputeCoeffs']
 
+
+###### FIT MODEL on SDSS Stripe 82 light curve
+
 ## load a light curve, put in nice format
 fname="LC_402316.dat"
 with open(fname) as csvf:
@@ -49,8 +52,8 @@ coeffs=ComputeCoeffs(lc,omega,r.tem) ## parameter estimates of best fit frequenc
 ## the output is [distance modulus (mu),amount of dust (E[B-V]),amplitude (a),phase (rho)]
 # >>> coeffs
 # R object with classes: ('numeric',) mapped to:
-# <FloatVector - Python:0x7f72c849a0c8 / R:0x5f40790>
-# [19.250568, 0.076749, 1.225825, 0.172240]
+# <FloatVector - Python:0x7f6ecca62088 / R:0x6c3bcf0>
+# [19.250568, 0.044055, 1.225825, 0.172240]
 # >>> omega
 # 1.8413499999980392
 # >>> pest
@@ -98,6 +101,77 @@ plt.show()
 
 
 
+###### DUST CORRECT LIGHT CURVE AND FIT MODEL
+###### WITHOUT DUST
+###### for the purposes of this demo we dust
+###### correct using the estimated E[B-V] value
+###### from the previous fit (coeffs[1]). however
+###### in practice one would dust correct using
+###### E[B-V] values in dust maps
+
+## load a light curve, put in nice format
+fname="LC_402316.dat"
+with open(fname) as csvf:
+    f = csv.reader(csvf,delimiter=' ')
+    time, band, mag, error = zip(*f)
+
+no_pound = [not '#' in x for x in time]    
+time = list(itertools.compress(time, no_pound))
+band = list(itertools.compress(band, no_pound))
+mag = list(itertools.compress(mag, no_pound))
+error = list(itertools.compress(error, no_pound))
+
+## convert to floats
+mag = list(map(float,mag))
+time = list(map(float,time))
+error = list(map(float,error))
+
+## dust correct mag vector
+schlegel_r = 0.108 ## extinction in r reported by schlegel for this lc
+ebv = schlegel_r / dust_dict['r'] ## convert to ebv
+dust_dict = {list(r.tem[0].names)[i] : list(r.tem[0])[i] for i in range(5)}
+def DustCorrect(b,m): ## b is band, m is mag
+    return m - ebv*dust_dict[b]
+
+mag = list(map(DustCorrect, band, mag))
+
+
+## create R dataframe using time,band,mag,error
+time = np.array(time,dtype='float64')
+mag = np.array(mag,dtype='float64')
+error = np.array(error,dtype='float64')
+lc = robjects.r['TBMEtoLC'](FloatVector(time),StrVector(band),FloatVector(mag),FloatVector(error))
+
+
+### fit model to lc with dust turned OFF
+omegas=FloatVector(np.arange(start=1.0,stop=2.5,step=0.1/4000.0))
+NN = IntVector(np.array([5],dtype='int'))
+use_errors = BoolVector(np.array([True],dtype='bool'))
+use_dust = BoolVector(np.array([False],dtype='bool'))
+rss=FitTemplate(lc,omegas,r.tem,NN,use_errors,use_dust)
+## select best fitting period, ie lowest rss
+omega = omegas[np.argmin(rss)] ## best fit frequency
+pest=1.0/omega ## best fit period
+NN = IntVector(np.array([20],dtype='int'))
+coeffs=ComputeCoeffs(lc,omega,r.tem,NN,use_errors,use_dust)  ## parameter estimates of best fit frequency
+coeffs
+## the output is [distance modulus (mu),amount of dust (E[B-V]),amplitude (a),phase (rho)]
+## E[B-V] = 0 because dust is off
+# >>> coeffs
+# R object with classes: ('numeric',) mapped to:
+# <FloatVector - Python:0x7fad945a1ac8 / R:0x65cef18>
+# [19.256907, 0.000000, 1.225244, 0.172226]
+omega
+# >>> omega
+# 1.8413499999980392
+pest
+# >>> pest
+# 0.543079805578008
+
+
+
+
+
 ###### FIT MODEL on DES version of light curve
 #### compare sloan / des fits on same RRL
 r.load("template_des.RData") ## loads des template
@@ -132,12 +206,17 @@ omega_des = omegas[np.argmin(rss_des)] ## best fit frequency
 ## parameter estimates of best fit frequency, compare to sloan above
 pest_des=1.0/omega_des ## best fit period
 coeffs_des=ComputeCoeffs(lc,omega_des,r.tem) 
-
+# >>> coeffs_des
+# R object with classes: ('numeric',) mapped to:
+# <FloatVector - Python:0x7fad945a9808 / R:0x5171668>
+# [19.232691, 0.049118, 1.182909, 0.182078]
 
 ######## compare des and sloan estimates
 ## des estimates
 pest_des
-coeffs_des
 ## sloan estimates
 pest
-coeffs
+
+
+
+
