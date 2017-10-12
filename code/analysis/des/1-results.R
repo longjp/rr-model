@@ -53,7 +53,7 @@ coeffs_des <- matrix(0,nrow=length(tms_des),ncol=4)
 for(ii in 1:length(tms_des)){
     omega <- 1 / period_est_des[ii,1]
     lc <- TMtoLC(tms_des[[ii]])
-    coeffs_des[ii,] <- ComputeCoeffs(lc,omega,tem)
+    coeffs_des[ii,] <- ComputeCoeffs(lc,omega,tem,use.dust=FALSE)
 }
 colnames(coeffs_des) <- c("mu","ebv","a","phi")
 
@@ -91,37 +91,6 @@ dev.off()
 ### improved distances by "correcting" based on extinction error
 kpc_to_mu <- function(kpc) 5*(log10(kpc*1000)-1)
 mu_to_kpc <- function(mu) (10^(mu/5 + 1)) / 1000
-
-
-
-
-x <- e_des-extcr
-y <- coeffs_des[,1]-kpc_to_mu(distance)
-pdf("dust_distance.pdf")
-par(mar=c(5,5,1,1))
-plot(x,y,
-     xlab="Model Estimated Extinction r - Schlegel Extinction r",ylab="mu DES - mu Sesar",
-     cex.lab=1.3,ylim=c(-.5,.5),xlim=c(-.3,.6),col=cols,pch=cols)
-dev.off()
-
-
-lm.fit <- lm(y ~ x)
-
-a
-
-pred_mu <- coeffs_des[,1] - predict(lm.fit)
-
-pdf("distance_des_corrected.pdf")
-par(mar=c(5,5,1,1))
-plot(distance,mu_to_kpc(pred_mu),xlab="Sesar Distance",ylab="Model Estimate (Corrected)",
-     col=cols,pch=cols)
-abline(a=0,b=1)
-abline(a=0,b=.95,lty=2)
-abline(a=0,b=1.05,lty=2)
-legend("bottomright",c("Identity","5% Scatter"),lty=1:2,lwd=2)
-dev.off()
-
-
 
 
 
