@@ -1,5 +1,4 @@
 ### demonstrates how to use some functions in fit_template.R
-### PART 1 below is the most useful, other parts are more code checking
 rm(list=ls())
 source("fit_template.R")
 
@@ -70,9 +69,9 @@ coeffs <- ComputeCoeffs(lc,omega_est,tem_sdss)
 names(coeffs) <- c("mu","ebv","amp","phase")
 coeffs
 ## correct values near:
-## coeffs
+## > coeffs
 ##          mu         ebv         amp       phase 
-## 16.17423839  0.08391984  0.58949080  0.24304752 
+## 16.17423839  0.05122597  0.58949080  0.24304752 
 ## p_est
 ## [1] 0.6417558
 
@@ -95,6 +94,8 @@ abline(v=coeffs[4])
 ##
 ## PART 2: refit model, subtracting off dust first
 ##         here we test if model works when use.dust=FALSE
+##         we use dust computed from earlier run (coeffs[2]),
+##         but in practice would use values from dust maps
 ebv <- coeffs[2]
 ## remove dust
 bands <- names(tem_sdss$dust)
