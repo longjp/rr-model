@@ -193,8 +193,6 @@ tem$betas <- betas_des
 #### SAVE OUTPUT
 ####
 
-## TODO: update RemoveBand so it does not delete betas
-
 ## get rid of u band
 tem <- RemoveBand(tem,"u")
 
