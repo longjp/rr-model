@@ -30,7 +30,7 @@ tmsc_des <- mapply(DustCorrect,tms_des,ebv,MoreArgs=list(tem=tem_des),SIMPLIFY=F
 ## estimate periods with des data
 omegas <- GetFreqs(0.4,0.95)
 period_est_des <- mclapply(1:N,FitTemplateParallel,
-                            tms=tms_des,omegas=omegas,tem=tem_des,NN=NN,use.errors=TRUE,
+                            tms=tmsc_des,omegas=omegas,tem=tem_des,NN=NN,use.errors=TRUE,
                             use.dust=FALSE,topN=topN,mc.cores=mc.cores)
 period_est_des <- matrix(unlist(period_est_des),ncol=topN,byrow=TRUE)
 
