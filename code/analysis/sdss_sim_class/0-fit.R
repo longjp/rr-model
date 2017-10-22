@@ -13,7 +13,6 @@ load("../../data/clean/sdss_sim_class.RData")
 
 ## parameters for simulation
 source("../params.R")
-omegas <- GetFreqs(0.4,0.95) ## frequency grid
 
 ## estimate periods for both the full lc (tms_FULL) and downsampled (tms)
 ## using both the RRL template and (period_est) and lomb-scarge (period_est_lomb)

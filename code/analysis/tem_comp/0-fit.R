@@ -15,7 +15,7 @@ source("../params.R")
 
 ## relies on fact that RRL are first in list
 N <- sum(cl=="rr")
-omegas <- GetFreqs(0.4,0.95) ## frequency grid
+
 
 ## create dust corrected tms
 ebv <- extcr / tem$dust['r']
