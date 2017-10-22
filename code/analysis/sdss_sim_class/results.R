@@ -11,7 +11,7 @@ source("../../common/plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_sim_class.RData")
-load("results.RData")
+load("0-fit.RData")
 source("../params.R")
 
 unlink("figs",recursive=TRUE)

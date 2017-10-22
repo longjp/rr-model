@@ -38,4 +38,4 @@ period_est_lomb_FULL <- mclapply(1:N,FitLombParallel,
 period_est_lomb_FULL <- matrix(unlist(period_est_lomb_FULL),ncol=topN,byrow=TRUE)
 
 
-save(period_est,period_est_lomb,period_est_FULL,period_est_lomb_FULL,file="results.RData")
+save(period_est,period_est_lomb,period_est_FULL,period_est_lomb_FULL,file="0-fit.RData")
