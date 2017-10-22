@@ -14,7 +14,7 @@ source("../funcs.R")
 
 ## data source
 load("../../data/clean/sdss_sim_class.RData")
-load("results.RData")
+load("0-fit.RData")
 source("../params.R")
 
 fig.dir <- "figs_classify"
