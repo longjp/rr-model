@@ -19,7 +19,7 @@ source("../../common/plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_sim_class.RData")
-load("results.RData")
+load("0-fit.RData")
 source("../params.R")
 
 
@@ -42,6 +42,10 @@ mlefvonmises_simple_k <- function(t){
         
 
 
+## create dust corrected tms
+ebv <- extcr / tem$dust['r']
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
 
 
 ps <- period_est[,1] ## just use best fit period
@@ -53,8 +57,8 @@ kappa_feat <- rep(0,length(ps))
 phis <- (1:100)/100
 for(ii in 1:nrow(coeffs)){
     omega <- 1/ps[ii]
-    lc <- TMtoLC(tms[[ii]])
-    rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis)
+    lc <- TMtoLC(tmsc[[ii]])
+    rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis,use.dust=FALSE)
     phi <- phis[which.min(rss_phase)]
     coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
     pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
