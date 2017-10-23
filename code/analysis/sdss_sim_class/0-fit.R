@@ -13,9 +13,6 @@ load("../../data/clean/sdss_sim_class.RData")
 
 ## parameters for simulation
 source("../params.R")
-mc.cores <- 2
-N <- 4
-
 
 ## create dust corrected tms
 ebv <- extcr / tem$dust['r']
