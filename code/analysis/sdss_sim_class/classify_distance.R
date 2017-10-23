@@ -27,16 +27,23 @@ period_est <- period_est[,1] ## just use best fit period
 sigs <- unlist(lapply(tms,function(tm){lapply(tm,function(x){x$error})}))
 hist(sigs[sigs<.1])
 
+
+## create dust corrected tms
+ebv <- extcr / tem$dust['r']
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+
+
 rss.n <- rep(0,N)
 rss.n2 <- rep(0,N)
 rss.n3 <- rep(0,N)
 coeffs <- matrix(0,ncol=4,nrow=N)
 cols <- matrix(0,ncol=2,nrow=N)
 for(ii in 1:N){
-    tm <- tms[[ii]]
+    tm <- tmsc[[ii]]
     omega <- 1/period_est[ii]
     lc <- TMtoLC(tm)
-    coes <- ComputeCoeffs(lc,omega,tem)
+    coes <- ComputeCoeffs(lc,omega,tem,use.dust=FALSE)
     coeffs[ii,] <- coes
     dev <- rep(0,length(tm))
     dev2 <- rep(0,length(tm))
