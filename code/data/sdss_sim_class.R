@@ -96,9 +96,6 @@ plot(out$extcr_web,out$extcr)
 abline(a=0,b=1)
 
 
-
-## QUESTION: HOW TO MERGE INTO ebv values
-
 ## compile attributes for each light curve
 periods <- c(periodsRR,rep(0,Nnot)) ## if not rrl, period=0
 distance <- c(distanceRR,rep(0,Nnot)) # if not rrl, distance=0
