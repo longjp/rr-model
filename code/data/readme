@@ -1,8 +1,10 @@
 ======= usage
 ## downloads all data to raw/
 Rscript download.R
+
 ## takes files in raw/, cleans them, moves to clean/
 any_R_file_other_than_download.R
+
 
 ======= description of files
 == raw/ contains raw data
@@ -10,6 +12,12 @@ any_R_file_other_than_download.R
    - see below for locations it was acquired from
 == clean/ data after cleaning, generally .RData files with tms for
    lightcurves and periods
+== extc/ obtains extinction values for all sdss stripe 82 variables from:
+    http://irsa.ipac.caltech.edu/applications/DUST/
+   specifically
+      1) input files in radec to website, output in radec_extc.
+      2) these files are processed ipac to csv by table_convert.py
+      3) radec_extc output used by some .R files
 == ../common/funcs.R functions used for processing raw data
 
 

@@ -1,5 +1,0 @@
-rm(list=ls())
-ebv0 <- read.csv("radec_values/0.txt")
-ebv1 <- read.table("radec_values/1.txt")
-head(ebv0)
-dim(ebv0)
