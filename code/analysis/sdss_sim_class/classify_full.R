@@ -18,7 +18,7 @@ source("../../common/plot_funcs.R")
 
 ## data source
 load("../../data/clean/sdss_sim_class.RData")
-load("results.RData")
+load("0-fit.RData")
 source("../params.R")
 
 
@@ -38,9 +38,10 @@ mlefvonmises_simple_k <- function(rho){
     return(k_hat)
 }
 
-
-
-
+## create dust corrected tms
+ebv <- extcr / tem$dust['r']
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
 
 ps <- period_est_FULL[,1] ## just use best fit period
 
@@ -51,10 +52,10 @@ kappa_feat <- rep(0,length(ps))
 phis <- (1:100)/100
 for(ii in 1:nrow(coeffs)){
     omega <- 1/ps[ii]
-    lc <- TMtoLC(tms_FULL[[ii]])
-    rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis)
+    lc <- TMtoLC(tmsc_FULL[[ii]])
+    rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis,use.dust=FALSE)
     phi <- phis[which.min(rss_phase)]
-    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
+    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem,use.dust=FALSE)
     pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
     rss[ii] <- median(abs(lc[,3] - pred))
     ##rss[ii] <- median((lc[,3] - pred)^2 / (tem$model_error[lc$band]^2 + lc[,4]^2))
@@ -94,7 +95,7 @@ ii <- 0
 ii <- ii + 1
 p_est <- ps[ords[ii]]
 omega <- 1/p_est
-lc <- TMtoLC(tms[[ords[ii]]])
+lc <- TMtoLC(tmsc[[ords[ii]]])
 ce2 <- ComputeCoeffs(lc,omega,tem,NN=20)
 coeffs[ords[ii],]
 plotLC(lc,p_est,coeffs[ords[ii],1:4],tem)
@@ -122,7 +123,7 @@ table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
 
 
 ### find and plot a RR Lyrae with period .5 and a aliased non RR with period .5
-tms_FULL_not <- tms_FULL[cl!="rr"]
+tms_FULL_not <- tmsc_FULL[cl!="rr"]
 ps_not <- ps[cl!="rr"]
 coeffs_not <- coeffs[cl!="rr",]
 ords <- order(abs(ps_not-.5),decreasing=FALSE)
@@ -140,7 +141,7 @@ dev.off()
 
 
 ### find and plot a RR Lyrae with period .5 and a aliased non RR with period .5
-tms_FULL_rr <- tms_FULL[cl=="rr"]
+tms_FULL_rr <- tmsc_FULL[cl=="rr"]
 ps_rr <- ps[cl=="rr"]
 coeffs_rr <- coeffs[cl=="rr",]
 ords <- order(abs(ps_rr-.5),decreasing=FALSE)
@@ -197,7 +198,7 @@ for(ii in 1:length(ds)){
 
 ## order non--rrlyrae from most likely to be rr to least likely
 ## then plot
-tms_FULL_not <- tms_FULL[cl!="rr"]
+tms_FULL_not <- tmsc_FULL[cl!="rr"]
 preds_not <- preds[cl!="rr"]
 ps_not <- ps[cl!="rr"]
 coeffs_not <- coeffs[cl!="rr",]
@@ -239,7 +240,7 @@ ii
 ### examine RRL classified as not
 ## order non--rrlyrae from most likely to be rr to least likely
 ## then plot
-tms_FULL_rr <- tms_FULL[cl=="rr"]
+tms_FULL_rr <- tmsc_FULL[cl=="rr"]
 preds_rr <- preds[cl=="rr"]
 ps_rr <- ps[cl=="rr"]
 coeffs_rr <- coeffs[cl=="rr",]
