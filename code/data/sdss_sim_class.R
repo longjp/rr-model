@@ -38,6 +38,7 @@ rrlyrae$extcr <- temp$V4
 rrlyrae[,1] <- as.character(rrlyrae[,1])
 rrlyrae <- rrlyrae[order(rrlyrae[,1]),]
 identical(rrlyrae[,1],names(lcsRR))
+names(rrlyrae)[1] <- "ID"
 
 ## use only "ab" rrlyrae
 rrab <- rrlyrae[,2] == "ab"
@@ -71,10 +72,37 @@ raNOTRR <- cat$ra[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
 decNOTRR <- cat$dec[order(match(cat$ID,ids))][1:length(ids)] # beautiful 1-liner
 
 
+## load dust
+nf <- sum(grepl(".txt",list.files("extc/radec_extc")))
+extcr <- vector("list",nf)
+for(ii in 1:nf){
+    extcr[[ii]] <- read.csv(paste0("extc/radec_extc/",ii-1,".txt"))
+}
+extcr <- do.call(rbind,extcr)
+extcr[,1] <- as.character(cat$ID[1:nrow(extcr)])
+names(extcr)[1] <- "ID"
+extcr <- extcr[,c("ID","E_B_V_SFD")]
+R_r <- 2.751 ## from dust website
+extcr[,2] <- extcr[,2]*R_r
+colnames(extcr)[2] <- "extcr"
+extcrNOTRR <- extcr$extcr[order(match(extcr$ID,ids))][1:length(ids)] # beautiful 1-liner
+
+
+
+## check that rrl ebv match
+names(extcr)[2] <- "extcr_web"
+out <- merge(extcr,rrlyrae[,c("ID","extcr")])
+plot(out$extcr_web,out$extcr)
+abline(a=0,b=1)
+
+
+
+## QUESTION: HOW TO MERGE INTO ebv values
+
 ## compile attributes for each light curve
 periods <- c(periodsRR,rep(0,Nnot)) ## if not rrl, period=0
 distance <- c(distanceRR,rep(0,Nnot)) # if not rrl, distance=0
-extcr <- c(extcrRR,rep(-99,Nnot))
+extcr <- c(extcrRR,extcrNOTRR)
 ra <- c(raRR,raNOTRR)
 dec <- c(decRR,decNOTRR)
 cl <- c(rep("rr",length(lcsRR)),rep("not",Nnot))
