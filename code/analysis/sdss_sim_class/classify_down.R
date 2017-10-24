@@ -60,7 +60,7 @@ for(ii in 1:nrow(coeffs)){
     lc <- TMtoLC(tmsc[[ii]])
     rss_phase <- ComputeRSSPhase(lc,omega,tem,phis=phis,use.dust=FALSE)
     phi <- phis[which.min(rss_phase)]
-    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem)
+    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem,use.dust=FALSE)
     pred <- PredictTimeBand(lc[,1],lc[,2],omega,coeffs[ii,],tem)
     rss[ii] <- median(abs(lc[,3] - pred))
     ##rss[ii] <- median((lc[,3] - pred)^2 / (tem$model_error[lc$band]^2 + lc[,4]^2))
@@ -109,7 +109,7 @@ plot(periods[to_use],ps[to_use],ylim=c(.2,1),xlim=c(.2,1))
 abline(a=0,b=1)
 
 
-## we get 90% of period estimates correct on full light curves, doesn't seem so good
+## we get 85% of period estimates correct on full light curves, doesn't seem so good
 e <- 20 / (60*60*24)
 table(abs(ps[to_use]-periods[to_use]) < e)
 table(abs(ps[to_use]-periods[to_use]) < e) / sum(to_use)
@@ -165,8 +165,8 @@ points(ds[[2]]$x,ds[[2]]$y*120,type='l',col=2)
 ## order non--rrlyrae from most likely to be rr to least likely
 ## then plot
 ##tms_not <- tms_FULL[cl!="rr"]
-tms_FULL_not <- tms_FULL[cl!="rr"]
-tms_not <- tms[cl!="rr"]
+tms_FULL_not <- tmsc_FULL[cl!="rr"]
+tms_not <- tmsc[cl!="rr"]
 preds_not <- preds[cl!="rr"]
 ps_not <- ps[cl!="rr"]
 coeffs_not <- coeffs[cl!="rr",]
@@ -231,4 +231,5 @@ names(lc)[4] <- "error"
 p_est <- ps_rr[ords[ii]]
 plotLC(lc,p_est,coeffs_rr[ords[ii],1:4],tem,
        main=paste0("prob RR=",round(preds_rr[ords[ii]],3),"  period=",round(p_est,3)))
+
 

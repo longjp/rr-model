@@ -110,7 +110,7 @@ dev.off()
 pdf(paste0(fig.dir,"/a_vs_dev.pdf"),height=6,width=7)
 par(mar=c(5,5,1,1))
 plot(features[,3],features[,6],col=cl.plot,pch=cl.plot,
-     xlab="Amplitude",ylab="Model Residual",cex.lab=1.3)
+     xlab="Amplitude",ylab="Model Residual",cex.lab=1.3,ylim=c(0,1),xlim=c(0,3))
 dev.off()
 
 
@@ -179,7 +179,6 @@ save(rf_rr,file="rf_rr.RData")
 table(predict(rf.fit),cl)
 
 
-
 ########## PLOT DISTANCES FOR LIGHTCURVES
 ##pdf("distance_comparison.pdf",width=7,height=7)
 to_use <- distance <= 120
@@ -194,17 +193,12 @@ plot(x,y,
      cex.lab=1.8,xlim=lim,ylim=lim,
      xaxs='i',yaxs='i')
 abline(a=0,b=1,lwd=2)
-error_budget <- 0.1
+error_budget <- 0.03
 lines(0:120,(1-error_budget)*(0:120),lty=2,lwd=2)
 lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
 legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
 ##dev.off()
 
-plot(a,x-y)
-## lm.fit <- lm(x-y~a)
-## abline(lm.fit)
-fit.l1 <- l1fit(a,x-y)
-abline(fit.l1$coeff,col='red')
 
 ## rr lyrae misclassified as non-rr lyrae tended to be further away, as expected
 cl_pred <- predict(rf.fit)
