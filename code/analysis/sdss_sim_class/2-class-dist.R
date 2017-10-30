@@ -180,7 +180,7 @@ table(predict(rf.fit),cl)
 
 
 ########## PLOT DISTANCES FOR LIGHTCURVES
-##pdf("distance_comparison.pdf",width=7,height=7)
+pdf("distance_comparison.pdf",width=7,height=7)
 to_use <- distance <= 120
 par(mar=c(5,5,1,1))
 x <- distance[cl=="rr" & to_use]
@@ -197,7 +197,7 @@ error_budget <- 0.03
 lines(0:120,(1-error_budget)*(0:120),lty=2,lwd=2)
 lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
 legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
-##dev.off()
+dev.off()
 
 
 ## rr lyrae misclassified as non-rr lyrae tended to be further away, as expected

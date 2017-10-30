@@ -100,7 +100,11 @@ MakeContour <- function(z.cont,grid.xy,grid.ind,rr,plot_contour=TRUE){
         points(grid.xy[grid.ind,],col=cols[dec[grid.ind]],pch=20)
     }
     ## locations of RRL
-    points(rr$x,rr$y,pch=20)
+    if(plot_contour){
+        points(rr$x,rr$y,pch=20)
+    } else {
+        points(rr$x,rr$y,pch=20,col='red')
+    }
     ## y=0 line, ie x-axis
     segments(-125,0,125,0,lwd=3)
     ## concentric circles for distance 
