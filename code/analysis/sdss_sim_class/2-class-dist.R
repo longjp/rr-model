@@ -199,6 +199,16 @@ lines(0:120,(1+error_budget)*(0:120),lty=2,lwd=2)
 legend("topleft",c("Identity",paste0(100*error_budget, "% Scatter")),lty=1:2,lwd=2,cex=1.5)
 dev.off()
 
+## distance hist
+pdf("distance_comparison_hist.pdf",width=7,height=7)
+par(mar=c(5,5,1,1))
+hist(y/x,xlab="Estimated Distance / True Distance",main="",cex.lab=1.8)
+dev.off()
+
+
+
+
+
 
 ## rr lyrae misclassified as non-rr lyrae tended to be further away, as expected
 cl_pred <- predict(rf.fit)
