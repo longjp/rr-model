@@ -132,13 +132,14 @@ plot(features[,3],features[,7],col=cl.plot,pch=cl.plot,
      log="xy",xlim=c(.01,5))
 legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.new()
+
+pdf(paste0(fig.dir,"/amp_rssn.pdf"),height=6,width=7)
 par(mar=c(5,5,1,1))
 plot(features[,3],features[,8],col=cl.plot,pch=cl.plot,
-     xlab="Amplitude",ylab="RSS3/n",cex.lab=1.3,
+     xlab="Amplitude",ylab="RSS/n",cex.lab=1.3,
      log="xy",xlim=c(.01,5))
 legend("topleft",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
-
-##dev.off()
+dev.off()
 
 
 pdf(paste0(fig.dir,"/period_vs_EBV.pdf"),height=6,width=7)
