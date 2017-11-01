@@ -177,19 +177,6 @@ for(ii in 1:Nlc){
 
 
 
-ix_high <- 2
-t <- (1:100)/100
-for(jj in 1:5){
-    ylim <- rev(range(lc_grid[,,jj]))
-    pdf(paste0(plot_foldername,"/unaligned_",jj,".pdf"),height=5,width=10)
-    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
-    for(ii in 1:Nlc){
-        points(t,lc_grid[ii,,jj],type='l',col="#00000050")
-    }
-    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=3)
-    dev.off()
-}
-
 
 
 
@@ -208,21 +195,6 @@ for(ii in 1:Nlc){
     } 
 }
 
-
-t <- (1:100)/100
-for(jj in 1:5){
-    ylim <- rev(range(lc_grid[,,jj]))
-    pdf(paste0(plot_foldername,"/aligned_feature",jj,".pdf"),height=5,width=10)
-    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
-    for(ii in 1:Nlc){
-        points(t,lc_grid[ii,,jj],type='l',col="#00000050")
-    }
-    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=3)
-    dev.off()
-}
-
-
-
 ## method 2: based on FDA book, see phase, phase_shift functions
 del <- phase(lc_grid[,,1],niter=1000)
 for(ii in 1:dim(lc_grid)[1]){
@@ -230,21 +202,6 @@ for(ii in 1:dim(lc_grid)[1]){
         lc_grid[ii,,jj] <- phase_shift(lc_grid[ii,,jj],del[ii])
     }
 }
-
-
-t <- (1:100)/100
-for(jj in 1:5){
-    ylim <- rev(range(lc_grid[,,jj]))
-    pdf(paste0(plot_foldername,"/aligned_rss",jj,".pdf"),height=5,width=10)
-    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
-    for(ii in 1:Nlc){
-        points(t,lc_grid[ii,,jj],type='l',col="#00000050")
-    }
-    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=3)
-    dev.off()
-}
-
-
 
 ## method 3: grid search to optimize phase (1-step)
 del <- PhaseGridAll(lc_grid[,,1])
@@ -257,17 +214,6 @@ for(ii in 1:dim(lc_grid)[1]){
 
 
 
-t <- (1:100)/100
-for(jj in 1:5){
-    ylim <- rev(range(lc_grid[,,jj]))
-    pdf(paste0(plot_foldername,"/aligned_grid",jj,".pdf"),height=5,width=10)
-    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
-    for(ii in 1:Nlc){
-        points(t,lc_grid[ii,,jj],type='l',col="#00000050")
-    }
-    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=3)
-    dev.off()
-}
 
 
 
