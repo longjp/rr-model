@@ -36,6 +36,7 @@ for(ii in 1:length(tms)){
     coes[ii,1:4] <- coeffs
 }    
 
+
 ## make all plots together
 for(ii in 1:length(tms)){
     print(ii)
@@ -43,10 +44,16 @@ for(ii in 1:length(tms)){
     omega <- 1 / p_est
     lc <- TMtoLC(tms[[ii]])
     coeffs <- ComputeCoeffs(lc,omega,tem)
-    pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=12)
+    pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=15)
     plotLC(lc,p_est,coeffs,tem)
     dev.off()
+    pdf(paste0("figs/",ii,"_one_unfolded.pdf"),height=8,width=15)
+    plotLCunfolded(lc)
+    dev.off()
 }
+
+
+
 
 
 
