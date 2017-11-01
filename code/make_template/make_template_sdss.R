@@ -52,6 +52,42 @@ for(ii in 1:Nlc){
 }
 
 
+####
+## lcs <- lapply(tms,TMtoLC)
+## for(ii in 1:length(lcs)){
+##     lcs[[ii]][,1] <- (lcs[[ii]][,1] %% periods[ii])/periods[ii]
+## }
+## tms_temp <- lapply(lcs,LCtoTM)
+## for(ii in 1:length(tms_temp)){
+##     for(jj in 1:length(tms_temp[[ii]])){
+##         tms_temp[[ii]][[jj]][,2] <- tms_temp[[ii]][[jj]][,2] - mean(tms_temp[[ii]][[jj]][,2])
+##     }
+## }
+
+## ix_high <- 2
+## t <- (1:100)/100
+## for(jj in 1:5){
+##     ylim <- rev(range(unlist(lapply(tms_temp,function(x){x[[jj]][,2]}))))
+##     pdf(paste0(plot_foldername,"/unaligned_",jj,"_tms.pdf"),height=5,width=10)
+##     plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
+##     for(ii in 1:Nlc){
+##         temp <- tms_temp[[ii]][[jj]]
+##         temp <- temp[order(temp[,1]),]
+##         points(temp[,1],temp[,2],type='l',col="#00000030")
+##     }
+##     temp <- tms_temp[[ix]][[jj]]
+##     temp <- temp[order(temp[,1]),]
+##     points(temp[,1],temp[,2],type='l',col="red")
+##     points(temp[,1],temp[,2],pch=20,col="red")
+##     dev.off()
+## }
+
+
+
+
+
+
+
 
 ## ## compute mean mag in each band / lc
 m <- apply(lc_grid,c(1,3),mean)
@@ -167,7 +203,7 @@ out <- print(xtable(tab_out,digits=3),hline.after=0)
 
 
 
-### DEMEAN AND PHASE ALIGN LIGHTCURVES
+### REMOVE MEAN AND PHASE ALIGN LIGHTCURVES
 
 ## make lc_grid mean 0 for each band, source
 for(ii in 1:Nlc){
@@ -175,6 +211,22 @@ for(ii in 1:Nlc){
         lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj])
     }
 }
+
+bands_order <- c("u","g","r","i","z")
+ix_high <- 2
+t <- (1:100)/100
+for(jj in bands_order){
+    ylim <- quantile(lc_grid[,,jj],c(.999,.001))
+    pdf(paste0(plot_foldername,"/unaligned_",jj,".pdf"),height=5,width=10)
+    par(mar=c(5,5,1,1))
+    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab=paste0(jj," Band Mag"),xaxs='i',cex.lab=1.9,cex.axis=1.9)
+    for(ii in 1:Nlc){
+        points(t,lc_grid[ii,,jj],type='l',col="#00000030")
+    }
+    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=4)
+    dev.off()
+}
+
 
 ### PHASE ALIGN
 ## method 1: crude phase aligns, make minimums = phase 0
@@ -204,6 +256,23 @@ for(ii in 1:dim(lc_grid)[1]){
 }
 
 
+bands_order <- c("u","g","r","i","z")
+ix_high <- 2
+t <- (1:100)/100
+for(jj in bands_order){
+    ylim <- quantile(lc_grid[,,jj],c(.999,.001))
+    pdf(paste0(plot_foldername,"/aligned_grid",jj,".pdf"),height=5,width=10)
+    par(mar=c(5,5,1,1))
+    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab=paste0(jj," Band Mag"),xaxs='i',cex.lab=1.9,cex.axis=1.9)
+    for(ii in 1:Nlc){
+        points(t,lc_grid[ii,,jj],type='l',col="#00000030")
+    }
+    points(t,lc_grid[ix_high,,jj],type='l',col='red',lwd=4)
+    dev.off()
+}
+
+
+
 
 ####### phase aligned light curves look good
 ## JJ <- 0
@@ -221,6 +290,42 @@ for(ii in 1:dim(lc_grid)[1]){
 
 ## determine amplitude and templates for sources
 out <- SolveAGamma(lc_grid)
+
+
+
+bands_order <- c("u","g","r","i","z")
+ix_high <- 2
+t <- (1:100)/100
+for(jj in bands_order){
+    ylim <- quantile(lc_grid[,,jj]/out$a,c(.999,.001))
+    pdf(paste0(plot_foldername,"/aligned_amp",jj,".pdf"),height=5,width=10)
+    par(mar=c(5,5,1,1))
+    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab=paste0(jj," Band Mag"),xaxs='i',cex.lab=1.9,cex.axis=1.9)
+    for(ii in 1:Nlc){
+        points(t,lc_grid[ii,,jj]/out$a[ii],type='l',col="#00000030")
+    }
+    points(t,lc_grid[ix_high,,jj]/out$a[ix_high],type='l',col='red',lwd=4)
+    dev.off()
+}
+
+
+
+bands_order <- c("u","g","r","i","z")
+t <- (1:100)/100
+for(jj in bands_order){
+    ylim <- quantile(lc_grid[,,jj]/out$a,c(.999,.001))
+    pdf(paste0(plot_foldername,"/aligned_amp_median",jj,".pdf"),height=5,width=10)
+    par(mar=c(5,5,1,1))
+    plot(0,0,xlim=range(t),ylim=ylim,col=0,xlab="Phase",ylab=paste0(jj," Band Mag"),xaxs='i',cex.lab=1.9,cex.axis=1.9)
+    for(ii in 1:Nlc){
+        points(t,lc_grid[ii,,jj]/out$a[ii],type='l',col="#00000030")
+    }
+    points(t,out$Y[,jj],type='l',col=bandcol[jj],lwd=4)
+    dev.off()
+}
+
+
+
 
 ## reorder output so templates is a B x T matrix
 templates <- t(out$Y)
@@ -388,16 +493,16 @@ tem$model_error[] <- mean(tem$model_error) ## makes model error same in all filt
 ## templates only
 ## colors for plotting
 ylim <- c(-.7,.4)
-xlim <- range(t)
+xlim <- range(c(t,t+1))
 bands_order <- c("u","g","r","i","z")
-pdf(paste0(plot_foldername,"/sdss_templates.pdf"),height=8,width=12)
+pdf(paste0(plot_foldername,"/sdss_templates.pdf"),height=8,width=15)
 par(mar=c(5,5,1,1))
 plot(0,0,col=0,ylim=rev(ylim),xlim=xlim,xlab="Phase",ylab=expression("Normalized Mag"~gamma),cex.lab=1.5,xaxs='i')
 for(ii in bands_order){
-    points(t,templates[ii,],type='l',lwd=4,
-           col=bandcol[ii],lty=bandpch[ii])
+    points(c(t,t+1),c(templates[ii,],templates[ii,]),type='l',lwd=4,
+           col=bandcol[ii])
 }
-legend("bottomleft",bands_order,col=bandcol[bands_order],lty=bandpch[bands_order],lwd=4,cex=1.5)
+legend("bottomleft",bands_order,col=bandcol[bands_order],lwd=4,cex=1.5)
 dev.off()
 
 ## templates with light curves
