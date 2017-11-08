@@ -1,4 +1,4 @@
-plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
+plotLC <- function(lc,p_est,coeffs=NULL,tem=NULL,main=NULL){
     bandpch <- 1:6
     names(bandpch) <- c("u","g","r","i","z","Y")
     bandcol <- c("dodgerblue3","green","red",
@@ -19,8 +19,12 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
     ## obtain magnitude predictions
     ti <- seq(0,p_est,length.out=100)
     ti <- c(ti,ti+p_est)
-    m <- PredictAllBand(ti,1/p_est,coeffs,tem)
-    ylim <- rev(range(m,lc$mag))
+    if(!is.null(tem)){
+        m <- PredictAllBand(ti,1/p_est,coeffs,tem)
+        ylim <- rev(range(m,lc$mag))
+    } else {
+        ylim <- rev(range(lc$mag))
+    }
     plot(lc_temp$time,lc_temp$mag,
          col=bandcol[lc_temp$band],pch=bandpch[lc_temp$band],
          ylim=ylim,
@@ -30,11 +34,17 @@ plotLC <- function(lc,p_est,coeffs,tem,main=NULL){
              lc_temp$mag+lc_temp$error,
              lc_temp$time,
              lc_temp$mag-lc_temp$error,col='grey')
-    for(ii in 1:ncol(m)){
-        points(ti/p_est,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
+    if(!is.null(tem)){
+        for(ii in 1:ncol(m)){
+            points(ti/p_est,m[,ii],type='l',col=bandcol[colnames(m)[ii]])
+        }
     }
     ## only make legend for bands used
-    bands <- sort(union(colnames(tem$betas),unique(lc$band)))
+    if(!is.null(tem)){
+        bands <- sort(union(colnames(tem$betas),unique(lc$band)))
+    } else {
+        bands <- sort(unique(lc$band))
+    }
     bandpch <- bandpch[names(bandpch) %in% bands]
     bandcol <- bandcol[names(bandcol) %in% bands]
     legend("bottomleft",names(bandcol),col=bandcol,pch=bandpch,lty=1)
