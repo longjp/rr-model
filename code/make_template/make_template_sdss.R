@@ -2,6 +2,7 @@ rm(list=ls())
 #unlink("*.RData")
 source('../common/funcs.R')
 source('plot_options.R')
+source('../common/plot_funcs.R')
 source('../fit_template/fit_template.R')
 load("../data/clean/sdss_rrab.RData")
 library(RColorBrewer)
@@ -50,41 +51,6 @@ for(ii in 1:Nlc){
         lc_grid[ii,,jj] <- y_approx
     }
 }
-
-
-####
-## lcs <- lapply(tms,TMtoLC)
-## for(ii in 1:length(lcs)){
-##     lcs[[ii]][,1] <- (lcs[[ii]][,1] %% periods[ii])/periods[ii]
-## }
-## tms_temp <- lapply(lcs,LCtoTM)
-## for(ii in 1:length(tms_temp)){
-##     for(jj in 1:length(tms_temp[[ii]])){
-##         tms_temp[[ii]][[jj]][,2] <- tms_temp[[ii]][[jj]][,2] - mean(tms_temp[[ii]][[jj]][,2])
-##     }
-## }
-
-## ix_high <- 2
-## t <- (1:100)/100
-## for(jj in 1:5){
-##     ylim <- rev(range(unlist(lapply(tms_temp,function(x){x[[jj]][,2]}))))
-##     pdf(paste0(plot_foldername,"/unaligned_",jj,"_tms.pdf"),height=5,width=10)
-##     plot(0,0,xlim=c(0,1),ylim=ylim,col=0,xlab="Phase",ylab="Magnitude",xaxs='i')
-##     for(ii in 1:Nlc){
-##         temp <- tms_temp[[ii]][[jj]]
-##         temp <- temp[order(temp[,1]),]
-##         points(temp[,1],temp[,2],type='l',col="#00000030")
-##     }
-##     temp <- tms_temp[[ix]][[jj]]
-##     temp <- temp[order(temp[,1]),]
-##     points(temp[,1],temp[,2],type='l',col="red")
-##     points(temp[,1],temp[,2],pch=20,col="red")
-##     dev.off()
-## }
-
-
-
-
 
 
 
@@ -211,6 +177,36 @@ for(ii in 1:Nlc){
         lc_grid[ii,,jj] <- lc_grid[ii,,jj] - mean(lc_grid[ii,,jj])
     }
 }
+
+
+## plot 1 function
+ix_high <- 2
+lc <- TMtoLC(tms[[ix_high]])
+lc[,1] <- (lc[,1] %% periods[ix_high]) / periods[ix_high]
+pdf(paste0(plot_foldername,"/lc_orig.pdf"),height=5,width=10)
+par(mar=c(5,5,1,1))
+plot(0,0,col=0,xlim=c(0,1),ylim=rev(range(lc[,3])),xaxs='i',
+     xlab="Phase",ylab="Magnitude",cex.lab=1.5,cex.axis=1.5)
+bands_order <- c("u","g","r","i","z")
+for(ii in bands_order){
+    lc_temp <- lc[lc$band==ii,]
+    points(lc_temp[,1],lc_temp[,3],col=bandcol[ii],lwd=3)
+    segments(lc_temp[,1],lc_temp[,3]+lc_temp[,4],lc_temp[,1],lc_temp[,3]-lc_temp[,4],col='grey')
+}
+legend("bottomleft",bands_order,col=bandcol[bands_order],cex=1.5,pch=1)
+dev.off()
+pdf(paste0(plot_foldername,"/lc_new.pdf"),height=5,width=10)
+par(mar=c(5,5,1,1))
+plot(0,0,col=0,xlim=range(t),ylim=rev(range(lc_grid[ix_high,,])),xaxs='i',
+     xlab="Phase",ylab="Normalized Magnitude",cex.lab=1.5,cex.axis=1.5)
+bands_order <- c("u","g","r","i","z")
+for(ii in bands_order){
+    points(t,lc_grid[ix_high,,ii],type='l',col=bandcol[ii],lwd=3)
+}
+legend("bottomleft",bands_order,col=bandcol[bands_order],lwd=4,cex=1.5)
+dev.off()
+
+
 
 bands_order <- c("u","g","r","i","z")
 ix_high <- 2
