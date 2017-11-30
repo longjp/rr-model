@@ -33,6 +33,10 @@ FitTemplateParallel <- function(ii,tms,omegas,tem,NN=5,use.errors=TRUE,use.dust=
 FitLombParallel <- function(ii,tms,omegas,topN){
     print(ii)
     tm <- tms[[ii]]
+    ## don't use errors with lomb because model is crude approximation
+    for(jj in 1:length(tm)){
+        tm[[jj]][,3] <- 1
+    }
     p_grid <- rev(1/omegas)
     out <- pgls(tm,periods=p_grid,BCD_flag=FALSE)
     rss <- out$rss_ls
