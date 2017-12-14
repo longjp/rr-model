@@ -586,18 +586,8 @@ dev.off()
 
 #### CONSTRUCT OLD TEMPLATE, NO PERIOD-ABS MAG DEPENDENCE
 ## find betas at median period, old template style
-tem_old <- tem
-tem_old$betas[1,] <- c0_old
-
-tem$betas
-tem_old$betas
-
 ## save template
-save(tem,tem_old,file="../fit_template/template_sdss.RData")
-
-## input period, output absolute mag in each filter?
-## then subtract off absolute mag at each new period
-
+save(tem_sdss,file="../fit_template/template_sdss.RData")
 
 
 

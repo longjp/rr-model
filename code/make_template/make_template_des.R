@@ -197,7 +197,7 @@ tem$betas <- betas_des
 tem <- RemoveBand(tem,"u")
 
 ## save template
-save(tem,file="../fit_template/template_des.RData")
+save(tem_des,file="../fit_template/template_des.RData")
 
 
 
