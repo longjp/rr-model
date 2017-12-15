@@ -18,8 +18,9 @@ load("../../fit_template/template_sdss.RData")
 ebv <- extcr / tem_sdss$dust['r']
 tmsc_des <- mapply(DustCorrect,tms_des,ebv,MoreArgs=list(tem=tem_des),SIMPLIFY=FALSE)
 
-lim <- c(.2,1)
+
 pdf("period_accuracy.pdf")
+lim <- c(.4,.9)
 par(mar=c(5,5,1,1))
 plot(periods,period_est_des[,1],xlim=lim,ylim=lim,
      xlab="True Period",ylab="DES Estimate",cex.lab=1.3)
@@ -29,7 +30,6 @@ dev.off()
 fraction_wrong <- function(est,truth,thres=.01){
     mean(abs(est-truth)/truth > thres)
 }
-
 1-fraction_wrong(period_est_des[,1],periods)
 
 
