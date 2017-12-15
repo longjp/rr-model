@@ -17,9 +17,9 @@ for(ii in 1:N){
     print(ii)
     lc <- lcs[[ii]]
     omega <- 1/periods[ii]
-    coes <- ComputeCoeffs(lc,omega,tem,NN=20)
+    coes <- ComputeCoeffs(lc,omega,tem_sdss,NN=20)
     coeffs[ii,] <- coes
-    pred <- PredictTimeBand(lc$time,lc$b,omega,coes,tem)
+    pred <- PredictTimeBand(lc$time,lc$b,omega,coes,tem_sdss)
     rss.n[ii] <- median(abs(pred - lc$mag))
 }
 
