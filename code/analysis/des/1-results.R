@@ -9,10 +9,7 @@ load("../../data/clean/des.RData")
 
 ## load templates
 load("../../fit_template/template_des.RData")
-tem_des <- tem
 load("../../fit_template/template_sdss.RData")
-tem_sdss <- tem
-rm(tem)
 
 ## = period estimate analysis
 ## scatterplot, fraction correct, fraction correct by # epochs

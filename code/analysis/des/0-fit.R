@@ -12,11 +12,7 @@ load("../../data/clean/des.RData")
 
 ## templates, des stored in tem_des, sdss stored in tem_sdss
 load("../../fit_template/template_sdss.RData")
-tem_sdss <- tem
 load("../../fit_template/template_des.RData")
-tem_des <- tem
-rm(tem)
-rm(tem_old)
 
 ## parameters for simulation
 tms <- rep(0,length(tms_des)) ## for compatibility with following source function
