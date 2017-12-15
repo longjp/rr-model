@@ -2,8 +2,8 @@ rm(list=ls())
 library(RColorBrewer)
 load("template_sdss.RData")
 
-templates <- tem$templates
-t <- tem$temp_time
+templates <- tem_sdss$templates
+t <- tem_sdss$temp_time
 ntemp <- nrow(templates)
 
 
