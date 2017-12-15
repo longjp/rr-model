@@ -587,6 +587,7 @@ dev.off()
 #### CONSTRUCT OLD TEMPLATE, NO PERIOD-ABS MAG DEPENDENCE
 ## find betas at median period, old template style
 ## save template
+tem_sdss <- tem
 save(tem_sdss,file="../fit_template/template_sdss.RData")
 
 

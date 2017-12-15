@@ -23,21 +23,21 @@ for(ii in 1:length(tms_sdss)){
     lc <- lcs_sdss[[ii]]
     p_est <- periods[ii]
     omega_est <- 1/p_est
-    coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem)
+    coeffs[ii,] <- ComputeCoeffs(lc,omega_est,tem_sdss)
 }
 
 
 ##### create DES template
 #####
 ### add Y band template that is identical to z
-tem <- AddBand(tem,"Y","z")
+tem_des <- AddBand(tem_sdss,"Y","z")
 
 
 ## plot folded light curve for des, sdss
 ii <- 6
 par(mfcol=c(2,1))
-plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem)
-plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
+plotLC(lcs_sdss[[ii]],periods[ii],coeffs[ii,],tem_sdss)
+plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem_des)
 
 
 
@@ -45,7 +45,7 @@ plotLC(lcs_des[[ii]],periods[ii],coeffs[ii,],tem)
 ## set dust to DES values
 extc <- read.table("extc.dat",stringsAsFactors=FALSE)
 extc <- extc[extc[,1]=="DES",c(2,3)]
-tem$dust[extc$V2] <- extc$V3
+tem_des$dust[extc$V2] <- extc$V3
 
 
 
@@ -61,8 +61,8 @@ lcs_resid <- lcs_des
 for(ii in 1:length(lcs_des)){
     omega_est <- 1/periods[ii]
     lcs_resid[[ii]][,1] <- (lcs_des[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
-    lcs_resid[[ii]][,3] <- (lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem) +
-                            tem$abs_mag(1/omega_est,tem)[1,][lcs_des[[ii]]$band])
+    lcs_resid[[ii]][,3] <- (lcs_des[[ii]][,3] - PredictTimeBand(lcs_des[[ii]][,1],lcs_des[[ii]][,2],omega_est,coeffs[ii,],tem_des) +
+                            tem_des$abs_mag(1/omega_est,tem_des)[1,][lcs_des[[ii]]$band])
 }
 
 tms_resid <- lapply(lcs_resid,LCtoTM)
@@ -70,7 +70,7 @@ tms_resid <- lapply(lcs_resid,LCtoTM)
 ### plot residuals as a function of band and estimate function
 bands <- unique(unlist(lapply(tms_resid,names)))
 betas_des <- matrix(0,nrow=3,ncol=length(bands))
-rownames(betas_des) <- rownames(tem$betas)
+rownames(betas_des) <- rownames(tem_des$betas)
 colnames(betas_des) <- bands
 
 pdf("period_mag_des.pdf",width=12,height=8)
@@ -88,8 +88,8 @@ for(ii in 1:length(bands)){
     }
     plot(periods,mags,main=band,ylim=c(.25,.9),cex.lab=1.3,cex.main=1.5,
          ylab="Absolute Magnitude",xlab="Period")
-    ## plot fits to sdss
-    vec <- tem$betas[,band]
+    ## plot fits to des
+    vec <- tem_des$betas[,band]
     ti <- seq(min(periods),max(periods),length.out=100)
     points(ti,vec[1] + vec[2]*(log10(ti)+.2) + vec[3]*(log10(ti)+.2)^2,type='l',col="red",lwd=2)
     ## estimate fits to des, plot
@@ -107,7 +107,7 @@ dev.off()
 
 
 ## store new DES values for betas
-tem$betas <- betas_des
+tem_des$betas <- betas_des
 
 
 
@@ -194,7 +194,7 @@ tem$betas <- betas_des
 ####
 
 ## get rid of u band
-tem <- RemoveBand(tem,"u")
+tem_des <- RemoveBand(tem_des,"u")
 
 ## save template
 save(tem_des,file="../fit_template/template_des.RData")
