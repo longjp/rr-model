@@ -88,7 +88,7 @@ for(ii in 1:length(tms)){
     omega <- 1 / p_est
     coeffs <- ComputeCoeffs(lc,omega,tem_sdss)
     pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=12)
-    plotLC(lc,p_est,coeffs,tem,main=NULL)
+    plotLC(lc,p_est,coeffs,tem_sdss,main=NULL)
     dev.off()
 }
 

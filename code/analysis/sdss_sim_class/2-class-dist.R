@@ -29,7 +29,7 @@ hist(sigs[sigs<.1])
 
 
 ## create dust corrected tms
-ebv <- extcr / tem$dust['r']
+ebv <- extcr / tem_sdss$dust['r']
 tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
 tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
 
@@ -152,8 +152,6 @@ plot(features[,5],features[,2],col=cl.plot,pch=cl.plot,
 legend("topright",c("RR Lyrae","Not RR Lyrae"),col=2:1,pch=2:1,cex=1.5)
 dev.off()
 
-load("../../fit_template/template_sdss.RData")
-
 pdf("features_template_downsampled.pdf",height=5,width=6)
 par(mar=c(5,5,1,1))
 plot(features[,'a'],period_est,col=cl.plot,pch=cl.plot,
@@ -246,7 +244,6 @@ summary(y[!pc]/x[!pc])
 
 dev.new()
 hist(y[!pc]/x[!pc])
-a
 
 plot(log10(features[,"a"]),features[,"period"],col=cl.plot)
 dev.new()
