@@ -86,7 +86,7 @@ for(ii in 1:length(tms)){
     lc <- TMtoLC(tm)
     p_est <- period_est[ii]
     omega <- 1 / p_est
-    coeffs <- ComputeCoeffs(lc,omega,tem)
+    coeffs <- ComputeCoeffs(lc,omega,tem_sdss)
     pdf(paste0("figs/",ii,"_one.pdf"),height=8,width=12)
     plotLC(lc,p_est,coeffs,tem,main=NULL)
     dev.off()

@@ -15,19 +15,19 @@ load("../../data/clean/sdss_sim_class.RData")
 source("../params.R")
 
 ## create dust corrected tms
-ebv <- extcr / tem$dust['r']
-tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
-tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+ebv <- extcr / tem_sdss$dust['r']
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
 
 ## estimate periods for both the full lc (tms_FULL) and downsampled (tms)
 ## using both the RRL template and (period_est) and lomb-scarge (period_est_lomb)
 period_est <- mclapply(1:N,FitTemplateParallel,
-                       tms=tmsc,omegas=omegas,tem=tem,NN=NN,use.dust=FALSE,topN=topN,
+                       tms=tmsc,omegas=omegas,tem=tem_sdss,NN=NN,use.dust=FALSE,topN=topN,
                        mc.cores=mc.cores)
 period_est <- matrix(unlist(period_est),ncol=topN,byrow=TRUE)
 
 period_est_FULL <- mclapply(1:N,FitTemplateParallel,
-                       tms=tmsc_FULL,omegas=omegas,tem=tem,NN=NN,use.dust=FALSE,topN=topN,
+                       tms=tmsc_FULL,omegas=omegas,tem=tem_sdss,NN=NN,use.dust=FALSE,topN=topN,
                        mc.cores=mc.cores)
 period_est_FULL <- matrix(unlist(period_est_FULL),ncol=topN,byrow=TRUE)
 

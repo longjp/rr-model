@@ -30,8 +30,8 @@ hist(sigs[sigs<.1])
 
 ## create dust corrected tms
 ebv <- extcr / tem$dust['r']
-tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
-tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem),SIMPLIFY=FALSE)
+tmsc <- mapply(DustCorrect,tms,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
+tmsc_FULL <- mapply(DustCorrect,tms_FULL,ebv,MoreArgs=list(tem=tem_sdss),SIMPLIFY=FALSE)
 
 
 rss.n <- rep(0,N)
@@ -43,15 +43,13 @@ for(ii in 1:N){
     tm <- tmsc[[ii]]
     omega <- 1/period_est[ii]
     lc <- TMtoLC(tm)
-    coes <- ComputeCoeffs(lc,omega,tem,use.dust=FALSE)
+    coes <- ComputeCoeffs(lc,omega,tem_sdss,use.dust=FALSE)
     coeffs[ii,] <- coes
     dev <- rep(0,length(tm))
     dev2 <- rep(0,length(tm))
     dev3 <- rep(0,length(tm))
     for(jj in 1:length(tm)){
-        pred <- PredictSingleBand(tm[[jj]][,1],names(tm)[jj],omega,coes,tem)
-        ## pred <- (coes[1] + tem$betas[jj] + coes[2]*tem$dust[jj]
-        ##     + coes[3]*tem$template_funcs[[jj]]((tm[[jj]][,1]*omega + coes[4]) %% 1))
+        pred <- PredictSingleBand(tm[[jj]][,1],names(tm)[jj],omega,coes,tem_sdss)
         dev[jj] <- sum(abs((pred - tm[[jj]][,2])))
         dev2[jj] <- sum(abs((pred - tm[[jj]][,2])/tm[[jj]][,3]))
         dev3[jj] <- sum(abs((pred - tm[[jj]][,2])/(tm[[jj]][,3] + .2)))
