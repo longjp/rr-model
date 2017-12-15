@@ -20,8 +20,8 @@ dir.create("figs")
 med_res <- vector("list",length(tms))
 for(ii in 1:length(med_res)){
     lc <- TMtoLC(tms[[ii]])
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem_sdss)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem_sdss)
     med_res[[ii]] <- (preds - lc[,3])^2 #- lc[,4]^2
 }
 
@@ -37,11 +37,11 @@ med_res <- vector("list",length(tms))
 for(ii in 1:length(med_res)){
     temp <- tms[[ii]]
     for(jj in 1:length(temp)){
-        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem$abs_mag(periods[ii],tem)[1,names(temp)[jj]]
+        temp[[jj]][,2] <- temp[[jj]][,2] - mean(temp[[jj]][,2]) + tem_sdss$abs_mag(periods[ii],tem_sdss)[1,names(temp)[jj]]
     }
     lc <- TMtoLC(temp)
-    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem)
-    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem)
+    coeffs <- ComputeCoeffs(lc,1/periods[ii],tem_sdss)
+    preds <- PredictTimeBand(lc[,1],lc[,2],1/periods[ii],coeffs,tem_sdss)
     med_res[[ii]] <- (preds - lc[,3])^2 #- lc[,4]^2
 }
 
@@ -63,8 +63,8 @@ for(ii in 1:length(med_res)){
     med_res[[ii]] <- vector("list",length(bands))
     for(jj in 1:length(bands)){
         temp <- lc[lc$band %in% bands[jj],]
-        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem,use.dust=FALSE)
-        preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem)
+        coeffs <- ComputeCoeffs(temp,1/periods[ii],tem_sdss,use.dust=FALSE)
+        preds <- PredictTimeBand(temp[,1],temp[,2],1/periods[ii],coeffs,tem_sdss)
         med_res[[ii]][[jj]] <- (preds - temp[,3])^2 #- temp[,4]^2
     }
 }
@@ -93,7 +93,7 @@ median(med_res)
 
 ## are templates mean 0?
 print("the mean of each template is:")
-rowMeans(tem$templates)
+rowMeans(tem_sdss$templates)
 
 
 
@@ -108,7 +108,7 @@ colnames(coeffs) <- c("mu","ebv","amp","phase")
 for(ii in 1:length(tms)){
     p_est <- periods[ii]
     omega_est <- 1/p_est
-    coeffs[ii,] <- ComputeCoeffs(lcs[[ii]],omega_est,tem)
+    coeffs[ii,] <- ComputeCoeffs(lcs[[ii]],omega_est,tem_sdss)
 }
 
 
@@ -116,7 +116,7 @@ lcs_resid <- lcs
 for(ii in 1:length(lcs)){
     omega_est <- 1/periods[ii]
     lcs_resid[[ii]][,1] <- (lcs[[ii]][,1]*omega_est + coeffs[ii,4]) %% 1.0
-    lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem)
+    lcs_resid[[ii]][,3] <- lcs[[ii]][,3] - PredictTimeBand(lcs[[ii]][,1],lcs[[ii]][,2],omega_est,coeffs[ii,],tem_sdss)
 }
 
 
