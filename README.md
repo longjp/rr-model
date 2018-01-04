@@ -2,8 +2,8 @@
 
 Most users will be interested in fitting the templates. Demos for fitting the templates are contained in
 
-code/fit_template/demo_R.ipynb
-code/fit_template/demo_python.ipynb
+- code/fit_template/demo_R.ipynb
+- code/fit_template/demo_python.ipynb
 
 ### Folders ###
 
