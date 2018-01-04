@@ -2,34 +2,35 @@
 ## contact jlong@stat.tamu.edu or profjameslong@gmail.com with
 ## questions or comments
 
-
-fit_template.R 
- - fits RR Lyrae template to light curve
- - function FitTemplate returns the residual sum of squares for
-   frequencies in omegas vector
-
 demo_python.ipynb
  - python wrapper demonstrating use FitTemplate, ComputeCoeffs functions
 
 demo_R.ipynb
  - R demonstration of FitTemplate, ComputeCoeffs functions
 
-feat.py
- - features which may be useful for identifying RRL
+
+fit_template.R 
+ - fits RR Lyrae template to light curve
+ - function FitTemplate returns the residual sum of squares for
+   frequencies in omegas vector
+
+kappy.py
+ - feature useful for alias detection
 
 zip.R
  - creates archive with templates, examples
-
-readme_zip
- - readme file for the zip archive
 
 template_sdss.RData
 template_des.RData
  - light curve shape information use by template functions
  - created by make_template/make_template.R
 
+
 LC_4099.dat
- - example RRL light curve
+ - example RRL light curve from SDSS Stripe 82
 LC_999886.dat
  - example non-RRL light curve from SDSS Stripe 82, fits should be nonsense
-
+LC_402316.dat
+ - sloan RR Lyrae
+LC_402316_des.dat
+ - des version of LC_402316.dat, poorly sampled
