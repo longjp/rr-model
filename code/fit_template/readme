@@ -8,10 +8,10 @@ fit_template.R
  - function FitTemplate returns the residual sum of squares for
    frequencies in omegas vector
 
-template.py
+demo_python.ipynb
  - python wrapper demonstrating use FitTemplate, ComputeCoeffs functions
 
-template.R
+demo_R.ipynb
  - R demonstration of FitTemplate, ComputeCoeffs functions
 
 feat.py
