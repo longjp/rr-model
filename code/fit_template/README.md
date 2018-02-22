@@ -4,7 +4,7 @@ Fit templates to RR Lyrae variable stars to estimate periods, amplitudes, and di
 
 ![alt text](figs/sdss.png "SDSS Stripe 82 RR Lyrae Light Curve")
 
-and outputs 5 parameters (distance modulus $\mu$, dust $E[B-V]$, amplitude, frequency, and phase) which can be used to construct the folded light curve:
+and outputs 5 parameters (distance modulus $$\mu$$, dust $E[B-V]$, amplitude, frequency, and phase) which can be used to construct the folded light curve:
 
 ![alt text](figs/sdss_fold.png "SDSS Stripe 82 RR Lyrae Folded Light Curve")
 
