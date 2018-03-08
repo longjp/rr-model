@@ -124,12 +124,14 @@ lcs <- c(lcsRR,lcsNOT)
 tms_FULL <- lapply(lcs,LCtoTM)
 names(tms_FULL) <- names(lcs)
 
-## downsampled to total of Nobs observations
-Nobs <- 20
+## downsampled randomly
+nmin <- 10
+nmax <- 30
+poss <- nmin:max
 for(ii in 1:length(lcs)){
     lc <- lcs[[ii]]
     lc <- lc[lc[,2]!="u",]
-    ix <- sample(1:nrow(lc),Nobs)
+    ix <- sample(1:nrow(lc),sample(poss,1))
     lcs[[ii]] <- lc[ix,]
 }
 tms <- lapply(lcs,LCtoTM)
