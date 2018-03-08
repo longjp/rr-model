@@ -125,9 +125,7 @@ tms_FULL <- lapply(lcs,LCtoTM)
 names(tms_FULL) <- names(lcs)
 
 ## downsampled randomly
-nmin <- 10
-nmax <- 30
-poss <- nmin:max
+poss <- 10:30
 for(ii in 1:length(lcs)){
     lc <- lcs[[ii]]
     lc <- lc[lc[,2]!="u",]
