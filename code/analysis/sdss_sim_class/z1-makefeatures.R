@@ -1,4 +1,5 @@
-### REWRITE UNCERTAINTY PIPELINE SO DO NOT COMPUTE FREQUENCY UNCERTAINTY
+### TODO: uncertainties should decrease with increasing n
+###       this is not the case for RSS uncertainty
 
 ## compute uncertainties on all parameter estimates
 ## output sds (square root diagonal of hessian) along with features
@@ -17,7 +18,14 @@ load("../../data/clean/sdss_sim_class.RData")
 load("z0-fit.RData")
 
 
-ComputeUncertainty <- function(coeffs,omega,lc,tem,use.errors=TRUE,use.dust=TRUE){
+## computes the fisher information, the hessian of the neg log like
+## can invert resulting matrix to determine asymptotic variance
+##
+## arguments
+##      coeffs : [mu,ebv,a,phase]
+##       omega : frequency
+##          lc : light curve
+ComputeFI <- function(coeffs,omega,lc,tem,use.errors=TRUE,use.dust=TRUE){
     if(use.dust){
         use.dust <- CheckNumberBands(lc)
     }
@@ -31,7 +39,7 @@ ComputeUncertainty <- function(coeffs,omega,lc,tem,use.errors=TRUE,use.dust=TRUE
     weights <- 1 / dat[[1]]$error^2
     nb <- dat[[2]]
     coeffs <- c(omega,coeffs)
-    return(solve(hessian(ComputeRSS,coeffs,mag=mag,tem=tem,nb=nb,t=t,dust=dust,weights=weights)))
+    return(hessian(ComputeRSS,coeffs,mag=mag,tem=tem,nb=nb,t=t,dust=dust,weights=weights))
 }
 
 ComputeRSS <- function(coeffs,mag,tem,nb,t,dust,weights){
@@ -63,7 +71,9 @@ print(paste("0.1%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N])
 print(paste("0.01%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N]) < 0.0001)))
 
 
-####### EXTRACT FEATURES
+
+
+####### ESTIMATE MODEL PARAMETERS AND UNCERTAINTIES
 ## a,ebv,phase,period,rss,variability measures,colors
 phis <- (1:100)/100
 
@@ -79,10 +89,10 @@ for(ii in 1:length(tms_FULL)){
     coeffs_FULL[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem_sdss)
 }
 
-coeffsu_FULL <- matrix(0,nrow=length(tms_FULL),ncol=5)
+coeffsu_FULL <- matrix(0,nrow=length(tms_FULL),ncol=4)
 for(ii in 1:nrow(coeffsu_FULL)){
-    u <- ComputeUncertainty(coeffs_FULL[ii,],1/period_est_FULL[ii],TMtoLC(tms_FULL[[ii]]),tem_sdss)
-    coeffsu_FULL[ii,] <- diag(u)
+    fi <- ComputeFI(coeffs_FULL[ii,],1/period_est_FULL[ii],TMtoLC(tms_FULL[[ii]]),tem_sdss)
+    coeffsu_FULL[ii,] <- diag(solve(fi[2:5,2:5]))
 }
 
 ## on poorly observed light curves, get features and uncertainties
@@ -99,49 +109,177 @@ for(ii in 1:length(tms)){
 
 coeffsu <- matrix(0,nrow=length(tms),ncol=4)
 for(ii in 1:nrow(coeffsu)){
-    u <- ComputeUncertainty(coeffs[ii,],1/period_est[ii],TMtoLC(tms[[ii]]),tem_sdss)
-    coeffsu[ii,] <- diag(solve(solve(u)[2:5,2:5]))
+    fi <- ComputeFI(coeffs[ii,],1/period_est[ii],TMtoLC(tms[[ii]]),tem_sdss)
+    coeffsu[ii,] <- diag(solve(fi[2:5,2:5]))
 }
 
 
+## occassionally covariances are negative due to hessian not being
+## psd which is caused by algorithm not converging. in these cases
+## infer standard deviation = 1/4 range of parameter (very large)
+#### TODO: why do more of the FULL have negative?
 sum(coeffsu<0)
+sum(coeffsu_FULL<0)
 
 ## bind period estimates and coefficients
 coeffs <- cbind(period_est,coeffs)
-coeffs_FULL <- cbind(period_est_FULL[,1],coeffs_FULL)
-
+coeffs_FULL <- cbind(period_est_FULL,coeffs_FULL)
 
 ## take square root of coeffsu
 coeffsu <- sqrt(coeffsu)
 coeffsu_FULL <- sqrt(coeffsu_FULL)
 
+## ## if uncertainty is negative, input 1/4 range
+## r_over_4 <- apply(apply(coeffs,2,range),2,diff)/4
+## for(ii in 1:ncol(coeffsu)){
+##     coeffsu[is.na(coeffsu[,ii]),ii] <- r_over_4[ii]
+## }
+## r_over_4 <- apply(apply(coeffs_FULL,2,range),2,diff)/4
+## for(ii in 1:ncol(coeffsu_FULL)){
+##     coeffsu_FULL[is.na(coeffsu_FULL[,ii]),ii] <- r_over_4[ii]
+## }
 
 
-## QUESTIONS
-## 1. negative uncertainty?
-## 2. if amplitude = 0 (such as for non-rrl), what does uncertainty mean?
+## add names to uncertainties
+fnames <- c("period","mu","ebv","amp","phase")
+fnames_sig <- c("mu_sig","ebv_sig","amp_sig","phase_sig")
+colnames(coeffs) <- fnames
+colnames(coeffs_FULL) <- fnames
+colnames(coeffsu) <- fnames_sig
+colnames(coeffsu_FULL) <- fnames_sig
 
-## compare LDA versus RF with original pipeline
-## if competitive, implement irina's idea with this data
-## if not, read up on kernalized lda, can you propagate feature uncertainty?
-## read a few of irina's articles
+npoints <- vapply(lapply(tms,TMtoLC),nrow,c(0))
+out <- aggregate(coeffsu[,4],by=list(npoints),FUN=function(x){median(x,na.rm=TRUE)})
+plot(out[,1],out[,2])
 
 
-## if we assume uncertainty is proportional to number of points, then easier from
-## an implementation perspective
+
+######## TODO: why only 74% of time for phase
+mean(coeffsu[,4] > coeffsu_FULL[,4])
+## mean(coeffsu[,4] > coeffsu_FULL[,4])
+## [1] 0.7440174
+out <- aggregate(coeffsu[,4],by=list(npoints),FUN=median)
+plot(out[,1],out[,2])
 
 
-## if uncertainty is negative, input 1/4 range
-r_over_4 <- apply(apply(coeffs,2,range),2,diff)/4
-for(ii in 1:ncol(coeffsu)){
-    coeffsu[is.na(coeffsu[,ii]),ii] <- r_over_4[ii]
+####
+#### compute rss and standard deviation of rss
+####
+
+ComputeResiduals <- function(lc,omega,coeffs,tem,use.errors,use.dust){
+    if(use.dust){
+        use.dust <- CheckNumberBands(lc)
+    }
+    CheckLC(lc)
+    tem <- CheckTemLC(tem,lc)
+    dat <- AugmentData(lc,tem,use.errors)
+    m <- dat[[1]]$mag
+    dust <- dat[[1]]$dust
+    t <- dat[[1]]$time
+    weights <- 1 / dat[[1]]$error^2
+    nb <- dat[[2]]
+    m <- m - rep.int(tem$abs_mag(1/omega,tem)[1,],nb)
+    rss_max <- sum((lm(m~dust,weights=weights)$residuals^2)*weights)
+    rss <- rep(0,length(phis))
+    gammaf <- ConstructGamma(t,nb,coeffs[4],omega,tem$template_funcs)
+    resid <- m - coeffs[1] - coeffs[2]*dust - coeffs[3]*gammaf
+    return(weights*resid^2)
 }
-r_over_4 <- apply(apply(coeffs_FULL,2,range),2,diff)/4
-for(ii in 1:ncol(coeffsu_FULL)){
-    coeffsu_FULL[is.na(coeffsu_FULL[,ii]),ii] <- r_over_4[ii]
+
+mss <- matrix(0,nrow=length(tms),ncol=2)
+colnames(mss) <- c("mss","mss_sd")
+for(ii in 1:length(tms)){
+    res <- ComputeResiduals(TMtoLC(tms[[ii]]),1/coeffs[ii,1],coeffs[ii,2:5],
+                            tem_sdss,use.errors=TRUE,use.dust=TRUE)
+    mss[ii,1] <- sum(res) / (length(res)-5)
+    mss[ii,2] <- sd(res) / sqrt(length(res))
+}
+
+mss_FULL <- matrix(0,nrow=length(tms_FULL),ncol=2)
+colnames(mss_FULL) <- c("mss","mss_sd")
+for(ii in 1:length(tms_FULL)){
+    res <- ComputeResiduals(TMtoLC(tms_FULL[[ii]]),1/coeffs_FULL[ii,1],coeffs_FULL[ii,2:5],
+                            tem_sdss,use.errors=TRUE,use.dust=TRUE)
+    mss_FULL[ii,1] <- sum(res) / (length(res)-5)
+    mss_FULL[ii,2] <- sd(res) / sqrt(length(res))
 }
 
 
+npoints <- vapply(lapply(tms,TMtoLC),nrow,c(0))
+out <- aggregate(mss[,1],by=list(npoints),FUN=mean)
+out2 <- aggregate(mss[,2],by=list(npoints),FUN=mean)
+par(mfcol=c(2,1))
+plot(out[,1],out[,2])
+plot(out2[,1],out2[,2])
+
+
+#### TODO: QUESTION: WHY is sd MSS LOWER FOR poorly sampled than well sampled
+mean(mss[,1] > mss_FULL[,1])
+a
+
+
+####
+#### compute period uncertainty due to vuong
+####
+
+## TODO: need to keep 2nd best period estimate for this part
+
+## estimates confidence of period estimate using baluev's method, one-sided
+PeriodConfidence <- function(lc,omega1,omega2,tem,phis=(1:100)/100,use.errors=TRUE,use.dust=TRUE){
+    phi1 <- phis[which.min(ComputeRSSPhase(lc,omega1,tem,phis,use.errors,use.dust))]
+    phi2 <- phis[which.min(ComputeRSSPhase(lc,omega2,tem,phis,use.errors,use.dust))]
+    coeffs1 <- ComputeCoeffsPhase(lc,omega1,phi1,tem,use.errors,use.dust)
+    coeffs2 <- ComputeCoeffsPhase(lc,omega2,phi2,tem,use.errors,use.dust)
+    r1 <- ComputeResiduals(lc,omega1,coeffs1,tem,use.errors,use.dust)
+    r2 <- ComputeResiduals(lc,omega2,coeffs2,tem,use.errors,use.dust)
+    return(pnorm(0,mean=mean(r1-r2),sd=sd(r1-r2)/sqrt(length(r1))))
+}
+
+
+
+## TODO: check that probability correct increases with increasing n
+
+
+####
+#### compute colors and uncertainties
+####
+ComputeColors <- function(tms,color_names){
+    com <- t(combn(1:length(color_names), 2))
+    cnames <- vapply(1:nrow(com),function(ix){paste(color_names[com[ix,]],collapse="-")},c("0"))
+    ## create matrices for storing colors and uncertainties
+    cols <- matrix(0,nrow=length(tms),ncol=nrow(com))
+    colsu <- matrix(0,nrow=length(tms),ncol=nrow(com))
+    colnames(cols) <- cnames
+    colnames(colsu) <- cnames
+    ## run through all light curves and all filters
+    for(ii in 1:length(tms)){
+        for(jj in 1:nrow(com)){
+            t1 <- tms[[ii]][[color_names[com[jj,1]]]][,2]
+            t2 <- tms[[ii]][[color_names[com[jj,2]]]][,2]
+            ## NAs if either filter has 0 obs
+            if(is.null(t1) | is.null(t2)){
+                cols[ii,jj] <- NA
+                colsu[ii,jj] <- NA
+            } else if((length(t1)==1) | (length(t2)==1)){
+                ## NAs if either filter has 1 obs
+                cols[ii,jj] <- mean(t1) - mean(t2)
+                colsu[ii,jj] <- NA
+            } else {
+                ## if at least two obs in each filter, compute means and sd
+                cols[ii,jj] <- mean(t1) - mean(t2)
+                colsu[ii,jj] <- sqrt(var(t1) / (length(t1) - 1)  + var(t2) / (length(t2) - 1))
+            }
+        }
+    }
+    return(list(cols=cols,colsu=colsu))
+}
+
+
+
+### TODO: how well does npoints predict uncertainty
+color_names <- unique(unlist(lapply(tms,names)))
+temp1 <- ComputeColors(tms,color_names)
+temp2 <- ComputeColors(tms_FULL,color_names)
 
 
 
@@ -218,5 +356,5 @@ coeffs_des <- ComputeCoeffs(lc_des,omega_est_des,tem_des)
 names(coeffs_des) <- c("mu","ebv","amp","phase")
 
 
-des_poor <- ComputeUncertainty(coeffs_des,omega_est_des,lc_des,tem_des)
+des_poor <- ComputeFI(coeffs_des,omega_est_des,lc_des,tem_des)
 des_poor
