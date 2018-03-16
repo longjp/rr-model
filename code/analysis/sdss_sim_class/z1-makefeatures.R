@@ -1,3 +1,5 @@
+### REWRITE UNCERTAINTY PIPELINE SO DO NOT COMPUTE FREQUENCY UNCERTAINTY
+
 ## compute uncertainties on all parameter estimates
 ## output sds (square root diagonal of hessian) along with features
 rm(list=ls())
@@ -45,14 +47,7 @@ ComputeRSS <- function(coeffs,mag,tem,nb,t,dust,weights){
 
 
 ####### CHECK PERIODS REASONABLE
-## fraction of times true period in top 5
 N <- sum(cl=="rr")
-print(paste0("accuracies, top ",topN,":"))
-print(paste("1%:",mean(within_x(period_est[1:N,],periods[1:N],0.01))))
-print(paste("0.1%:",mean(within_x(period_est[1:N,],periods[1:N],0.001))))
-print(paste("0.01%:",mean(within_x(period_est[1:N,],periods[1:N],0.0001))))
-print("")
-
 ## fraction of times period is best
 print("accuracies, top period:")
 period_est <- period_est[,1] ## just use best fit period
@@ -60,12 +55,17 @@ print(paste("1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.01
 print(paste("0.1%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.001)))
 print(paste("0.01%:",mean(abs((periods[1:N] - period_est[1:N])/periods[1:N]) < 0.0001)))
 
-
-
+## fraction of times period is best on FULL
+print("accuracies, top period:")
+period_est_FULL <- period_est_FULL[,1] ## just use best fit period
+print(paste("1%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N]) < 0.01)))
+print(paste("0.1%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N]) < 0.001)))
+print(paste("0.01%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N]) < 0.0001)))
 
 
 ####### EXTRACT FEATURES
 ## a,ebv,phase,period,rss,variability measures,colors
+phis <- (1:100)/100
 
 ## on full light curves, get features and uncertainties
 coeffs_FULL <- matrix(0,nrow=length(tms_FULL),ncol=4)
@@ -74,7 +74,9 @@ for(ii in 1:length(tms_FULL)){
     lc <- TMtoLC(tm)
     p_est <- period_est_FULL[ii]
     omega <- 1 / p_est
-    coeffs_FULL[ii,] <- ComputeCoeffs(lc,omega,tem_sdss)
+    rssphi <- ComputeRSSPhase(lc,omega,tem_sdss,phis)
+    phi <- phis[which.min(rssphi)]
+    coeffs_FULL[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem_sdss)
 }
 
 coeffsu_FULL <- matrix(0,nrow=length(tms_FULL),ncol=5)
@@ -90,16 +92,19 @@ for(ii in 1:length(tms)){
     lc <- TMtoLC(tm)
     p_est <- period_est[ii]
     omega <- 1 / p_est
-    coeffs[ii,] <- ComputeCoeffs(lc,omega,tem_sdss)
+    rssphi <- ComputeRSSPhase(lc,omega,tem_sdss,phis)
+    phi <- phis[which.min(rssphi)]
+    coeffs[ii,] <- ComputeCoeffsPhase(lc,omega,phi,tem_sdss)
 }
 
-coeffsu <- matrix(0,nrow=length(tms),ncol=5)
+coeffsu <- matrix(0,nrow=length(tms),ncol=4)
 for(ii in 1:nrow(coeffsu)){
     u <- ComputeUncertainty(coeffs[ii,],1/period_est[ii],TMtoLC(tms[[ii]]),tem_sdss)
-    coeffsu[ii,] <- diag(u)
+    coeffsu[ii,] <- diag(solve(solve(u)[2:5,2:5]))
 }
 
 
+sum(coeffsu<0)
 
 ## bind period estimates and coefficients
 coeffs <- cbind(period_est,coeffs)
