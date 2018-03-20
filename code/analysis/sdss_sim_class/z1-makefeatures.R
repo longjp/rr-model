@@ -1,6 +1,11 @@
 ### TODO: uncertainties should decrease with increasing n
 ###       this is not the case for RSS uncertainty
 
+
+####
+#### - There are strong correlations between class and feature errors
+#### - larger feature errors suggest not rrlyrae
+
 ## compute uncertainties on all parameter estimates
 ## output sds (square root diagonal of hessian) along with features
 rm(list=ls())
@@ -75,7 +80,7 @@ print(paste("0.01%:",mean(abs((periods[1:N] - period_est_FULL[1:N])/periods[1:N]
 
 ####### ESTIMATE MODEL PARAMETERS AND UNCERTAINTIES
 ## a,ebv,phase,period,rss,variability measures,colors
-phis <- (1:100)/100
+phis <- (1:1000)/1000
 
 ## on full light curves, get features and uncertainties
 coeffs_FULL <- matrix(0,nrow=length(tms_FULL),ncol=4)
@@ -114,13 +119,6 @@ for(ii in 1:nrow(coeffsu)){
 }
 
 
-## occassionally covariances are negative due to hessian not being
-## psd which is caused by algorithm not converging. in these cases
-## infer standard deviation = 1/4 range of parameter (very large)
-#### TODO: why do more of the FULL have negative?
-sum(coeffsu<0)
-sum(coeffsu_FULL<0)
-
 ## bind period estimates and coefficients
 coeffs <- cbind(period_est,coeffs)
 coeffs_FULL <- cbind(period_est_FULL,coeffs_FULL)
@@ -128,17 +126,6 @@ coeffs_FULL <- cbind(period_est_FULL,coeffs_FULL)
 ## take square root of coeffsu
 coeffsu <- sqrt(coeffsu)
 coeffsu_FULL <- sqrt(coeffsu_FULL)
-
-## ## if uncertainty is negative, input 1/4 range
-## r_over_4 <- apply(apply(coeffs,2,range),2,diff)/4
-## for(ii in 1:ncol(coeffsu)){
-##     coeffsu[is.na(coeffsu[,ii]),ii] <- r_over_4[ii]
-## }
-## r_over_4 <- apply(apply(coeffs_FULL,2,range),2,diff)/4
-## for(ii in 1:ncol(coeffsu_FULL)){
-##     coeffsu_FULL[is.na(coeffsu_FULL[,ii]),ii] <- r_over_4[ii]
-## }
-
 
 ## add names to uncertainties
 fnames <- c("period","mu","ebv","amp","phase")
@@ -148,18 +135,9 @@ colnames(coeffs_FULL) <- fnames
 colnames(coeffsu) <- fnames_sig
 colnames(coeffsu_FULL) <- fnames_sig
 
-npoints <- vapply(lapply(tms,TMtoLC),nrow,c(0))
-out <- aggregate(coeffsu[,4],by=list(npoints),FUN=function(x){median(x,na.rm=TRUE)})
-plot(out[,1],out[,2])
 
 
 
-######## TODO: why only 74% of time for phase
-mean(coeffsu[,4] > coeffsu_FULL[,4])
-## mean(coeffsu[,4] > coeffsu_FULL[,4])
-## [1] 0.7440174
-out <- aggregate(coeffsu[,4],by=list(npoints),FUN=median)
-plot(out[,1],out[,2])
 
 
 ####
@@ -206,16 +184,48 @@ for(ii in 1:length(tms_FULL)){
 
 
 npoints <- vapply(lapply(tms,TMtoLC),nrow,c(0))
-out <- aggregate(mss[,1],by=list(npoints),FUN=mean)
-out2 <- aggregate(mss[,2],by=list(npoints),FUN=mean)
+out <- aggregate(mss[,1],by=list(npoints),FUN=median)
+out2 <- aggregate(mss[,2],by=list(npoints),FUN=median)
 par(mfcol=c(2,1))
 plot(out[,1],out[,2])
 plot(out2[,1],out2[,2])
 
 
+dat <- data.frame(cl=cl,mss)
+g <- ggplot(dat, aes(mss))
+g + geom_density(aes(fill=factor(cl)), alpha=0.8) + 
+    labs(title="Density plot", 
+         x="mss",
+         fill="class") + xlim(0, 10)
+
+dat <- data.frame(cl=cl,mss,coeffs)
+dat$g <- dat$amp / dat$mss
+g <- ggplot(dat, aes(g))
+g + geom_density(aes(fill=factor(cl)), alpha=0.8) + 
+    labs(title="Density plot", 
+         x="g",
+         fill="class") + xlim(0, 2)
+
+
+
+dat <- data.frame(cl=cl,mss_FULL,coeffs_FULL)
+dat$g <- dat$amp / dat$mss
+g <- ggplot(dat, aes(g))
+g + geom_density(aes(fill=factor(cl)), alpha=0.8) + 
+    labs(title="Density plot", 
+         x="g",
+         fill="class") + xlim(0, 2)
 #### TODO: QUESTION: WHY is sd MSS LOWER FOR poorly sampled than well sampled
+#### TODO: MSS lower for FULL 
 mean(mss[,1] > mss_FULL[,1])
-a
+sum(mss_FULL[,2] < mss[,2])
+
+
+
+
+
+
+
 
 
 ####
