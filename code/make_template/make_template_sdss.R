@@ -468,8 +468,7 @@ tem$model_error <- rep(0,length(tem$dust))
 names(tem$model_error) <- names(tem$dust)
 
 
-## TODO: improve this by using different level of error
-## in each filter, need to trust errors more before doing this
+## compute mean error
 med_res <- matrix(0,ncol=length(bands),nrow=length(tms))
 for(ii in 1:nrow(med_res)){
     lc <- TMtoLC(tms[[ii]])
