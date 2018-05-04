@@ -88,7 +88,6 @@ PhaseGridAll <- function(X){
 ## solves the optimization problem
 ##    argmin_{a,Y} \sum_i ||(X[i,,] - a[i]Y||_F^2
 ##  by iterating updates for a and Y where we constrain ||a||_2 = 1
-##  see description.tex for why this is done
 ##
 ##
 ## arguments
