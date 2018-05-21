@@ -1,7 +1,7 @@
 ### plot outputs from ls periodogram applied to well and poorly sampled data
 rm(list=ls())
 library(multiband)
-load("results.RData")
+load("0-fit.RData")
 load("../../data/clean/sdss_sim_class.RData")
 
 
@@ -95,3 +95,8 @@ plot(out[,"g","amp"],
      ylab="period (days)",cex.lab=1.3,
      log='x',xlim=c(.01,5),ylim=c(.2,1))
 dev.off()
+
+ixs <- (1:length(cl))[out[,"g","amp"]==1]
+
+
+
