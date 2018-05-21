@@ -1,5 +1,5 @@
 Title:
-Mapping the Milky Way Halo: Modeling and Classification of Sparsely Sampled Vector Valued Functions
+Modeling and Classification of Sparsely Sampled Vector Valued Functions
 
 Abstract:
 Time domain astronomical surveys measure the brightness of celestial objects over time. These surveys provide insight into some of the most fundamental questions in cosmology, such as how galaxies form and the rate of expansion of the universe. Stars observed in time domain surveys are recorded as vector valued functions sampled at irregular intervals. Modern time domain surveys collect tens of millions of such functions. Generating scientific insights from this data requires solving many statistical challenges. In this talk, I illustrate progress towards mapping the Milky Way halo using RR Lyrae variable stars. Numerous statistical challenges arise including modeling and classification of vector valued functions, fitting approximate models in the presence of heteroskedastic errors, and estimation of the intensity of a non-homogeneous Poisson process contaminated with measurement error. Preliminary results are shown for the Sloan Digital Sky Survey (SDSS) Stripe 82 and the Dark Energy Survey (DES).
