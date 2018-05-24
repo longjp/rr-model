@@ -50,11 +50,19 @@ feats_FULL <- ComputeColorMatrix(tms_FULL,band_names)
 
 
 ## some manual checks
-head(color_feats)
+head(feats)
+head(feats_FULL)
 mean(tms[[2]][["g"]]$mag) - mean(tms[[2]][["r"]]$mag)
 sqrt(var(tms[[2]][["g"]]$mag)/length(tms[[2]][["g"]]$mag) + var(tms[[2]][["r"]]$mag)/length(tms[[2]][["r"]]$mag))
 
 
+## get number of observatiosn for poor and well sampled
+n <- vapply(tms,function(x){sum(vapply(x,nrow,c(0)))},c(0))
+n_FULL <- vapply(tms_FULL,function(x){sum(vapply(x,nrow,c(0)))},c(0))
 
 
-save(feats,feats_FULL,cl,file="z2-color_feats.RData")
+hist(n)
+hist(n_FULL)
+
+
+save(feats,feats_FULL,n,n_FULL,cl,file="z2-color_feats.RData")

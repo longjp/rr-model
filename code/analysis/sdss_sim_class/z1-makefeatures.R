@@ -169,7 +169,7 @@ colnames(mss) <- c("mss","mss_sd")
 for(ii in 1:length(tms)){
     res <- ComputeResiduals(TMtoLC(tms[[ii]]),1/coeffs[ii,1],coeffs[ii,2:5],
                             tem_sdss,use.errors=TRUE,use.dust=TRUE)
-    mss[ii,1] <- sum(res) / (length(res)-5)
+    mss[ii,1] <- sum(res) / (length(res)-9)
     mss[ii,2] <- sd(res) / sqrt(length(res))
 }
 
@@ -178,7 +178,7 @@ colnames(mss_FULL) <- c("mss","mss_sd")
 for(ii in 1:length(tms_FULL)){
     res <- ComputeResiduals(TMtoLC(tms_FULL[[ii]]),1/coeffs_FULL[ii,1],coeffs_FULL[ii,2:5],
                             tem_sdss,use.errors=TRUE,use.dust=TRUE)
-    mss_FULL[ii,1] <- sum(res) / (length(res)-5)
+    mss_FULL[ii,1] <- sum(res) / (length(res)-9)
     mss_FULL[ii,2] <- sd(res) / sqrt(length(res))
 }
 
@@ -198,6 +198,14 @@ g + geom_density(aes(fill=factor(cl)), alpha=0.8) +
          x="mss",
          fill="class") + xlim(0, 10)
 
+dev.new()
+dat <- data.frame(cl=cl,mss_FULL)
+g <- ggplot(dat, aes(mss))
+g + geom_density(aes(fill=factor(cl)), alpha=0.8) + 
+    labs(title="Density plot", 
+         x="mss",
+         fill="class") + xlim(0, 10)
+
 dat <- data.frame(cl=cl,mss,coeffs)
 dat$g <- dat$amp / dat$mss
 g <- ggplot(dat, aes(g))
@@ -207,7 +215,7 @@ g + geom_density(aes(fill=factor(cl)), alpha=0.8) +
          fill="class") + xlim(0, 2)
 
 
-
+dev.new()
 dat <- data.frame(cl=cl,mss_FULL,coeffs_FULL)
 dat$g <- dat$amp / dat$mss
 g <- ggplot(dat, aes(g))
@@ -219,6 +227,9 @@ g + geom_density(aes(fill=factor(cl)), alpha=0.8) +
 #### TODO: MSS lower for FULL 
 mean(mss[,1] > mss_FULL[,1])
 sum(mss_FULL[,2] < mss[,2])
+
+
+
 
 
 
