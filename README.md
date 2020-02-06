@@ -1,15 +1,14 @@
 # RR Lyrae Template Construction and Fitting #
 
-Most users will be interested in fitting the templates. Demos for fitting the templates are contained in
+This repository contains code for **building** templates used in [Stringer et. al. 2019](https://doi.org/10.3847/1538-3881/ab1f46).
 
-- code/fit_template/demo_R.ipynb
-- code/fit_template/demo_python.ipynb
+If you only are interested in **fitting** the templates (most likely scenario) please see [https://github.com/longjp/rr-templates](https://github.com/longjp/rr-templates).
+
 
 ### Folders ###
 
 - pres : presentations given based on research
 - ms   : notes about some aspects of the code
-- lit  : articles relevant to project
 - code : code (and data) for building, fitting, and testing RRL template
 
 
