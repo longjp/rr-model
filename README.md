@@ -2,7 +2,7 @@
 
 This repository contains code for **building** templates used in [Stringer et. al. 2019](https://doi.org/10.3847/1538-3881/ab1f46). If you only are interested in **fitting** the templates (most likely scenario) please see [https://github.com/longjp/rr-templates](https://github.com/longjp/rr-templates).
 
-Please Stringer if you use this code. Contact James Long (jplong@mdanderson.org) if you have any questions about the code.
+Please cite Stringer if you use this code in any published work. Contact James Long (jplong@mdanderson.org) if you have any questions about the code.
 
 
 ### Folders ###
